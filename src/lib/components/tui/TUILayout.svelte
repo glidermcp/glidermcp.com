@@ -1,14 +1,18 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import TUIMenuBar from './TUIMenuBar.svelte';
 	import TUIStatusBar from './TUIStatusBar.svelte';
+	import { keyboardManager } from '$lib/services/keyboard-manager';
+	import { focusedPanel as focusedPanelStore, togglePanel } from '$stores/keyboard';
 
 	interface Props {
 		title?: string;
 		leftPanel?: Snippet;
 		rightPanel?: Snippet;
 		leftPanelWidth?: string;
-		focusedPanel?: 'left' | 'right';
+		leftPanelTitle?: string;
+		rightPanelTitle?: string;
 	}
 
 	let {
@@ -16,8 +20,20 @@
 		leftPanel,
 		rightPanel,
 		leftPanelWidth = '220px',
-		focusedPanel = 'left'
+		leftPanelTitle = '',
+		rightPanelTitle = ''
 	}: Props = $props();
+
+	const focusedPanel = $derived($focusedPanelStore);
+
+	// Initialize keyboard manager on mount
+	onMount(() => {
+		keyboardManager.init();
+	});
+
+	onDestroy(() => {
+		keyboardManager.destroy();
+	});
 </script>
 
 <div class="tui-layout">
