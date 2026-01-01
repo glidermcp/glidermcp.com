@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { theme, applyTheme } from '$stores/theme';
+	import { theme, applyTheme, type ThemeType } from '$stores/theme';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -16,7 +16,7 @@
 		applyTheme($theme);
 
 		// Subscribe to theme changes
-		const unsubscribe = theme.subscribe((value) => {
+		const unsubscribe = theme.subscribe((value: ThemeType) => {
 			applyTheme(value);
 		});
 

@@ -12,14 +12,7 @@
 		expandSection,
 		collapseSection
 	} from '$stores/keyboard';
-
-	export interface NavItem {
-		id: string;
-		label: string;
-		icon?: string;
-		children?: NavItem[];
-		disabled?: boolean;
-	}
+	import type { NavItem } from '$types/navigation';
 
 	interface Props {
 		items: NavItem[];

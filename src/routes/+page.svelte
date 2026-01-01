@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import TUILayout from '$components/tui/TUILayout.svelte';
-	import TUINavigationTree, { type NavItem } from '$components/tui/TUINavigationTree.svelte';
+	import TUINavigationTree from '$components/tui/TUINavigationTree.svelte';
+	import type { NavItem } from '$types/navigation';
 	import Logo from '$components/tui/Logo.svelte';
+	import { PlaygroundView } from '$components/playground';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
 		focusedPanel,
@@ -160,17 +162,7 @@ cd glider</pre>
 "What types implement IRepository?"</pre>
 
 			{:else if selectedId === 'playground'}
-				<h2>Playground</h2>
-				<p class="muted">
-					Connect to a local Glider MCP server to test tools interactively.
-				</p>
-				<div class="connection-status">
-					<span class="status-indicator disconnected"></span>
-					<span>Not connected - Start server at localhost:3001</span>
-				</div>
-				<p class="hint">
-					<kbd>F5</kbd> to execute selected tool
-				</p>
+				<PlaygroundView />
 
 			{:else if selectedId === 'tools'}
 				<h2>Available Tools</h2>
@@ -358,41 +350,8 @@ cd glider</pre>
 		word-break: break-word;
 	}
 
-	.connection-status {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-sm);
-		padding: var(--spacing-md);
-		background-color: var(--bg-secondary);
-		border: 1px solid var(--border-dim);
-		color: var(--text-muted);
-		margin: var(--spacing-md) 0;
-	}
-
-	.status-indicator {
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-	}
-
-	.status-indicator.disconnected {
-		background-color: var(--text-muted);
-	}
-
-	.status-indicator.connected {
-		background-color: var(--accent);
-	}
-
 	.hint {
 		color: var(--text-muted);
-		font-size: var(--font-size-sm);
-	}
-
-	kbd {
-		background-color: var(--status-key-bg);
-		color: var(--status-key-fg);
-		padding: 2px var(--spacing-xs);
-		font-family: var(--font-mono);
 		font-size: var(--font-size-sm);
 	}
 

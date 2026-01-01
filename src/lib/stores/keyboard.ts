@@ -23,10 +23,10 @@ export const modalOpen = atom<boolean>(false);
 export const contentScrollTop = atom<number>(0);
 
 // Derived: is left panel focused
-export const isLeftFocused = computed(focusedPanel, (panel) => panel === 'left');
+export const isLeftFocused = computed(focusedPanel, (panel: FocusedPanel) => panel === 'left');
 
 // Derived: is right panel focused
-export const isRightFocused = computed(focusedPanel, (panel) => panel === 'right');
+export const isRightFocused = computed(focusedPanel, (panel: FocusedPanel) => panel === 'right');
 
 /**
  * Toggle between left and right panels
