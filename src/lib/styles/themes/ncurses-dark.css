@@ -1,0 +1,79 @@
+/* ncurses-inspired dark theme - Classic terminal aesthetic */
+:root[data-theme='ncurses-dark'],
+:root:not([data-theme]) {
+	/* Background colors */
+	--bg-primary: #000000;
+	--bg-secondary: #0a0a0a;
+	--bg-tertiary: #111111;
+	--bg-panel: #050505;
+
+	/* Text colors */
+	--text-primary: #00ff00;
+	--text-secondary: #00cc00;
+	--text-muted: #008800;
+	--text-dim: #005500;
+
+	/* Border colors */
+	--border: #00ff00;
+	--border-dim: #00aa00;
+	--border-focus: #00ffff;
+
+	/* Accent colors */
+	--accent: #00ffff;
+	--accent-dim: #00aaaa;
+
+	/* Selection */
+	--selection-bg: rgba(0, 255, 0, 0.2);
+	--selection-fg: #ffffff;
+
+	/* Status colors */
+	--success: #00ff00;
+	--warning: #ffff00;
+	--error: #ff4444;
+	--info: #00ffff;
+
+	/* Panel header */
+	--panel-header-bg: #001100;
+	--panel-header-fg: #00ff00;
+
+	/* Menu bar */
+	--menu-bg: #000000;
+	--menu-fg: #00ff00;
+	--menu-hover-bg: #003300;
+
+	/* Status bar */
+	--status-bg: #001100;
+	--status-fg: #00ff00;
+	--status-key-bg: #003300;
+	--status-key-fg: #00ffff;
+
+	/* Focus indicator */
+	--focus-ring: #00ffff;
+	--focus-bg: rgba(0, 255, 255, 0.1);
+
+	/* Typography */
+	--font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
+	--font-size-base: 14px;
+	--font-size-sm: 12px;
+	--font-size-lg: 16px;
+
+	/* Spacing */
+	--spacing-xs: 2px;
+	--spacing-sm: 4px;
+	--spacing-md: 8px;
+	--spacing-lg: 16px;
+	--spacing-xl: 24px;
+
+	/* Box drawing (for reference in JS) */
+	--box-horizontal: '─';
+	--box-vertical: '│';
+	--box-top-left: '┌';
+	--box-top-right: '┐';
+	--box-bottom-left: '└';
+	--box-bottom-right: '┘';
+	--box-tee-right: '├';
+	--box-tee-left: '┤';
+	--box-tee-down: '┬';
+	--box-tee-up: '┴';
+	--box-cross: '┼';
+}

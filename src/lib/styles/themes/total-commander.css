@@ -1,0 +1,78 @@
+/* Total Commander blue/white theme - Classic file manager aesthetic */
+:root[data-theme='total-commander'] {
+	/* Background colors */
+	--bg-primary: #ffffff;
+	--bg-secondary: #f0f0f0;
+	--bg-tertiary: #e8e8e8;
+	--bg-panel: #ffffff;
+
+	/* Text colors */
+	--text-primary: #000000;
+	--text-secondary: #333333;
+	--text-muted: #666666;
+	--text-dim: #999999;
+
+	/* Border colors */
+	--border: #0000aa;
+	--border-dim: #000088;
+	--border-focus: #0000ff;
+
+	/* Accent colors */
+	--accent: #0000ff;
+	--accent-dim: #0000aa;
+
+	/* Selection */
+	--selection-bg: #0000aa;
+	--selection-fg: #ffffff;
+
+	/* Status colors */
+	--success: #008800;
+	--warning: #cc8800;
+	--error: #cc0000;
+	--info: #0000cc;
+
+	/* Panel header - Classic Total Commander blue */
+	--panel-header-bg: #0000aa;
+	--panel-header-fg: #ffffff;
+
+	/* Menu bar */
+	--menu-bg: #c0c0c0;
+	--menu-fg: #000000;
+	--menu-hover-bg: #0000aa;
+
+	/* Status bar */
+	--status-bg: #c0c0c0;
+	--status-fg: #000000;
+	--status-key-bg: #0000aa;
+	--status-key-fg: #ffffff;
+
+	/* Focus indicator */
+	--focus-ring: #0000ff;
+	--focus-bg: rgba(0, 0, 170, 0.1);
+
+	/* Typography */
+	--font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
+	--font-size-base: 14px;
+	--font-size-sm: 12px;
+	--font-size-lg: 16px;
+
+	/* Spacing */
+	--spacing-xs: 2px;
+	--spacing-sm: 4px;
+	--spacing-md: 8px;
+	--spacing-lg: 16px;
+	--spacing-xl: 24px;
+
+	/* Box drawing (for reference in JS) */
+	--box-horizontal: '─';
+	--box-vertical: '│';
+	--box-top-left: '┌';
+	--box-top-right: '┐';
+	--box-bottom-left: '└';
+	--box-bottom-right: '┘';
+	--box-tee-right: '├';
+	--box-tee-left: '┤';
+	--box-tee-down: '┬';
+	--box-tee-up: '┴';
+	--box-cross: '┼';
+}

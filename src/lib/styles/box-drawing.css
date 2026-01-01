@@ -1,0 +1,97 @@
+/* Box-drawing character utilities */
+
+/* Box drawing character classes for use in pseudo-elements */
+.box-border {
+	font-family: var(--font-mono);
+	line-height: 1;
+}
+
+/* Panel border styles using actual characters */
+.box-panel {
+	position: relative;
+	border: 1px solid var(--border);
+}
+
+/* Box characters as content */
+.box-char-h::before { content: '─'; }
+.box-char-v::before { content: '│'; }
+.box-char-tl::before { content: '┌'; }
+.box-char-tr::before { content: '┐'; }
+.box-char-bl::before { content: '└'; }
+.box-char-br::before { content: '┘'; }
+.box-char-t-right::before { content: '├'; }
+.box-char-t-left::before { content: '┤'; }
+.box-char-t-down::before { content: '┬'; }
+.box-char-t-up::before { content: '┴'; }
+.box-char-cross::before { content: '┼'; }
+
+/* Tree drawing characters */
+.tree-branch::before { content: '├─ '; }
+.tree-branch-last::before { content: '└─ '; }
+.tree-pipe::before { content: '│  '; }
+.tree-space::before { content: '   '; }
+
+/* Expanded/collapsed indicators */
+.tree-expanded::before { content: '▼ '; }
+.tree-collapsed::before { content: '▶ '; }
+
+/* ASCII-style borders using box-shadow technique */
+.ascii-border {
+	box-shadow:
+		inset 1px 0 0 0 var(--border),
+		inset -1px 0 0 0 var(--border),
+		inset 0 1px 0 0 var(--border),
+		inset 0 -1px 0 0 var(--border);
+}
+
+/* Focus state for panels */
+.panel-focus {
+	box-shadow:
+		inset 2px 0 0 0 var(--border-focus),
+		inset -2px 0 0 0 var(--border-focus),
+		inset 0 2px 0 0 var(--border-focus),
+		inset 0 -2px 0 0 var(--border-focus);
+}
+
+/* Horizontal line/separator */
+.box-separator {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	color: var(--border);
+}
+
+.box-separator::before {
+	content: '├';
+}
+
+.box-separator::after {
+	content: '┤';
+}
+
+.box-separator-line {
+	flex: 1;
+	height: 1px;
+	background:
+		repeating-linear-gradient(
+			to right,
+			var(--border) 0,
+			var(--border) 8px,
+			transparent 8px,
+			transparent 9px
+		);
+}
+
+/* Double-line borders for headers */
+.box-double-h::before { content: '═'; }
+.box-double-v::before { content: '║'; }
+.box-double-tl::before { content: '╔'; }
+.box-double-tr::before { content: '╗'; }
+.box-double-bl::before { content: '╚'; }
+.box-double-br::before { content: '╝'; }
+
+/* Status indicators */
+.status-connected::before { content: '●'; color: var(--success); }
+.status-disconnected::before { content: '○'; color: var(--text-muted); }
+.status-loading::before { content: '◐'; color: var(--warning); }
+.status-error::before { content: '●'; color: var(--error); }

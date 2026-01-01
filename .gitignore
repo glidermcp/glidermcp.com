@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+.svelte-kit/
+build/
+.vercel/
+.netlify/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Cache
+.cache/
+.turbo/
+
+# Claude
+.claude/
