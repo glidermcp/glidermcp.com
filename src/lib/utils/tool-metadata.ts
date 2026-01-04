@@ -1,9 +1,9 @@
 /**
  * Tool Metadata Definitions
- * All 8 Glider MCP tools with their schemas, parameters, and examples
+ * All 12 Glider MCP tools with their schemas, parameters, and examples
  */
 
-export type ToolCategory = 'diagnostics' | 'solution' | 'search' | 'analysis';
+export type ToolCategory = 'diagnostics' | 'solution' | 'search' | 'analysis' | 'refactoring' | 'external';
 
 export interface ToolParameter {
 	name: string;
@@ -40,7 +40,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	solution: {
 		label: 'Solution Management',
-		description: 'Load and unload .NET solutions'
+		description: 'Load and unload .NET solutions and projects'
 	},
 	search: {
 		label: 'Search',
@@ -49,11 +49,19 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	analysis: {
 		label: 'Analysis',
 		description: 'Get detailed type and method information'
+	},
+	refactoring: {
+		label: 'Refactoring',
+		description: 'Rename symbols and move types/members'
+	},
+	external: {
+		label: 'External Source',
+		description: 'View source code of NuGet/framework types'
 	}
 };
 
 /**
- * All tool metadata
+ * All 12 tool metadata
  */
 export const TOOLS: ToolMetadata[] = [
 	// Diagnostics
@@ -96,6 +104,29 @@ export const TOOLS: ToolMetadata[] = [
 			}
 		],
 		responseDescription: 'Returns list of projects in the solution'
+	},
+	{
+		id: 'load_project',
+		name: 'load_project',
+		displayName: 'Load Project',
+		description: 'Loads a standalone C# project (.csproj file) for analysis when no solution file exists.',
+		category: 'solution',
+		parameters: [
+			{
+				name: 'projectPath',
+				type: 'string',
+				description: 'The absolute path to the .csproj file to load.',
+				required: true,
+				placeholder: '/path/to/Project.csproj'
+			}
+		],
+		examples: [
+			{
+				description: 'Load a standalone project',
+				params: { projectPath: '/Users/dev/MyProject/MyProject.csproj' }
+			}
+		],
+		responseDescription: 'Returns project information'
 	},
 	{
 		id: 'unload_solution',
@@ -295,6 +326,205 @@ export const TOOLS: ToolMetadata[] = [
 			}
 		],
 		responseDescription: 'Returns method signature with parameters, return type, and documentation'
+	},
+
+	// Refactoring
+	{
+		id: 'rename_symbol',
+		name: 'rename_symbol',
+		displayName: 'Rename Symbol',
+		description: 'Renames a symbol throughout the solution with semantic awareness. Unlike grep-based renaming, this correctly distinguishes between different symbols with the same name.',
+		category: 'refactoring',
+		parameters: [
+			{
+				name: 'symbolName',
+				type: 'string',
+				description: 'Name of the symbol to rename (simple or fully qualified).',
+				required: true,
+				placeholder: 'OldClassName'
+			},
+			{
+				name: 'newName',
+				type: 'string',
+				description: 'The new name for the symbol.',
+				required: true,
+				placeholder: 'NewClassName'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Optional project name to limit the search scope.',
+				required: false,
+				placeholder: 'MyProject'
+			},
+			{
+				name: 'applyChanges',
+				type: 'boolean',
+				description: 'If true (default), applies changes. If false, returns preview only.',
+				required: false,
+				default: true
+			}
+		],
+		examples: [
+			{
+				description: 'Rename a class',
+				params: { symbolName: 'OldClassName', newName: 'NewClassName' }
+			},
+			{
+				description: 'Preview rename without applying',
+				params: { symbolName: 'OldName', newName: 'NewName', applyChanges: false }
+			}
+		],
+		responseDescription: 'Returns files changed, locations modified, and unified diff'
+	},
+	{
+		id: 'move_type',
+		name: 'move_type',
+		displayName: 'Move Type',
+		description: 'Moves a type to a different file and/or namespace. Automatically updates all references and adds required using directives.',
+		category: 'refactoring',
+		parameters: [
+			{
+				name: 'typeName',
+				type: 'string',
+				description: 'Name of the type to move (simple or fully qualified).',
+				required: true,
+				placeholder: 'MyClass'
+			},
+			{
+				name: 'targetFilePath',
+				type: 'string',
+				description: 'Target file path. If not specified, creates new file based on type name.',
+				required: false,
+				placeholder: '/path/to/NewFile.cs'
+			},
+			{
+				name: 'targetNamespace',
+				type: 'string',
+				description: 'Target namespace. If not specified, keeps original namespace.',
+				required: false,
+				placeholder: 'MyApp.NewNamespace'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Optional project name to limit the search scope.',
+				required: false,
+				placeholder: 'MyProject'
+			},
+			{
+				name: 'applyChanges',
+				type: 'boolean',
+				description: 'If true (default), applies changes. If false, returns preview only.',
+				required: false,
+				default: true
+			}
+		],
+		examples: [
+			{
+				description: 'Move type to new file',
+				params: { typeName: 'MyClass', targetFilePath: '/path/to/NewFile.cs' }
+			},
+			{
+				description: 'Move type to new namespace',
+				params: { typeName: 'MyClass', targetNamespace: 'MyApp.NewNamespace' }
+			}
+		],
+		responseDescription: 'Returns source and target locations, files changed/created, and diff'
+	},
+	{
+		id: 'move_member',
+		name: 'move_member',
+		displayName: 'Move Member',
+		description: 'Moves a member (method, property, field, etc.) from one type to another. Automatically updates all references.',
+		category: 'refactoring',
+		parameters: [
+			{
+				name: 'memberName',
+				type: 'string',
+				description: 'Name of the member to move.',
+				required: true,
+				placeholder: 'MyMethod'
+			},
+			{
+				name: 'sourceTypeName',
+				type: 'string',
+				description: 'Name of the type containing the member.',
+				required: true,
+				placeholder: 'SourceClass'
+			},
+			{
+				name: 'targetTypeName',
+				type: 'string',
+				description: 'Name of the type to move the member to.',
+				required: true,
+				placeholder: 'TargetClass'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Optional project name to limit the search scope.',
+				required: false,
+				placeholder: 'MyProject'
+			},
+			{
+				name: 'applyChanges',
+				type: 'boolean',
+				description: 'If true (default), applies changes. If false, returns preview only.',
+				required: false,
+				default: true
+			}
+		],
+		examples: [
+			{
+				description: 'Move method to another class',
+				params: { memberName: 'ProcessData', sourceTypeName: 'OldClass', targetTypeName: 'NewClass' }
+			}
+		],
+		responseDescription: 'Returns source and target types, files changed, and diff'
+	},
+
+	// External Source
+	{
+		id: 'view_external_definition',
+		name: 'view_external_definition',
+		displayName: 'View External Definition',
+		description: 'Views the source code of external symbols (types, methods, properties) from NuGet packages or framework assemblies. Attempts SourceLink resolution first, then falls back to ILSpy decompilation.',
+		category: 'external',
+		parameters: [
+			{
+				name: 'symbolName',
+				type: 'string',
+				description: 'Name of the symbol to look up (simple or fully qualified).',
+				required: true,
+				placeholder: 'JsonSerializer'
+			},
+			{
+				name: 'assemblyHint',
+				type: 'string',
+				description: 'Assembly name hint to filter results when multiple matches exist.',
+				required: false,
+				placeholder: 'System.Text.Json'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Optional project name to limit the search scope.',
+				required: false,
+				placeholder: 'MyProject'
+			}
+		],
+		examples: [
+			{
+				description: 'View JsonSerializer source',
+				params: { symbolName: 'JsonSerializer' }
+			},
+			{
+				description: 'View with assembly hint',
+				params: { symbolName: 'JsonSerializer', assemblyHint: 'System.Text.Json' }
+			}
+		],
+		responseDescription: 'Returns source code, assembly info, and source origin (SourceLink or decompiled)'
 	}
 ];
 

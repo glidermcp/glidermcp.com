@@ -17,7 +17,9 @@
 			diagnostics: [],
 			solution: [],
 			search: [],
-			analysis: []
+			analysis: [],
+			refactoring: [],
+			external: []
 		};
 
 		for (const tool of TOOLS) {
@@ -30,7 +32,7 @@
 	// Flatten for keyboard navigation
 	const flatTools = $derived.by(() => {
 		const result: { toolId: string; categoryIndex: number }[] = [];
-		const categories: ToolCategory[] = ['diagnostics', 'solution', 'search', 'analysis'];
+		const categories: ToolCategory[] = ['diagnostics', 'solution', 'search', 'analysis', 'refactoring', 'external'];
 
 		for (let ci = 0; ci < categories.length; ci++) {
 			for (const tool of toolsByCategory[categories[ci]]) {
