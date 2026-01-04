@@ -1,9 +1,30 @@
 <script lang="ts">
-	import { lastResponse, executionState, clearResponse } from '$stores/playground';
+	import { lastResponse, executionState, clearResponse, selectedToolId } from '$stores/playground';
 	import { formatDuration } from '$stores/history';
+	import ResponseVisualizer from './ResponseVisualizer.svelte';
 
 	const response = $derived($lastResponse);
 	const state = $derived($executionState);
+	const toolId = $derived($selectedToolId);
+
+	// Toggle between raw and visual view
+	let viewMode = $state<'raw' | 'visual'>('visual');
+
+	// Check if current tool supports visualization
+	const supportsVisualization = $derived.by(() => {
+		const visualizableTools = [
+			'get_type_info',
+			'get_method_signature',
+			'find_usages',
+			'find_implementation',
+			'load_solution'
+		];
+		return visualizableTools.includes(toolId);
+	});
+
+	function toggleViewMode(): void {
+		viewMode = viewMode === 'raw' ? 'visual' : 'raw';
+	}
 
 	function formatJson(data: unknown): string {
 		try {
@@ -35,6 +56,17 @@
 		{#if response}
 			<div class="header-actions">
 				<span class="duration">{formatDuration(response.duration)}</span>
+				{#if supportsVisualization && response.success}
+					<button
+						type="button"
+						class="action-btn"
+						class:active={viewMode === 'visual'}
+						onclick={toggleViewMode}
+						title="Toggle visualization"
+					>
+						{viewMode === 'visual' ? 'Raw' : 'Visual'}
+					</button>
+				{/if}
 				<button type="button" class="action-btn" onclick={copyToClipboard} title="Copy to clipboard">
 					Copy
 				</button>
@@ -57,7 +89,13 @@
 					<span class="indicator success">✓</span>
 					<span>Success</span>
 				</div>
-				<pre class="response-data">{formatJson(response.data)}</pre>
+				{#if supportsVisualization && viewMode === 'visual'}
+					<div class="visualization-wrapper">
+						<ResponseVisualizer {toolId} data={response.data} />
+					</div>
+				{:else}
+					<pre class="response-data">{formatJson(response.data)}</pre>
+				{/if}
 			{:else}
 				<div class="error-indicator">
 					<span class="indicator error">✗</span>
@@ -121,6 +159,11 @@
 	.action-btn:hover {
 		color: var(--text-secondary);
 		border-color: var(--border);
+	}
+
+	.action-btn.active {
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 
 	.response-content {
@@ -197,6 +240,14 @@
 
 	.response-data {
 		color: var(--text-primary);
+	}
+
+	.visualization-wrapper {
+		flex: 1;
+		border: 1px solid var(--border-dim);
+		background-color: var(--bg-secondary);
+		overflow: hidden;
+		min-height: 200px;
 	}
 
 	.response-error {
