@@ -2,7 +2,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { toggleTheme } from '$stores/theme';
-	import { togglePanel, setModalOpen } from '$stores/keyboard';
+	import { togglePanel } from '$stores/keyboard';
+	import { showGame } from '$stores/game';
 
 	interface StatusKey {
 		key: string;
@@ -17,9 +18,6 @@
 	}
 
 	const defaultKeys: StatusKey[] = [
-		{ key: 'F1', label: 'Help', action: 'help' },
-		{ key: 'F3', label: 'View', action: 'view' },
-		{ key: 'F5', label: 'Run', action: 'execute' },
 		{ key: 'F9', label: 'Theme', action: 'theme' },
 		{ key: 'Tab', label: 'Panel', action: 'tab' },
 		{ key: '^G', label: 'Game', action: 'game' }
@@ -35,6 +33,9 @@
 				return true;
 			case 'tab':
 				togglePanel();
+				return true;
+			case 'game':
+				showGame();
 				return true;
 			default:
 				// Delegate to parent handler

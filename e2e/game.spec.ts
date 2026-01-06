@@ -5,32 +5,37 @@ test.describe('Flappy Glider Game', () => {
 		await page.goto('/');
 	});
 
-	test('should launch game with Ctrl+/ shortcut', async ({ page }) => {
-		// Press Ctrl+/ to launch game
-		await page.keyboard.press('Control+/');
+	test('should launch game with Ctrl+G shortcut', async ({ page }) => {
+		// Press Ctrl+G to launch game
+		await page.keyboard.press('Control+g');
 
 		// Wait for game modal to appear
-		const gameModal = page.locator('[data-testid="game-modal"]').or(
-			page.locator('.game-container')
-		).or(
-			page.getByText(/Flappy Glider/i)
-		);
+		const gameModal = page.locator('.game-container');
+		await expect(gameModal).toBeVisible();
+	});
 
-		// Game should be visible or at least the keyboard shortcut should be handled
-		await expect(page.locator('body')).toBeVisible();
+	test('should launch game by clicking ^G button in status bar', async ({ page }) => {
+		// Find and click the Game button in the status bar
+		const gameButton = page.locator('.status-key').filter({ hasText: '^G' });
+		await gameButton.click();
+
+		// Wait for game modal to appear
+		const gameModal = page.locator('.game-container');
+		await expect(gameModal).toBeVisible();
 	});
 
 	test('should close game with Escape key', async ({ page }) => {
 		// Launch game
-		await page.keyboard.press('Control+/');
+		await page.keyboard.press('Control+g');
 
-		// Small delay to let modal open
-		await page.waitForTimeout(100);
+		// Wait for game modal to appear
+		const gameModal = page.locator('.game-container');
+		await expect(gameModal).toBeVisible();
 
 		// Press Escape to close
 		await page.keyboard.press('Escape');
 
-		// Page should return to normal state
-		await expect(page.locator('body')).toBeVisible();
+		// Game modal should be hidden
+		await expect(gameModal).not.toBeVisible();
 	});
 });

@@ -19,7 +19,7 @@ export default defineConfig({
 		}
 	],
 	webServer: {
-		command: 'yarn preview',
+		command: 'yarn build && yarn preview',
 		url: 'http://localhost:4173',
 		reuseExistingServer: !process.env.CI
 	}

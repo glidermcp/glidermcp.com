@@ -23,10 +23,11 @@ test.describe('Navigation', () => {
 		await expect(page.getByText(/Glider/i).first()).toBeVisible();
 	});
 
-	test('should have status bar with F-key shortcuts', async ({ page }) => {
-		// Check for function key hints in status bar
-		await expect(page.getByText(/F1/i).first()).toBeVisible();
+	test('should have status bar with key shortcuts', async ({ page }) => {
+		// Check for key hints in status bar (F9 Theme, Tab Panel, ^G Game)
 		await expect(page.getByText(/F9/i).first()).toBeVisible();
+		await expect(page.getByText(/Tab/i).first()).toBeVisible();
+		await expect(page.getByText(/\^G/i).first()).toBeVisible();
 	});
 });
 
