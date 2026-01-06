@@ -76,6 +76,105 @@ test.describe('Keyboard Navigation', () => {
 		// Page should remain functional
 		await expect(page.locator('body')).toBeVisible();
 	});
+
+	test('should expand all sections by default on page load', async ({ page }) => {
+		await page.goto('/');
+
+		// Installation and Tools sections should be expanded by default
+		// Check for child items being visible (e.g., "Claude Code" under Installation)
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
+		await expect(page.locator('.nav-item:has-text("server_status")')).toBeVisible();
+
+		// Parent sections should show expanded indicator (▼)
+		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
+		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+
+		const toolsItem = page.locator('.nav-item:has-text("Tools")').first();
+		await expect(toolsItem.locator('.prefix')).toHaveText('▼');
+	});
+
+	test('should toggle section expand/collapse with Space key', async ({ page }) => {
+		await page.goto('/');
+
+		// Navigate to Installation section (index 2: Introduction, Quick Start, Installation)
+		await page.keyboard.press('ArrowDown'); // Quick Start
+		await page.keyboard.press('ArrowDown'); // Installation
+
+		// Verify Installation is selected and expanded
+		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
+		await expect(installationItem).toHaveClass(/selected/);
+		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+
+		// Child items should be visible
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
+
+		// Press Space to collapse
+		await page.keyboard.press(' ');
+
+		// Section should now be collapsed (▶)
+		await expect(installationItem.locator('.prefix')).toHaveText('▶');
+
+		// Child items should be hidden
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).not.toBeVisible();
+
+		// Press Space again to expand
+		await page.keyboard.press(' ');
+
+		// Section should be expanded again
+		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
+	});
+
+	test('should navigate to page with Enter key without toggling', async ({ page }) => {
+		await page.goto('/');
+
+		// Navigate to Installation section
+		await page.keyboard.press('ArrowDown'); // Quick Start
+		await page.keyboard.press('ArrowDown'); // Installation
+
+		// Verify it's expanded
+		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
+		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+
+		// Press Enter to navigate (should NOT toggle)
+		await page.keyboard.press('Enter');
+
+		// Section should still be expanded (Enter navigates, doesn't toggle)
+		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+
+		// Content panel should show Installation content
+		await expect(page.locator('h2:has-text("Installation")')).toBeVisible();
+	});
+
+	test('should navigate to leaf item with Enter key', async ({ page }) => {
+		await page.goto('/');
+
+		// Navigate to Quick Start (a leaf item with no children)
+		await page.keyboard.press('ArrowDown'); // Quick Start
+
+		// Press Enter to navigate
+		await page.keyboard.press('Enter');
+
+		// Content should show Quick Start page
+		await expect(page.locator('h2:has-text("Quick Start")')).toBeVisible();
+	});
+
+	test('Space should have no effect on leaf items', async ({ page }) => {
+		await page.goto('/');
+
+		// Navigate to Quick Start (a leaf item)
+		await page.keyboard.press('ArrowDown'); // Quick Start
+
+		const quickStartItem = page.locator('.nav-item:has-text("Quick Start")').first();
+		await expect(quickStartItem).toHaveClass(/selected/);
+
+		// Press Space - should have no effect (no children to toggle)
+		await page.keyboard.press(' ');
+
+		// Item should still be selected, page should be functional
+		await expect(quickStartItem).toHaveClass(/selected/);
+		await expect(page.locator('body')).toBeVisible();
+	});
 });
 
 test.describe('Accessibility', () => {
