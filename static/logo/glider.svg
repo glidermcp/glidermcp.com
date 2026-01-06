@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Glider paper airplane icon -->
+  <path d="M4 24L44 4L24 44L20 28L4 24Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M20 28L44 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>

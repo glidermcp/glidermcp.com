@@ -1,0 +1,5 @@
+# Glider MCP - glidermcp.com
+User-agent: *
+Allow: /
+
+Sitemap: https://glidermcp.com/sitemap.xml

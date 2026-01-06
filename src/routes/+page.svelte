@@ -1,174 +1,136 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import TUILayout from '$components/tui/TUILayout.svelte';
-	import ListItem from '$components/ui/ListItem.svelte';
-	import { toggleTheme } from '$stores/theme';
+	import TUINavigationTree from '$components/tui/TUINavigationTree.svelte';
+	import type { NavItem } from '$types/navigation';
+	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
+	import { focusedPanel, setFocusedPanel, setNavIndex, expandSection } from '$stores/keyboard';
+	import HomeContent from '$components/pages/HomeContent.svelte';
+	import { getContent, type Locale } from '$lib/content';
+	import { FlappyBird } from '$components/game';
+	import { showGame } from '$stores/game';
 
-	interface NavItem {
-		id: string;
-		label: string;
-		icon?: string;
-		children?: NavItem[];
-	}
-
-	const navItems: NavItem[] = [
-		{ id: 'intro', label: 'Introduction', icon: '▶' },
-		{ id: 'quick-start', label: 'Quick Start', icon: '▶' },
-		{
-			id: 'tools',
-			label: 'Tools',
-			icon: '▼',
-			children: [
-				{ id: 'server-status', label: 'server_status' },
-				{ id: 'load-solution', label: 'load_solution' },
-				{ id: 'find-types', label: 'find_types' },
-				{ id: 'find-usages', label: 'find_usages' },
-				{ id: 'get-type-info', label: 'get_type_info' }
-			]
-		},
-		{ id: 'playground', label: 'Playground', icon: '▶' },
-		{ id: 'prompts', label: 'Prompts', icon: '▶' },
-		{ id: 'faq', label: 'FAQ', icon: '▶' },
-		{ id: 'pricing', label: 'Pricing', icon: '▶' }
-	];
-
+	// Current selected section ID
 	let selectedId = $state('intro');
-	let focusedPanel = $state<'left' | 'right'>('left');
 
-	function handleNavSelect(id: string) {
-		selectedId = id;
-		focusedPanel = 'right';
+	// Track focused panel from store
+	const currentFocusedPanel = $derived($focusedPanel);
+
+	// Track expanded tools for ToolCard
+	let expandedTools = $state<Set<string>>(new Set());
+
+	let locale = $state<Locale>('en');
+	const content = $derived(getContent(locale));
+
+	function toggleToolExpand(toolId: string) {
+		const newSet = new Set(expandedTools);
+		if (newSet.has(toolId)) {
+			newSet.delete(toolId);
+		} else {
+			newSet.add(toolId);
+		}
+		expandedTools = newSet;
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		switch (e.key) {
-			case 'Tab':
-				e.preventDefault();
-				focusedPanel = focusedPanel === 'left' ? 'right' : 'left';
+	function handleNavSelect(item: NavItem) {
+		selectedId = item.id;
+	}
+
+	// Handle page-level keyboard actions
+	function handleAction(action: KeyboardAction): void {
+		switch (action) {
+			case 'help':
+				selectedId = 'intro';
+				setNavIndex(0);
 				break;
-			case 'F9':
-				e.preventDefault();
-				toggleTheme();
+			case 'game':
+				showGame();
 				break;
 		}
 	}
+
+	// Handle content panel keyboard navigation
+	function handleContentKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
+		// Handle game action globally
+		if (action === 'game') {
+			showGame();
+			return true;
+		}
+
+		if ($focusedPanel !== 'right') return false;
+
+		switch (action) {
+			case 'pageUp':
+			case 'pageDown':
+				return false;
+			case 'back':
+				setFocusedPanel('left');
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	let unsubscribe: (() => void) | null = null;
+
+	onMount(() => {
+		unsubscribe = keyboardManager.addHandler(handleContentKeyboard);
+		expandSection('tools');
+	});
+
+	onDestroy(() => {
+		unsubscribe?.();
+	});
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
-
 <svelte:head>
-	<title>Glider MCP - Roslyn-powered C# Code Analysis</title>
+	<title>{content.meta.title}</title>
+	<meta name="description" content={content.meta.description} />
 </svelte:head>
 
-<TUILayout title="Glider MCP" {focusedPanel}>
+<TUILayout title="Glider MCP">
 	{#snippet leftPanel()}
-		<nav class="nav-tree" aria-label="Navigation">
-			{#each navItems as item}
-				<ListItem
-					selected={selectedId === item.id}
-					prefix={item.icon || '▶'}
-					onclick={() => handleNavSelect(item.id)}
-				>
-					{item.label}
-				</ListItem>
-				{#if item.children && selectedId.startsWith(item.id)}
-					{#each item.children as child}
-						<ListItem
-							selected={selectedId === child.id}
-							indent={1}
-							prefix="•"
-							onclick={() => handleNavSelect(child.id)}
-						>
-							{child.label}
-						</ListItem>
-					{/each}
-				{/if}
-			{/each}
-		</nav>
+		<TUINavigationTree items={content.navItems} onSelect={handleNavSelect} />
 	{/snippet}
 
 	{#snippet rightPanel()}
-		<div class="content-area">
-			{#if selectedId === 'intro'}
-				<div class="intro-content">
-					<pre class="ascii-logo">
-   ____  _ _     _
-  / ___|| (_) __| | ___ _ __
- | |  _ | | |/ _` |/ _ \ '__|
- | |_| || | | (_| |  __/ |
-  \____||_|_|\__,_|\___|_|
-
-  MCP Server for C# Code Analysis
-					</pre>
-
-					<h2>Welcome to Glider MCP</h2>
-					<p>
-						Glider is a Roslyn-powered MCP server that gives AI assistants
-						deep understanding of C# codebases. It provides semantic code
-						analysis, type exploration, and refactoring capabilities.
-					</p>
-
-					<h3>Features</h3>
-					<ul class="feature-list">
-						<li>├─ Load and analyze .NET solutions</li>
-						<li>├─ Find type definitions and implementations</li>
-						<li>├─ Discover symbol usages across projects</li>
-						<li>├─ Get detailed type and method information</li>
-						<li>├─ Safe refactoring operations</li>
-						<li>└─ Real-time diagnostics</li>
-					</ul>
-
-					<h3>Quick Install</h3>
-					<pre class="code-block">
-npx @anthropic/claude-code mcp add glider -- \
-  dotnet run --project /path/to/Glider.Server
-					</pre>
-				</div>
-			{:else if selectedId === 'quick-start'}
-				<h2>Quick Start</h2>
-				<p>Get started with Glider MCP in minutes.</p>
-				<ol class="steps-list">
-					<li>1. Clone the Glider repository</li>
-					<li>2. Build the server: <code>dotnet build</code></li>
-					<li>3. Configure your AI assistant</li>
-					<li>4. Load a solution and start exploring</li>
-				</ol>
-			{:else if selectedId === 'playground'}
-				<h2>Playground</h2>
-				<p class="muted">
-					Connect to a local Glider MCP server to test tools interactively.
-				</p>
-				<div class="connection-status">
-					<span class="status-disconnected">○</span>
-					<span>Not connected - Start server at localhost:3001</span>
-				</div>
-			{:else}
-				<h2>{selectedId.replace(/-/g, '_')}</h2>
-				<p class="muted">Content for {selectedId} section.</p>
-			{/if}
+		<div class="content-area" class:focused={currentFocusedPanel === 'right'}>
+			<HomeContent
+				selectedId={selectedId}
+				{content}
+				expandedTools={expandedTools}
+				onSelect={(id) => (selectedId = id)}
+				onToggleTool={toggleToolExpand}
+			/>
 		</div>
 	{/snippet}
 </TUILayout>
 
-<style>
-	.nav-tree {
-		display: flex;
-		flex-direction: column;
-	}
+<FlappyBird />
 
+<style>
 	.content-area {
 		padding: var(--spacing-md);
+		padding-left: var(--spacing-lg);
 		height: 100%;
 		overflow: auto;
 	}
 
-	.ascii-logo {
+	.content-area.focused {
+		/* Visual indicator that content is focused */
+	}
+
+	.content-area :global(.intro-content) {
+		max-width: 650px;
+	}
+
+	.content-area :global(.tagline) {
 		color: var(--accent);
-		font-size: var(--font-size-sm);
-		line-height: 1.2;
+		font-size: var(--font-size-base);
 		margin-bottom: var(--spacing-lg);
 	}
 
-	h2 {
+	.content-area :global(h2) {
 		color: var(--text-primary);
 		font-size: var(--font-size-lg);
 		font-weight: 700;
@@ -177,75 +139,203 @@ npx @anthropic/claude-code mcp add glider -- \
 		padding-bottom: var(--spacing-sm);
 	}
 
-	h3 {
+	.content-area :global(h3) {
 		color: var(--text-secondary);
 		font-size: var(--font-size-base);
-		font-weight: 500;
+		font-weight: 600;
 		margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
 	}
 
-	p {
+	.content-area :global(p) {
 		color: var(--text-secondary);
 		margin: 0 0 var(--spacing-md) 0;
-		line-height: 1.5;
+		line-height: 1.6;
 	}
 
-	.muted {
+	.content-area :global(.muted) {
 		color: var(--text-muted);
 	}
 
-	.feature-list {
+	.content-area :global(.hint) {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	.content-area :global(.feature-list) {
 		list-style: none;
 		padding: 0;
 		margin: 0 0 var(--spacing-lg) 0;
 		color: var(--text-secondary);
 	}
 
-	.feature-list li {
+	.content-area :global(.feature-list li) {
 		padding: var(--spacing-xs) 0;
 	}
 
-	.steps-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		color: var(--text-secondary);
+	.content-area :global(.feature-list li::before) {
+		content: '- ';
+		color: var(--text-muted);
 	}
 
-	.steps-list li {
-		padding: var(--spacing-sm) 0;
+	.content-area :global(.link) {
+		color: var(--accent);
+		text-decoration: none;
 	}
 
-	.steps-list code {
+	.content-area :global(.link:hover) {
+		text-decoration: underline;
+	}
+
+	/* Client grid */
+	.content-area :global(.client-grid) {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: var(--spacing-md);
+		margin-top: var(--spacing-lg);
+	}
+
+	.content-area :global(.client-card) {
+		display: flex;
+		flex-direction: column;
+		padding: var(--spacing-md);
 		background-color: var(--bg-secondary);
+		border: 1px solid var(--border-dim);
+		cursor: pointer;
+		text-align: left;
+		font-family: var(--font-mono);
+		transition: border-color 0.15s;
+	}
+
+	.content-area :global(.client-card:hover) {
+		border-color: var(--accent);
+	}
+
+	.content-area :global(.client-card:focus) {
+		outline: none;
+		border-color: var(--accent);
+		background-color: var(--selection-bg);
+	}
+
+	.content-area :global(.client-card:focus-visible) {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+
+	.content-area :global(.client-name) {
+		color: var(--accent);
+		font-weight: 600;
+		margin-bottom: var(--spacing-xs);
+	}
+
+	.content-area :global(.client-desc) {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	/* Tool category */
+	.content-area :global(.tool-category) {
+		margin-bottom: var(--spacing-xl);
+	}
+
+	.content-area :global(.tool-category h3) {
+		color: var(--accent);
+		font-size: var(--font-size-sm);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin-bottom: var(--spacing-xs);
+	}
+
+	.content-area :global(.category-desc) {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+		margin-bottom: var(--spacing-md);
+	}
+
+	.content-area :global(.tool-category-badge) {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+		margin-top: calc(-1 * var(--spacing-sm));
+	}
+
+	/* Params table */
+	.content-area :global(.params-table) {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: var(--font-size-sm);
+		margin: var(--spacing-md) 0;
+	}
+
+	.content-area :global(.params-table th) {
+		text-align: left;
+		color: var(--text-muted);
+		font-weight: 500;
 		padding: var(--spacing-xs) var(--spacing-sm);
+		border-bottom: 1px solid var(--border-dim);
+	}
+
+	.content-area :global(.params-table td) {
+		padding: var(--spacing-xs) var(--spacing-sm);
+		color: var(--text-secondary);
+		vertical-align: top;
+		border-bottom: 1px solid var(--border-dim);
+	}
+
+	.content-area :global(.param-name) {
+		color: var(--accent) !important;
+		font-family: var(--font-mono);
+	}
+
+	.content-area :global(.param-type) {
+		color: var(--text-muted) !important;
+		font-family: var(--font-mono);
+	}
+
+	.content-area :global(.example-desc) {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+		margin-bottom: var(--spacing-xs);
+	}
+
+	/* FAQ */
+	.content-area :global(.faq-item) {
+		margin-bottom: var(--spacing-lg);
+		padding-bottom: var(--spacing-lg);
+		border-bottom: 1px solid var(--border-dim);
+	}
+
+	.content-area :global(.faq-item:last-child) {
+		border-bottom: none;
+	}
+
+	.content-area :global(.faq-item h3) {
+		color: var(--text-primary);
+		margin-top: 0;
+	}
+
+	.content-area :global(.faq-item code) {
+		background-color: var(--bg-secondary);
+		padding: 2px var(--spacing-xs);
 		color: var(--accent);
 	}
 
-	.code-block {
+	/* Pricing */
+	.content-area :global(.pricing-card) {
 		background-color: var(--bg-secondary);
-		padding: var(--spacing-md);
-		border: 1px solid var(--border-dim);
-		overflow-x: auto;
-		font-size: var(--font-size-sm);
+		border: 1px solid var(--accent);
+		padding: var(--spacing-lg);
+		margin: var(--spacing-lg) 0;
+		max-width: 300px;
+	}
+
+	.content-area :global(.pricing-card h3) {
+		margin: 0 0 var(--spacing-sm) 0;
+		color: var(--accent);
+	}
+
+	.content-area :global(.price) {
+		font-size: 2rem;
 		color: var(--text-primary);
-	}
-
-	.connection-status {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-sm);
-		padding: var(--spacing-md);
-		background-color: var(--bg-secondary);
-		border: 1px solid var(--border-dim);
-		color: var(--text-muted);
-	}
-
-	.status-disconnected {
-		color: var(--text-muted);
-	}
-
-	.intro-content {
-		max-width: 600px;
+		font-weight: 700;
+		margin: 0 0 var(--spacing-md) 0;
 	}
 </style>

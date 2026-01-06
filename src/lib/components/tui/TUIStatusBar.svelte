@@ -1,24 +1,80 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
+	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
+	import { toggleTheme } from '$stores/theme';
+	import { togglePanel, setModalOpen } from '$stores/keyboard';
+
 	interface StatusKey {
 		key: string;
 		label: string;
-		action?: () => void;
+		action: KeyboardAction;
+		handler?: () => void;
 	}
 
 	interface Props {
 		keys?: StatusKey[];
+		onAction?: (action: KeyboardAction) => void;
 	}
 
 	const defaultKeys: StatusKey[] = [
-		{ key: 'F1', label: 'Help' },
-		{ key: 'F2', label: 'Menu' },
-		{ key: 'F3', label: 'View' },
-		{ key: 'F9', label: 'Theme' },
-		{ key: 'F10', label: 'Quit' },
-		{ key: 'F12', label: 'Game' }
+		{ key: 'F1', label: 'Help', action: 'help' },
+		{ key: 'F3', label: 'View', action: 'view' },
+		{ key: 'F5', label: 'Run', action: 'execute' },
+		{ key: 'F9', label: 'Theme', action: 'theme' },
+		{ key: 'Tab', label: 'Panel', action: 'tab' },
+		{ key: '^G', label: 'Game', action: 'game' }
 	];
 
-	let { keys = defaultKeys }: Props = $props();
+	let { keys = defaultKeys, onAction }: Props = $props();
+
+	// Built-in handlers for common actions
+	function handleAction(action: KeyboardAction): boolean {
+		switch (action) {
+			case 'theme':
+				toggleTheme();
+				return true;
+			case 'tab':
+				togglePanel();
+				return true;
+			default:
+				// Delegate to parent handler
+				onAction?.(action);
+				return false;
+		}
+	}
+
+	// Handle keyboard events
+	function handleKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
+		// Check if this action is in our keys list
+		const keyItem = keys.find(k => k.action === action);
+		if (keyItem) {
+			if (keyItem.handler) {
+				keyItem.handler();
+				return true;
+			}
+			return handleAction(action);
+		}
+		return false;
+	}
+
+	// Handle click on status key button
+	function handleClick(keyItem: StatusKey): void {
+		if (keyItem.handler) {
+			keyItem.handler();
+		} else {
+			handleAction(keyItem.action);
+		}
+	}
+
+	let unsubscribe: (() => void) | null = null;
+
+	onMount(() => {
+		unsubscribe = keyboardManager.addHandler(handleKeyboard);
+	});
+
+	onDestroy(() => {
+		unsubscribe?.();
+	});
 </script>
 
 <footer class="tui-statusbar">
@@ -26,7 +82,7 @@
 		{#each keys as item}
 			<button
 				class="status-key"
-				onclick={item.action}
+				onclick={() => handleClick(item)}
 				title="{item.key} - {item.label}"
 			>
 				<span class="key">{item.key}</span>

@@ -2,6 +2,7 @@
   "name": "glidermcp.com",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@4.0.2",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -22,13 +23,16 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0",
     "vite": "^6.0.0",
-    "vitest": "^2.0.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^2.0.0",
+    "workbox-window": "^7.4.0",
+    "wrangler": "^3.28.4"
   },
   "dependencies": {
     "@nanostores/persistent": "^0.10.0",
     "clsx": "^2.1.1",
-    "nanostores": "^0.11.0",
     "nanoid": "^5.0.0",
+    "nanostores": "^0.11.0",
     "shiki": "^1.0.0"
   },
   "type": "module"

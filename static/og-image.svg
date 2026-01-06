@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#000000"/>
+
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#003300" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.5"/>
+
+  <!-- Glider icon -->
+  <g transform="translate(100, 200)">
+    <path d="M0 100L200 0L100 200L80 120L0 100Z" fill="#00ff00" stroke="#00ff00" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M80 120L200 0" stroke="#00ff00" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Title -->
+  <text x="350" y="260" font-family="JetBrains Mono, Courier New, monospace" font-size="72" font-weight="bold" fill="#00ff00">Glider MCP</text>
+
+  <!-- Subtitle -->
+  <text x="350" y="340" font-family="JetBrains Mono, Courier New, monospace" font-size="32" fill="#00aa00">Roslyn-powered C# Code Analysis</text>
+
+  <!-- Description -->
+  <text x="350" y="400" font-family="JetBrains Mono, Courier New, monospace" font-size="24" fill="#008800">Model Context Protocol Server for AI Assistants</text>
+
+  <!-- Terminal prompt -->
+  <text x="100" y="550" font-family="JetBrains Mono, Courier New, monospace" font-size="20" fill="#00ff00">
+    <tspan fill="#00aa00">$</tspan> mcp connect glider <tspan fill="#00ff00" opacity="0.5">_</tspan>
+  </text>
+
+  <!-- URL -->
+  <text x="1100" y="550" font-family="JetBrains Mono, Courier New, monospace" font-size="18" fill="#00aa00" text-anchor="end">glidermcp.com</text>
+</svg>

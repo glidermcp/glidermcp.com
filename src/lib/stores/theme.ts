@@ -5,7 +5,7 @@ export type ThemeType = 'ncurses-dark' | 'total-commander';
 
 export const theme = persistentAtom<ThemeType>('glider-theme', 'ncurses-dark');
 
-export const isDarkTheme = computed(theme, (t) => t === 'ncurses-dark');
+export const isDarkTheme = computed(theme, (t: ThemeType) => t === 'ncurses-dark');
 
 export function toggleTheme(): void {
 	const current = theme.get();

@@ -24,6 +24,7 @@
 	/* Selection */
 	--selection-bg: #0000aa;
 	--selection-fg: #ffffff;
+	--selection-bg-dim: rgba(0, 0, 170, 0.2);
 
 	/* Status colors */
 	--success: #008800;
@@ -52,8 +53,9 @@
 
 	/* Typography */
 	--font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', 'Courier New', monospace;
-	--font-size-base: 14px;
+	--font-size-xs: 10px;
 	--font-size-sm: 12px;
+	--font-size-base: 14px;
 	--font-size-lg: 16px;
 
 	/* Spacing */

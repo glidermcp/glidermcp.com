@@ -13,6 +13,9 @@ const config = {
 			$services: 'src/lib/services',
 			$utils: 'src/lib/utils',
 			$types: 'src/lib/types'
+		},
+		serviceWorker: {
+			register: true
 		}
 	}
 };
