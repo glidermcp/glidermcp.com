@@ -4,11 +4,11 @@
 	import ResponseVisualizer from './ResponseVisualizer.svelte';
 
 	const response = $derived($lastResponse);
-	const state = $derived($executionState);
+	const executionStateValue = $derived($executionState);
 	const toolId = $derived($selectedToolId);
 
 	// Toggle between raw and visual view
-	let viewMode = $state<'raw' | 'visual'>('visual');
+	let viewMode: 'raw' | 'visual' = $state('visual');
 
 	// Check if current tool supports visualization
 	const supportsVisualization = $derived.by(() => {
@@ -78,7 +78,7 @@
 	</div>
 
 	<div class="response-content">
-		{#if state === 'executing'}
+		{#if executionStateValue === 'executing'}
 			<div class="executing">
 				<span class="spinner"></span>
 				<span>Executing...</span>
