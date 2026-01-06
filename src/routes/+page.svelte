@@ -7,6 +7,8 @@
 	import { focusedPanel, setFocusedPanel, setNavIndex, expandSection } from '$stores/keyboard';
 	import HomeContent from '$components/pages/HomeContent.svelte';
 	import { getContent, type Locale } from '$lib/content';
+	import { FlappyBird } from '$components/game';
+	import { showGame } from '$stores/game';
 
 	// Current selected section ID
 	let selectedId = $state('intro');
@@ -42,14 +44,19 @@
 				setNavIndex(0);
 				break;
 			case 'game':
-				// TODO: Open game modal
-				console.log('Game not yet implemented');
+				showGame();
 				break;
 		}
 	}
 
 	// Handle content panel keyboard navigation
 	function handleContentKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
+		// Handle game action globally
+		if (action === 'game') {
+			showGame();
+			return true;
+		}
+
 		if ($focusedPanel !== 'right') return false;
 
 		switch (action) {
@@ -98,6 +105,8 @@
 		</div>
 	{/snippet}
 </TUILayout>
+
+<FlappyBird />
 
 <style>
 	.content-area {

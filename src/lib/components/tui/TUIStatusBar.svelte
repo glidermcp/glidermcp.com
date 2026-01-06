@@ -22,7 +22,7 @@
 		{ key: 'F5', label: 'Run', action: 'execute' },
 		{ key: 'F9', label: 'Theme', action: 'theme' },
 		{ key: 'Tab', label: 'Panel', action: 'tab' },
-		{ key: 'F12', label: 'Game', action: 'game' }
+		{ key: '^G', label: 'Game', action: 'game' }
 	];
 
 	let { keys = defaultKeys, onAction }: Props = $props();

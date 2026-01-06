@@ -10,7 +10,7 @@ export type KeyboardAction =
 	| 'execute'        // F5
 	| 'theme'          // F9
 	| 'quit'           // F10
-	| 'game'           // F12
+	| 'game'           // Ctrl+G
 	| 'up'             // Arrow Up
 	| 'down'           // Arrow Down
 	| 'left'           // Arrow Left
@@ -41,7 +41,7 @@ const KEY_BINDINGS: KeyBinding[] = [
 	{ key: 'F5', action: 'execute' },
 	{ key: 'F9', action: 'theme' },
 	{ key: 'F10', action: 'quit' },
-	{ key: 'F12', action: 'game' },
+	{ key: 'g', action: 'game', ctrl: true },
 
 	// Navigation keys
 	{ key: 'ArrowUp', action: 'up' },
