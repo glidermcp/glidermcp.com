@@ -4,6 +4,7 @@
  */
 
 import { atom, computed } from 'nanostores';
+import { audioManager } from '$lib/services/audio-manager';
 
 // Game configuration
 export const GAME_CONFIG = {
@@ -78,6 +79,7 @@ export const highScore = atom<number>(0);
 export const glider = atom<Glider>({ y: 200, velocity: 0, rotation: 0 });
 export const obstacles = atom<Obstacle[]>([]);
 export const gameVisible = atom<boolean>(false);
+export const gameMuted = atom<boolean>(false);
 
 // Derived
 export const isPlaying = computed(gameState, (state: GameState) => state === 'playing');
@@ -96,6 +98,7 @@ if (typeof window !== 'undefined') {
  * Show the game modal
  */
 export function showGame(): void {
+	audioManager.init();
 	gameVisible.set(true);
 	resetGame();
 }
@@ -116,6 +119,7 @@ export function startGame(): void {
 
 	resetGame();
 	gameState.set('playing');
+	audioManager.play('start');
 }
 
 /**
@@ -144,6 +148,7 @@ export function jump(): void {
 		velocity: GAME_CONFIG.JUMP_FORCE,
 		rotation: -20,
 	});
+	audioManager.play('jump');
 }
 
 /**
@@ -151,6 +156,7 @@ export function jump(): void {
  */
 export function endGame(): void {
 	gameState.set('gameOver');
+	audioManager.play('gameOver');
 
 	const currentScore = score.get();
 	const currentHigh = highScore.get();
@@ -201,6 +207,7 @@ export function updateGame(canvasHeight: number, deltaTime: number = 1): void {
 			// Check if passed
 			if (!o.passed && newX + GAME_CONFIG.OBSTACLE_WIDTH < GAME_CONFIG.GLIDER_X) {
 				score.set(score.get() + 1);
+				audioManager.play('score');
 				return { ...o, x: newX, passed: true };
 			}
 
@@ -258,4 +265,12 @@ export function togglePause(): void {
 	} else if (current === 'paused') {
 		gameState.set('playing');
 	}
+}
+
+/**
+ * Toggle sound mute
+ */
+export function toggleMute(): void {
+	const muted = audioManager.toggleMute();
+	gameMuted.set(muted);
 }

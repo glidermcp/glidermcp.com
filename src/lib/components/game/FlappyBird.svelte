@@ -6,10 +6,11 @@
 		gameState,
 		score,
 		highScore,
+		gameMuted,
 		hideGame,
 		startGame,
-		resetGame,
 		jump,
+		toggleMute,
 	} from '$stores/game';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { setModalOpen } from '$stores/keyboard';
@@ -18,6 +19,7 @@
 	const state = $derived($gameState);
 	const currentScore = $derived($score);
 	const best = $derived($highScore);
+	const muted = $derived($gameMuted);
 
 	let unsubscribe: (() => void) | null = null;
 
@@ -50,6 +52,9 @@
 			} else {
 				jump();
 			}
+		}
+		if (event.key === 'm' || event.key === 'M') {
+			toggleMute();
 		}
 	}
 
@@ -108,6 +113,14 @@
 				<div class="game-content">
 					<div class="score-bar">
 						<span class="score-label">SCORE: <span class="score-value">{currentScore}</span></span>
+						<button
+							class="mute-btn"
+							onclick={toggleMute}
+							aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+							title={muted ? 'Unmute sounds (M)' : 'Mute sounds (M)'}
+						>
+							{muted ? '🔇' : '🔊'}
+						</button>
 						<span class="score-label">BEST: <span class="score-value">{best}</span></span>
 					</div>
 
@@ -146,6 +159,7 @@
 
 					<div class="controls-hint">
 						<span>SPACE / Click = Jump</span>
+						<span>M = Mute</span>
 						<span>ESC = Close</span>
 					</div>
 				</div>
@@ -248,6 +262,7 @@
 	.score-bar {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		color: var(--text-primary);
 		font-size: var(--font-size-base);
 	}
@@ -255,6 +270,31 @@
 	.score-value {
 		color: var(--accent);
 		font-weight: bold;
+	}
+
+	.mute-btn {
+		background: transparent;
+		border: 1px solid var(--border-dim);
+		color: var(--text-secondary);
+		font-size: var(--font-size-base);
+		cursor: pointer;
+		padding: 2px 8px;
+		border-radius: 4px;
+		transition: all 0.15s ease;
+	}
+
+	.mute-btn:hover {
+		border-color: var(--accent);
+		color: var(--text-primary);
+	}
+
+	.mute-btn:focus {
+		outline: none;
+	}
+
+	.mute-btn:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
 	}
 
 	.canvas-wrapper {
