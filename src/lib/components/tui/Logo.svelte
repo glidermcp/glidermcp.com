@@ -69,6 +69,7 @@
 		color: var(--accent);
 		line-height: 1.2;
 		margin: 0;
+		margin-bottom: var(--spacing-lg);
 		white-space: pre;
 	}
 

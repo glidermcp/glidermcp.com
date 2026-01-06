@@ -4,6 +4,7 @@
  */
 
 import { atom, computed } from 'nanostores';
+import { audioManager } from '$lib/services/audio-manager';
 
 // Game configuration
 export const GAME_CONFIG = {
@@ -78,6 +79,7 @@ export const highScore = atom<number>(0);
 export const glider = atom<Glider>({ y: 200, velocity: 0, rotation: 0 });
 export const obstacles = atom<Obstacle[]>([]);
 export const gameVisible = atom<boolean>(false);
+export const gameMuted = atom<boolean>(false);
 
 // Derived
 export const isPlaying = computed(gameState, (state: GameState) => state === 'playing');
@@ -96,6 +98,7 @@ if (typeof window !== 'undefined') {
  * Show the game modal
  */
 export function showGame(): void {
+	audioManager.init();
 	gameVisible.set(true);
 	resetGame();
 }
@@ -116,6 +119,7 @@ export function startGame(): void {
 
 	resetGame();
 	gameState.set('playing');
+	audioManager.play('start');
 }
 
 /**
@@ -144,6 +148,7 @@ export function jump(): void {
 		velocity: GAME_CONFIG.JUMP_FORCE,
 		rotation: -20,
 	});
+	audioManager.play('jump');
 }
 
 /**
@@ -151,6 +156,7 @@ export function jump(): void {
  */
 export function endGame(): void {
 	gameState.set('gameOver');
+	audioManager.play('gameOver');
 
 	const currentScore = score.get();
 	const currentHigh = highScore.get();
@@ -165,15 +171,20 @@ export function endGame(): void {
 
 /**
  * Update game state (called each frame)
+ * @param canvasHeight - Height of the game canvas
+ * @param deltaTime - Time multiplier normalized to 60fps (1.0 = 16.67ms)
  */
-export function updateGame(canvasHeight: number): void {
+export function updateGame(canvasHeight: number, deltaTime: number = 1): void {
 	if (gameState.get() !== 'playing') return;
 
-	// Update glider
+	// Clamp deltaTime to prevent physics explosions on tab switch or lag spikes
+	const dt = Math.min(deltaTime, 3);
+
+	// Update glider with delta-time based physics
 	const g = glider.get();
-	const newVelocity = g.velocity + GAME_CONFIG.GRAVITY;
-	const newY = g.y + newVelocity;
-	const newRotation = Math.min(90, Math.max(-30, g.rotation + 2));
+	const newVelocity = g.velocity + GAME_CONFIG.GRAVITY * dt;
+	const newY = g.y + newVelocity * dt;
+	const newRotation = Math.min(90, Math.max(-30, g.rotation + 2 * dt));
 
 	// Check bounds collision
 	if (newY < 0 || newY > canvasHeight - GAME_CONFIG.GLIDER_SIZE) {
@@ -187,15 +198,16 @@ export function updateGame(canvasHeight: number): void {
 		rotation: newRotation,
 	});
 
-	// Update obstacles
+	// Update obstacles with delta-time
 	const obs = obstacles.get();
 	const updatedObs = obs
 		.map((o: Obstacle) => {
-			const newX = o.x - GAME_CONFIG.OBSTACLE_SPEED;
+			const newX = o.x - GAME_CONFIG.OBSTACLE_SPEED * dt;
 
 			// Check if passed
 			if (!o.passed && newX + GAME_CONFIG.OBSTACLE_WIDTH < GAME_CONFIG.GLIDER_X) {
 				score.set(score.get() + 1);
+				audioManager.play('score');
 				return { ...o, x: newX, passed: true };
 			}
 
@@ -253,4 +265,12 @@ export function togglePause(): void {
 	} else if (current === 'paused') {
 		gameState.set('playing');
 	}
+}
+
+/**
+ * Toggle sound mute
+ */
+export function toggleMute(): void {
+	const muted = audioManager.toggleMute();
+	gameMuted.set(muted);
 }

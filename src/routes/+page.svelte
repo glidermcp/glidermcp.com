@@ -4,7 +4,13 @@
 	import TUINavigationTree from '$components/tui/TUINavigationTree.svelte';
 	import type { NavItem } from '$types/navigation';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
-	import { focusedPanel, setFocusedPanel, setNavIndex, expandSection } from '$stores/keyboard';
+	import {
+		focusedPanel,
+		expandedSections,
+		setFocusedPanel,
+		setNavIndex,
+		expandSection
+	} from '$stores/keyboard';
 	import HomeContent from '$components/pages/HomeContent.svelte';
 	import { getContent, type Locale } from '$lib/content';
 	import { FlappyBird } from '$components/game';
@@ -36,16 +42,52 @@
 		selectedId = item.id;
 	}
 
-	// Handle page-level keyboard actions
-	function handleAction(action: KeyboardAction): void {
-		switch (action) {
-			case 'help':
-				selectedId = 'intro';
-				setNavIndex(0);
-				break;
-			case 'game':
-				showGame();
-				break;
+	/**
+	 * Handle content selection (e.g., from InstallationOverview cards)
+	 * Updates selectedId, expands parent section if needed, and syncs nav selection
+	 */
+	function handleContentSelect(id: string) {
+		selectedId = id;
+
+		// Find parent section and expand it if needed
+		for (const item of content.navItems) {
+			if (item.children) {
+				const childIndex = item.children.findIndex((child) => child.id === id);
+				if (childIndex >= 0) {
+					// Expand the parent section
+					expandSection(item.id);
+
+					// Calculate the nav index: count items before parent + 1 (parent) + childIndex + 1
+					let navIndex = 0;
+					for (const navItem of content.navItems) {
+						if (navItem.id === item.id) {
+							// Found parent, add 1 for parent itself, then child position
+							navIndex += 1 + childIndex;
+							break;
+						}
+						navIndex++; // Count this item
+						// If this section is expanded, count its children
+						if (navItem.children && $expandedSections.has(navItem.id)) {
+							navIndex += navItem.children.length;
+						}
+					}
+					setNavIndex(navIndex);
+					return;
+				}
+			}
+		}
+
+		// If not a child item, find it as a top-level item
+		let navIndex = 0;
+		for (const navItem of content.navItems) {
+			if (navItem.id === id) {
+				setNavIndex(navIndex);
+				return;
+			}
+			navIndex++;
+			if (navItem.children && $expandedSections.has(navItem.id)) {
+				navIndex += navItem.children.length;
+			}
 		}
 	}
 
@@ -60,9 +102,6 @@
 		if ($focusedPanel !== 'right') return false;
 
 		switch (action) {
-			case 'pageUp':
-			case 'pageDown':
-				return false;
 			case 'back':
 				setFocusedPanel('left');
 				return true;
@@ -99,7 +138,7 @@
 				selectedId={selectedId}
 				{content}
 				expandedTools={expandedTools}
-				onSelect={(id) => (selectedId = id)}
+				onSelect={handleContentSelect}
 				onToggleTool={toggleToolExpand}
 			/>
 		</div>
@@ -220,6 +259,26 @@
 	.content-area :global(.client-card:focus-visible) {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
+	}
+
+	.content-area :global(.client-card.selected) {
+		border-color: var(--accent);
+		background-color: var(--selection-bg);
+	}
+
+	.content-area :global(.client-grid.active .client-card.selected) {
+		border-color: var(--accent);
+		background-color: var(--selection-bg);
+	}
+
+	.content-area :global(.client-grid.active .client-card.selected .client-name),
+	.content-area :global(.client-grid.active .client-card.selected .client-desc) {
+		color: var(--selection-fg);
+	}
+
+	.content-area :global(.client-grid:not(.active) .client-card.selected) {
+		border-color: var(--border);
+		background-color: var(--selection-bg-dim);
 	}
 
 	.content-area :global(.client-name) {

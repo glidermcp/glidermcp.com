@@ -7,6 +7,11 @@
 	}
 
 	let { content }: Props = $props();
+
+	// Assemble email from parts to obfuscate from bots
+	const emailParts = ['bogdan', 'sacrorum.com'];
+	const email = emailParts.join('@');
+	const mailto = `mailto:${email}`;
 </script>
 
 <h2>{content.title}</h2>
@@ -29,7 +34,7 @@
 
 <h3>{content.authorTitle}</h3>
 <p>{content.authorLabel} <a href={content.authorUrl} class="link">{content.authorName}</a></p>
-<p class="muted">{content.authorEmail}</p>
+<p class="muted"><a href={mailto} class="link">{email}</a></p>
 
 <h3>{content.licenseTitle}</h3>
 <p>{content.licenseText}</p>
