@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { connectionStatus, isConnected } from '$stores/playground';
+	import { isOnline } from '$stores/network';
 
 	const status = $derived($connectionStatus);
 	const connected = $derived($isConnected);
+	const online = $derived($isOnline);
 
-	function getStatusLabel(s: typeof status): string {
+	function getStatusLabel(s: typeof status, browserOnline: boolean): string {
+		if (!browserOnline) {
+			return 'Offline';
+		}
 		switch (s) {
 			case 'connected':
 				return 'Connected';
@@ -20,9 +25,9 @@
 	}
 </script>
 
-<div class="connection-indicator" class:connected class:error={status === 'error'}>
+<div class="connection-indicator" class:connected={connected && online} class:error={status === 'error'} class:offline={!online}>
 	<span class="status-dot" class:pulse={status === 'connecting'}></span>
-	<span class="status-text">{getStatusLabel(status)}</span>
+	<span class="status-text">{getStatusLabel(status, online)}</span>
 </div>
 
 <style>
@@ -62,6 +67,15 @@
 
 	.connection-indicator.error .status-dot {
 		background-color: var(--error, #ff5555);
+	}
+
+	.connection-indicator.offline {
+		color: var(--text-muted);
+		border-color: var(--text-muted);
+	}
+
+	.connection-indicator.offline .status-dot {
+		background-color: var(--text-muted);
 	}
 
 	.status-dot.pulse {

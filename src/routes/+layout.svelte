@@ -2,6 +2,12 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { theme, applyTheme, type ThemeType } from '$stores/theme';
+	import {
+		initNetworkStatus,
+		initInstallPrompt,
+		initServiceWorker
+	} from '$stores/network';
+	import Toast from '$components/ui/Toast.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -20,7 +26,17 @@
 			applyTheme(value);
 		});
 
-		return unsubscribe;
+		// Initialize PWA features
+		const cleanupNetwork = initNetworkStatus();
+		const cleanupInstall = initInstallPrompt();
+		const cleanupSW = initServiceWorker();
+
+		return () => {
+			unsubscribe();
+			cleanupNetwork();
+			cleanupInstall();
+			cleanupSW();
+		};
 	});
 
 	// Also handle SSR by applying theme in effect
@@ -30,3 +46,4 @@
 </script>
 
 {@render children()}
+<Toast />
