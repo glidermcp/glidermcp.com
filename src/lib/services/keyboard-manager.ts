@@ -4,12 +4,8 @@
  */
 
 export type KeyboardAction =
-	| 'help'           // F1
-	| 'menu'           // F2
-	| 'view'           // F3
 	| 'execute'        // F5
 	| 'theme'          // F9
-	| 'quit'           // F10
 	| 'game'           // Ctrl+G
 	| 'up'             // Arrow Up
 	| 'down'           // Arrow Down
@@ -19,8 +15,6 @@ export type KeyboardAction =
 	| 'toggle'         // Space (toggle expand/collapse)
 	| 'back'           // ESC
 	| 'tab'            // Tab (switch panels)
-	| 'pageUp'         // Page Up
-	| 'pageDown'       // Page Down
 	| 'home'           // Home
 	| 'end';           // End
 
@@ -36,12 +30,8 @@ interface KeyBinding {
 
 const KEY_BINDINGS: KeyBinding[] = [
 	// Function keys
-	{ key: 'F1', action: 'help' },
-	{ key: 'F2', action: 'menu' },
-	{ key: 'F3', action: 'view' },
 	{ key: 'F5', action: 'execute' },
 	{ key: 'F9', action: 'theme' },
-	{ key: 'F10', action: 'quit' },
 	{ key: 'g', action: 'game', ctrl: true },
 
 	// Navigation keys
@@ -53,8 +43,6 @@ const KEY_BINDINGS: KeyBinding[] = [
 	{ key: ' ', action: 'toggle' },
 	{ key: 'Escape', action: 'back' },
 	{ key: 'Tab', action: 'tab' },
-	{ key: 'PageUp', action: 'pageUp' },
-	{ key: 'PageDown', action: 'pageDown' },
 	{ key: 'Home', action: 'home' },
 	{ key: 'End', action: 'end' },
 ];

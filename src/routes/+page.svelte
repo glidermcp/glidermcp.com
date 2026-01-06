@@ -91,19 +91,6 @@
 		}
 	}
 
-	// Handle page-level keyboard actions
-	function handleAction(action: KeyboardAction): void {
-		switch (action) {
-			case 'help':
-				selectedId = 'intro';
-				setNavIndex(0);
-				break;
-			case 'game':
-				showGame();
-				break;
-		}
-	}
-
 	// Handle content panel keyboard navigation
 	function handleContentKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
 		// Handle game action globally
@@ -115,9 +102,6 @@
 		if ($focusedPanel !== 'right') return false;
 
 		switch (action) {
-			case 'pageUp':
-			case 'pageDown':
-				return false;
 			case 'back':
 				setFocusedPanel('left');
 				return true;
