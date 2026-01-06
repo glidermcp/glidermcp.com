@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import type { InstallationContent } from '$lib/content/types';
+	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
+	import { focusedPanel } from '$stores/keyboard';
 
 	interface Props {
 		content: InstallationContent;
@@ -7,6 +10,85 @@
 	}
 
 	let { content, onSelect }: Props = $props();
+
+	// Track selected card index for keyboard navigation
+	let selectedIndex = $state(0);
+	const isActive = $derived($focusedPanel === 'right');
+
+	function handleKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
+		// Only handle when right panel is focused
+		if (!isActive) return false;
+
+		const totalItems = content.clients.length;
+		if (totalItems === 0) return false;
+
+		switch (action) {
+			case 'left': {
+				// Move left
+				if (selectedIndex > 0) {
+					selectedIndex = selectedIndex - 1;
+					scrollToSelected();
+				}
+				return true;
+			}
+
+			case 'right': {
+				// Move right
+				if (selectedIndex < totalItems - 1) {
+					selectedIndex = selectedIndex + 1;
+					scrollToSelected();
+				}
+				return true;
+			}
+
+			case 'home':
+				selectedIndex = 0;
+				scrollToSelected();
+				return true;
+
+			case 'end':
+				selectedIndex = totalItems - 1;
+				scrollToSelected();
+				return true;
+
+			case 'select': {
+				// Enter: Navigate to the selected client
+				const client = content.clients[selectedIndex];
+				if (client) {
+					onSelect(client.id);
+				}
+				return true;
+			}
+
+			default:
+				return false;
+		}
+	}
+
+	function scrollToSelected(): void {
+		requestAnimationFrame(() => {
+			const selectedEl = document.querySelector('.client-card.selected');
+			if (selectedEl) {
+				selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+			}
+		});
+	}
+
+	function handleCardClick(index: number): void {
+		selectedIndex = index;
+		onSelect(content.clients[index].id);
+	}
+
+	// Register keyboard handler
+	let unsubscribe: (() => void) | null = null;
+
+	onMount(() => {
+		unsubscribe = keyboardManager.addHandler(handleKeyboard);
+	});
+
+	onDestroy(() => {
+		unsubscribe?.();
+	});
 </script>
 
 <h2>{content.title}</h2>
@@ -15,37 +97,20 @@
 {/each}
 <p class="hint">{content.hint}</p>
 
-<div class="client-grid" role="listbox" aria-label={content.ariaLabel}>
+<div
+	class="client-grid"
+	class:active={isActive}
+	role="grid"
+	aria-label={content.ariaLabel}
+>
 	{#each content.clients as client, index}
 		<button
 			class="client-card"
-			role="option"
-			aria-selected={false}
-			onclick={() => onSelect(client.id)}
-			onkeydown={(e) => {
-				const grid = e.currentTarget.parentElement;
-				const buttons = grid?.querySelectorAll('.client-card');
-				if (!buttons) return;
-
-				let newIndex = index;
-				if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-					newIndex = Math.min(buttons.length - 1, index + 1);
-					e.preventDefault();
-				} else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-					newIndex = Math.max(0, index - 1);
-					e.preventDefault();
-				} else if (e.key === 'Home') {
-					newIndex = 0;
-					e.preventDefault();
-				} else if (e.key === 'End') {
-					newIndex = buttons.length - 1;
-					e.preventDefault();
-				}
-
-				if (newIndex !== index) {
-					(buttons[newIndex] as HTMLElement)?.focus();
-				}
-			}}
+			class:selected={index === selectedIndex}
+			role="gridcell"
+			aria-selected={index === selectedIndex}
+			tabindex={index === selectedIndex ? 0 : -1}
+			onclick={() => handleCardClick(index)}
 		>
 			<span class="client-name">{client.name}</span>
 			<span class="client-desc">{client.desc}</span>
