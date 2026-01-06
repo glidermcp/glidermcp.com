@@ -117,7 +117,8 @@
 	}
 
 	.content-area.focused {
-		/* Visual indicator that content is focused */
+		outline: 1px solid var(--border);
+		outline-offset: -1px;
 	}
 
 	.content-area :global(.intro-content) {

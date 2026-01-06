@@ -66,6 +66,13 @@
 		}
 	}
 
+	function handleCanvasKeydown(event: KeyboardEvent): void {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			handleCanvasClick();
+		}
+	}
+
 	onMount(() => {
 		unsubscribe = keyboardManager.addHandler(handleKeyboard);
 		if (typeof window !== 'undefined') {
@@ -104,8 +111,14 @@
 						<span class="score-label">BEST: <span class="score-value">{best}</span></span>
 					</div>
 
-					<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-					<div class="canvas-wrapper" onclick={handleCanvasClick} role="application" aria-label="Game area - click or press space to jump">
+					<div
+						class="canvas-wrapper"
+						role="button"
+						tabindex="0"
+						aria-label="Game area - click or press space to jump"
+						onclick={handleCanvasClick}
+						onkeydown={handleCanvasKeydown}
+					>
 						<GameCanvas />
 
 						{#if state === 'idle'}

@@ -132,19 +132,19 @@
 			<span class="entry-count">({displayEntries.length} entries)</span>
 		</div>
 	{/if}
-	<div class="timeline-list" role="list" aria-label={title}>
+	<div class="timeline-list" aria-label={title}>
 		{#if displayEntries.length > 0}
 			{#each displayEntries as entry, index}
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<div
+				<button
+					type="button"
 					class="timeline-entry"
 					class:selected={interactive && index === selectedIndex}
 					class:success={entry.success}
 					class:error={!entry.success}
-					role="listitem"
-					aria-selected={interactive && index === selectedIndex}
+					aria-pressed={interactive && index === selectedIndex}
 					tabindex={interactive && index === selectedIndex ? 0 : -1}
 					onclick={() => handleEntryClick(index)}
+					disabled={!interactive}
 				>
 					<span class="timestamp">[{formatTime(entry.timestamp)}]</span>
 					<span class="tool-name">{entry.toolName}</span>
@@ -154,7 +154,7 @@
 					{#if !entry.success && entry.error}
 						<span class="error-hint" title={entry.error}>({entry.error.slice(0, 30)}{entry.error.length > 30 ? '...' : ''})</span>
 					{/if}
-				</div>
+				</button>
 			{/each}
 		{:else}
 			<div class="empty-state">
@@ -203,6 +203,19 @@
 		white-space: nowrap;
 		cursor: pointer;
 		border-left: 2px solid transparent;
+		background: none;
+		border-top: none;
+		border-right: none;
+		border-bottom: none;
+		width: 100%;
+		text-align: left;
+		font: inherit;
+		color: inherit;
+	}
+
+	.timeline-entry:disabled {
+		cursor: default;
+		opacity: 0.7;
 	}
 
 	.timeline-entry:hover {
