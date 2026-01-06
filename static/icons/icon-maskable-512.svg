@@ -2,7 +2,11 @@
   <!-- Maskable icon with safe area padding (10% on each side = 51.2px) -->
   <rect width="512" height="512" fill="#000000"/>
   <g transform="translate(102.4, 102.4) scale(6.4)">
+    <!-- Paper plane body -->
     <path d="M4 24L44 4L24 44L20 28L4 24Z" fill="#00ff00" stroke="#00ff00" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M20 28L44 4" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/>
+    <!-- Center fold line (creates 3D paper effect) -->
+    <path d="M4 24L44 4" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Inner fold line -->
+    <path d="M20 28L44 4" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/>
   </g>
 </svg>
