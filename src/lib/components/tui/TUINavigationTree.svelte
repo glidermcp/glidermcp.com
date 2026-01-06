@@ -68,6 +68,22 @@
 		}
 	});
 
+	// Expand all sections with children by default on mount
+	$effect(() => {
+		// Only run once on initial mount when expandedSections is empty
+		if ($expandedSections.size === 0) {
+			const sectionsWithChildren = items
+				.filter(item => item.children?.length)
+				.map(item => item.id);
+
+			if (sectionsWithChildren.length > 0) {
+				for (const id of sectionsWithChildren) {
+					expandSection(id);
+				}
+			}
+		}
+	});
+
 	function handleKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
 		// Only handle if left panel is focused
 		if (!isActive) return false;
@@ -120,13 +136,22 @@
 				return true;
 			}
 
-			case 'select': {
+			case 'toggle': {
+				// Space: Toggle expand/collapse for sections with children
 				const current = flatItems[selectedIndex];
 				if (!current || current.item.disabled) return false;
 
 				if (current.hasChildren) {
 					toggleSection(current.item.id);
 				}
+				return true;
+			}
+
+			case 'select': {
+				// Enter: Navigate to the page
+				const current = flatItems[selectedIndex];
+				if (!current || current.item.disabled) return false;
+
 				onSelect?.(current.item);
 				return true;
 			}

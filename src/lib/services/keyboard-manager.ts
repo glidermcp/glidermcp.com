@@ -16,6 +16,7 @@ export type KeyboardAction =
 	| 'left'           // Arrow Left
 	| 'right'          // Arrow Right
 	| 'select'         // Enter
+	| 'toggle'         // Space (toggle expand/collapse)
 	| 'back'           // ESC
 	| 'tab'            // Tab (switch panels)
 	| 'pageUp'         // Page Up
@@ -49,6 +50,7 @@ const KEY_BINDINGS: KeyBinding[] = [
 	{ key: 'ArrowLeft', action: 'left' },
 	{ key: 'ArrowRight', action: 'right' },
 	{ key: 'Enter', action: 'select' },
+	{ key: ' ', action: 'toggle' },
 	{ key: 'Escape', action: 'back' },
 	{ key: 'Tab', action: 'tab' },
 	{ key: 'PageUp', action: 'pageUp' },
