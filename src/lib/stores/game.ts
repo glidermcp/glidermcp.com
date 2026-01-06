@@ -165,15 +165,20 @@ export function endGame(): void {
 
 /**
  * Update game state (called each frame)
+ * @param canvasHeight - Height of the game canvas
+ * @param deltaTime - Time multiplier normalized to 60fps (1.0 = 16.67ms)
  */
-export function updateGame(canvasHeight: number): void {
+export function updateGame(canvasHeight: number, deltaTime: number = 1): void {
 	if (gameState.get() !== 'playing') return;
 
-	// Update glider
+	// Clamp deltaTime to prevent physics explosions on tab switch or lag spikes
+	const dt = Math.min(deltaTime, 3);
+
+	// Update glider with delta-time based physics
 	const g = glider.get();
-	const newVelocity = g.velocity + GAME_CONFIG.GRAVITY;
-	const newY = g.y + newVelocity;
-	const newRotation = Math.min(90, Math.max(-30, g.rotation + 2));
+	const newVelocity = g.velocity + GAME_CONFIG.GRAVITY * dt;
+	const newY = g.y + newVelocity * dt;
+	const newRotation = Math.min(90, Math.max(-30, g.rotation + 2 * dt));
 
 	// Check bounds collision
 	if (newY < 0 || newY > canvasHeight - GAME_CONFIG.GLIDER_SIZE) {
@@ -187,11 +192,11 @@ export function updateGame(canvasHeight: number): void {
 		rotation: newRotation,
 	});
 
-	// Update obstacles
+	// Update obstacles with delta-time
 	const obs = obstacles.get();
 	const updatedObs = obs
 		.map((o: Obstacle) => {
-			const newX = o.x - GAME_CONFIG.OBSTACLE_SPEED;
+			const newX = o.x - GAME_CONFIG.OBSTACLE_SPEED * dt;
 
 			// Check if passed
 			if (!o.passed && newX + GAME_CONFIG.OBSTACLE_WIDTH < GAME_CONFIG.GLIDER_X) {

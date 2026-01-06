@@ -13,6 +13,7 @@
 	let ctx: CanvasRenderingContext2D | null = null;
 	let animationId: number | null = null;
 	let lastSpawnTime = 0;
+	let lastFrameTime = 0;
 	let canvasWidth = 0;
 	let canvasHeight = 0;
 
@@ -164,14 +165,18 @@
 	}
 
 	function gameLoop(timestamp: number): void {
+		// Calculate delta time normalized to 60fps (16.67ms per frame)
+		const deltaTime = lastFrameTime === 0 ? 1 : (timestamp - lastFrameTime) / 16.67;
+		lastFrameTime = timestamp;
+
 		if (state !== 'playing') {
 			draw();
 			animationId = requestAnimationFrame(gameLoop);
 			return;
 		}
 
-		// Update game state
-		updateGame(canvasHeight);
+		// Update game state with delta time
+		updateGame(canvasHeight, deltaTime);
 
 		// Spawn obstacles
 		if (timestamp - lastSpawnTime > GAME_CONFIG.OBSTACLE_SPAWN_INTERVAL) {
@@ -188,6 +193,7 @@
 	function startLoop(): void {
 		if (animationId !== null) return;
 		lastSpawnTime = performance.now();
+		lastFrameTime = 0; // Reset to get a fresh delta on first frame
 		animationId = requestAnimationFrame(gameLoop);
 	}
 
