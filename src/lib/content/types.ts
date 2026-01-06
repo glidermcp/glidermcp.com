@@ -139,7 +139,6 @@ export interface PricingContent {
 	authorLabel: string;
 	authorName: string;
 	authorUrl: string;
-	authorEmail: string;
 	licenseTitle: string;
 	licenseText: string;
 }

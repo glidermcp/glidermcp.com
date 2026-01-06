@@ -24,7 +24,6 @@ export const pricing: PricingContent = {
 	authorLabel: 'Built by',
 	authorName: 'Bogdan Novosad',
 	authorUrl: 'https://sacrorum.com',
-	authorEmail: 'bogdan@sacrorum.com',
 	licenseTitle: 'License',
 	licenseText: 'All Rights Reserved'
 };
