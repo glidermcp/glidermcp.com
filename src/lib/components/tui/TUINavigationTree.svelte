@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy, untrack } from 'svelte';
+	import { onMount, onDestroy, tick, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
@@ -65,18 +65,42 @@
 	// Track last synced path to detect actual navigation changes
 	let lastSyncedPath = $state('');
 
+	function findParentChain(navItems: NavItem[], href: string, parents: string[] = []): string[] | null {
+		for (const item of navItems) {
+			if (item.href === href) {
+				return parents;
+			}
+
+			if (item.children?.length) {
+				const result = findParentChain(item.children, href, [...parents, item.id]);
+				if (result) {
+					return result;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	// Sync selection with current path when the path actually changes (user navigated)
 	// This should ONLY run when currentPath changes, not when flatItems changes
 	$effect(() => {
 		const path = currentPath; // Only depend on currentPath
 		if (path !== lastSyncedPath) {
 			lastSyncedPath = path;
+			const parentChain = findParentChain(items, path) ?? [];
+			for (const id of parentChain) {
+				expandSection(id);
+			}
+
 			// Use untrack to prevent flatItems from being a dependency
 			untrack(() => {
-				const pathIndex = flatItems.findIndex(f => f.item.href === path);
-				if (pathIndex >= 0) {
-					setNavIndex(pathIndex);
-				}
+				tick().then(() => {
+					const pathIndex = flatItems.findIndex(f => f.item.href === path);
+					if (pathIndex >= 0) {
+						setNavIndex(pathIndex);
+					}
+				});
 			});
 		}
 	});
@@ -85,24 +109,6 @@
 	$effect(() => {
 		if (selectedIndex >= flatItems.length && flatItems.length > 0) {
 			setNavIndex(flatItems.length - 1);
-		}
-	});
-
-	// Expand all sections with children by default on mount (only once)
-	let hasInitializedExpanded = $state(false);
-	$effect(() => {
-		// Only run once on initial mount
-		if (!hasInitializedExpanded && $expandedSections.size === 0) {
-			hasInitializedExpanded = true;
-			const sectionsWithChildren = items
-				.filter(item => item.children?.length)
-				.map(item => item.id);
-
-			if (sectionsWithChildren.length > 0) {
-				for (const id of sectionsWithChildren) {
-					expandSection(id);
-				}
-			}
 		}
 	});
 

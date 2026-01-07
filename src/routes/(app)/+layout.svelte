@@ -7,10 +7,7 @@
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
 		focusedPanel,
-		expandedSections,
-		setFocusedPanel,
-		setNavIndex,
-		expandSection
+		setFocusedPanel
 	} from '$stores/keyboard';
 	import { getContent, type Locale } from '$lib/content';
 	import { FlappyBird } from '$components/game';
@@ -51,12 +48,6 @@
 
 	onMount(() => {
 		unsubscribe = keyboardManager.addHandler(handleContentKeyboard);
-		// Expand sections that have children by default
-		for (const item of content.navItems) {
-			if (item.children?.length) {
-				expandSection(item.id);
-			}
-		}
 	});
 
 	onDestroy(() => {
