@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
@@ -62,22 +62,22 @@
 	const selectedIndex = $derived($navSelectedIndex);
 	const isActive = $derived($focusedPanel === 'left');
 
-	// Find the index of the current path in flatItems
-	function findCurrentPathIndex(): number {
-		return flatItems.findIndex(f => f.item.href === currentPath);
-	}
-
-	// Track the last path to only sync when it actually changes
+	// Track last synced path to detect actual navigation changes
 	let lastSyncedPath = $state('');
 
-	// Sync selection with current path only when the path changes (not on every render)
+	// Sync selection with current path when the path actually changes (user navigated)
+	// This should ONLY run when currentPath changes, not when flatItems changes
 	$effect(() => {
-		if (currentPath !== lastSyncedPath) {
-			lastSyncedPath = currentPath;
-			const pathIndex = findCurrentPathIndex();
-			if (pathIndex >= 0) {
-				setNavIndex(pathIndex);
-			}
+		const path = currentPath; // Only depend on currentPath
+		if (path !== lastSyncedPath) {
+			lastSyncedPath = path;
+			// Use untrack to prevent flatItems from being a dependency
+			untrack(() => {
+				const pathIndex = flatItems.findIndex(f => f.item.href === path);
+				if (pathIndex >= 0) {
+					setNavIndex(pathIndex);
+				}
+			});
 		}
 	});
 
@@ -88,10 +88,12 @@
 		}
 	});
 
-	// Expand all sections with children by default on mount
+	// Expand all sections with children by default on mount (only once)
+	let hasInitializedExpanded = $state(false);
 	$effect(() => {
-		// Only run once on initial mount when expandedSections is empty
-		if ($expandedSections.size === 0) {
+		// Only run once on initial mount
+		if (!hasInitializedExpanded && $expandedSections.size === 0) {
+			hasInitializedExpanded = true;
 			const sectionsWithChildren = items
 				.filter(item => item.children?.length)
 				.map(item => item.id);
@@ -124,7 +126,6 @@
 				if (!current) return false;
 
 				if (current.hasChildren && current.isExpanded) {
-					// Collapse current section
 					collapseSection(current.item.id);
 				} else if (current.parentId) {
 					// Jump to parent
@@ -143,7 +144,6 @@
 
 				if (current.hasChildren) {
 					if (!current.isExpanded) {
-						// Expand section
 						expandSection(current.item.id);
 					} else {
 						// Move to first child
@@ -157,9 +157,15 @@
 			}
 
 			case 'toggle': {
+				// IMPORTANT: Prevent default immediately to stop Space from triggering
+				// the native anchor click behavior which would navigate to the href
+				event.preventDefault();
+				event.stopPropagation();
+
 				// Space: Toggle expand/collapse for sections with children
 				const current = flatItems[selectedIndex];
-				if (!current || current.item.disabled) return false;
+				if (!current || current.item.disabled) 
+					return true;
 
 				if (current.hasChildren) {
 					toggleSection(current.item.id);
@@ -176,15 +182,17 @@
 				return true;
 			}
 
-			case 'home':
+			case 'home': {
 				setNavIndex(0);
 				scrollToSelected();
 				return true;
+			}
 
-			case 'end':
+			case 'end': {
 				setNavIndex(flatItems.length - 1);
 				scrollToSelected();
 				return true;
+			}
 
 			default:
 				return false;
@@ -203,6 +211,10 @@
 	}
 
 	function handleItemClick(event: MouseEvent, index: number): void {
+		// Ignore clicks triggered by keyboard (Space/Enter activate anchors)
+		// We handle keyboard navigation separately in handleKeyboard
+		if (event.detail === 0) return;
+
 		const flat = flatItems[index];
 		if (!flat || flat.item.disabled) return;
 
@@ -246,7 +258,7 @@
 		if (flat.hasChildren) {
 			return flat.isExpanded ? '▼' : '▶';
 		}
-		return flat.depth > 0 ? '•' : '▶';
+		return '•';
 	}
 </script>
 
@@ -269,6 +281,12 @@
 			tabindex={index === selectedIndex ? 0 : -1}
 			style:padding-left="{flat.depth * 16 + 8}px"
 			onclick={(e) => handleItemClick(e, index)}
+			onkeydown={(e) => {
+				// Prevent Space from triggering anchor click - we handle it in keyboard manager
+				if (e.key === ' ') {
+					e.preventDefault();
+				}
+			}}
 		>
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
