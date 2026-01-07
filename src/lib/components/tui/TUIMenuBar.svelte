@@ -27,7 +27,14 @@
 		<span class="title">{title}</span>
 	</div>
 	<div class="menubar-right">
-		<span class="theme-indicator">[{themeName}]</span>
+		<button
+			class="theme-indicator"
+			onclick={toggleTheme}
+			title="Toggle theme"
+			aria-label="Toggle theme"
+		>
+			[{themeName}]
+		</button>
 		<button class="theme-toggle" onclick={toggleTheme} title="F9 to toggle theme">
 			F9 Theme
 		</button>
@@ -85,8 +92,23 @@
 	}
 
 	.theme-indicator {
+		background: transparent;
+		border: 1px solid transparent;
 		color: var(--text-muted);
 		font-size: var(--font-size-sm);
+		font-family: var(--font-mono);
+		cursor: pointer;
+		padding: var(--spacing-xs) var(--spacing-sm);
+	}
+
+	.theme-indicator:hover {
+		color: var(--menu-fg);
+		border-color: var(--border);
+	}
+
+	.theme-indicator:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
 	}
 
 	.theme-toggle {
@@ -122,6 +144,10 @@
 
 		.hamburger-button {
 			display: inline-flex;
+		}
+
+		.theme-toggle {
+			display: none;
 		}
 	}
 </style>

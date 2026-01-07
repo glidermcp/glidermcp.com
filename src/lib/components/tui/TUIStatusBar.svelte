@@ -144,4 +144,10 @@
 		color: var(--status-fg);
 		padding: var(--spacing-xs) var(--spacing-sm);
 	}
+
+	@media (max-width: 768px) {
+		.tui-statusbar {
+			display: none;
+		}
+	}
 </style>
