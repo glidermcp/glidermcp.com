@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { getHighlighter, resolveLanguage } from '$lib/utils/shiki';
 
 	interface Props {
 		code: string;
@@ -16,14 +17,11 @@
 
 	async function loadShiki() {
 		try {
-			const { createHighlighter } = await import('shiki');
-			const highlighter = await createHighlighter({
-				themes: ['github-dark'],
-				langs: [language, 'bash', 'json', 'typescript', 'csharp', 'plaintext']
-			});
+			const highlighter = await getHighlighter();
+			const resolvedLanguage = resolveLanguage(language);
 
 			highlightedHtml = highlighter.codeToHtml(code, {
-				lang: language,
+				lang: resolvedLanguage,
 				theme: 'github-dark'
 			});
 			shikiLoaded = true;
