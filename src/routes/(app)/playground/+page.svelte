@@ -9,4 +9,27 @@
 	<title>Playground - {content.meta.title}</title>
 </svelte:head>
 
-<PlaygroundView />
+<section class="playground-page">
+	<p class="playground-mobile-message">Playground is available on desktop.</p>
+	<div class="playground-desktop">
+		<PlaygroundView />
+	</div>
+</section>
+
+<style>
+	.playground-mobile-message {
+		display: none;
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	@media (max-width: 768px) {
+		.playground-desktop {
+			display: none;
+		}
+
+		.playground-mobile-message {
+			display: block;
+		}
+	}
+</style>

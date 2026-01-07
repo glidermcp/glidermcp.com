@@ -274,6 +274,7 @@
 		<a
 			href={flat.item.href}
 			class="nav-item"
+			class:playground={flat.item.href === '/playground'}
 			class:selected={index === selectedIndex}
 			class:current={isCurrentPath(flat.item.href)}
 			class:disabled={flat.item.disabled}
@@ -398,5 +399,11 @@
 	.label {
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	@media (max-width: 768px) {
+		.nav-item.playground {
+			display: none;
+		}
 	}
 </style>
