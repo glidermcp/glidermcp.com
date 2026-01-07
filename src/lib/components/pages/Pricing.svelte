@@ -11,8 +11,8 @@
 
 	// Assemble email from parts to obfuscate from bots
 	const emailParts = ['bogdan', 'sacrorum.com'];
-	let email = '';
-	let mailto = '';
+	let email = $state('');
+	let mailto = $state('');
 
 	onMount(() => {
 		email = emailParts.join('@');
