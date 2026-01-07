@@ -8,14 +8,9 @@ test.describe('Pricing Page', () => {
 	});
 
 	test('should display obfuscated email as clickable mailto link', async ({ page }) => {
-		// Find the email link
-		const emailLink = page.locator('a[href^="mailto:"]');
+		// Wait for client-side render of the email link
+		const emailLink = page.locator('a[href="mailto:bogdan@sacrorum.com"]');
 		await expect(emailLink).toBeVisible();
-
-		// Verify the mailto href is correct (assembled from parts)
-		await expect(emailLink).toHaveAttribute('href', 'mailto:bogdan@sacrorum.com');
-
-		// Verify the displayed text is the email
 		await expect(emailLink).toHaveText('bogdan@sacrorum.com');
 	});
 
