@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { dev } from '$app/environment';
 	import { theme, applyTheme, type ThemeType } from '$stores/theme';
 	import {
 		initNetworkStatus,
@@ -15,6 +16,7 @@
 	}
 
 	let { children }: Props = $props();
+	const isAnalyticsEnabled = !dev && !import.meta.env.VITE_DISABLE_GA;
 
 	// Apply theme on mount and when it changes
 	onMount(() => {
@@ -44,6 +46,18 @@
 		applyTheme($theme);
 	});
 </script>
+
+{#if isAnalyticsEnabled}
+	<svelte:head>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-MQP7KFQ9YD"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'G-MQP7KFQ9YD');
+		</script>
+	</svelte:head>
+{/if}
 
 {@render children()}
 <Toast />
