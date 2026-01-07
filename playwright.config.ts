@@ -19,7 +19,7 @@ export default defineConfig({
 		}
 	],
 	webServer: {
-		command: 'yarn build && yarn preview',
+		command: 'VITE_DISABLE_GA=true yarn build && VITE_DISABLE_GA=true yarn preview',
 		url: 'http://localhost:4173',
 		reuseExistingServer: !process.env.CI
 	}
