@@ -77,20 +77,20 @@ test.describe('Keyboard Navigation', () => {
 		await expect(page.locator('body')).toBeVisible();
 	});
 
-	test('should expand all sections by default on page load', async ({ page }) => {
+	test('should keep sections collapsed by default on page load', async ({ page }) => {
 		await page.goto('/');
 
-		// Installation and Tools sections should be expanded by default
-		// Check for child items being visible (e.g., "Claude Code" under Installation)
-		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
-		await expect(page.locator('.nav-item:has-text("server_status")')).toBeVisible();
+		// Installation and Tools sections should be collapsed by default
+		// Check for child items being hidden (e.g., "Claude Code" under Installation)
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).not.toBeVisible();
+		await expect(page.locator('.nav-item:has-text("server_status")')).not.toBeVisible();
 
-		// Parent sections should show expanded indicator (▼)
+		// Parent sections should show collapsed indicator (▶)
 		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
-		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+		await expect(installationItem.locator('.prefix')).toHaveText('▶');
 
 		const toolsItem = page.locator('.nav-item:has-text("Tools")').first();
-		await expect(toolsItem.locator('.prefix')).toHaveText('▼');
+		await expect(toolsItem.locator('.prefix')).toHaveText('▶');
 	});
 
 	test('should toggle section expand/collapse with Space key', async ({ page }) => {
@@ -100,28 +100,23 @@ test.describe('Keyboard Navigation', () => {
 		await page.keyboard.press('ArrowDown'); // Quick Start
 		await page.keyboard.press('ArrowDown'); // Installation
 
-		// Verify Installation item is in the nav and expanded
+		// Verify Installation item is in the nav and collapsed
 		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
-		await expect(installationItem.locator('.prefix')).toHaveText('▼');
-
-		// Child items should be visible
-		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
-
-		// Press Space to collapse
-		await page.keyboard.press(' ');
-
-		// Section should now be collapsed (▶)
 		await expect(installationItem.locator('.prefix')).toHaveText('▶');
 
-		// Child items should be hidden
-		await expect(page.locator('.nav-item:has-text("Claude Code")')).not.toBeVisible();
-
-		// Press Space again to expand
+		// Press Space to expand
 		await page.keyboard.press(' ');
 
-		// Section should be expanded again
+		// Section should now be expanded (▼)
 		await expect(installationItem.locator('.prefix')).toHaveText('▼');
 		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
+
+		// Press Space again to collapse
+		await page.keyboard.press(' ');
+
+		// Section should be collapsed again
+		await expect(installationItem.locator('.prefix')).toHaveText('▶');
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).not.toBeVisible();
 	});
 
 	test('should navigate to page with Enter key without toggling', async ({ page }) => {
@@ -131,20 +126,21 @@ test.describe('Keyboard Navigation', () => {
 		await page.keyboard.press('ArrowDown'); // Quick Start
 		await page.keyboard.press('ArrowDown'); // Installation
 
-		// Verify it's expanded
+		// Verify it's collapsed
 		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
-		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+		await expect(installationItem.locator('.prefix')).toHaveText('▶');
 
 		// Press Enter to navigate (should NOT toggle)
 		await page.keyboard.press('Enter');
 
-		// Section should still be expanded (Enter navigates, doesn't toggle)
+		// Section should be expanded after navigation (Enter navigates, doesn't toggle)
+		await expect(page).toHaveURL(/\/installation$/);
 		await expect(installationItem.locator('.prefix')).toHaveText('▼');
+		await expect(page.locator('.nav-item:has-text("Claude Code")')).toBeVisible();
 
 		// Content panel should show Installation content (title is "Installation Guides")
 		await expect(page.locator('h2:has-text("Installation Guides")')).toBeVisible();
 		// URL should change to /installation
-		await expect(page).toHaveURL(/\/installation$/);
 	});
 
 	test('should navigate to leaf item with Enter key', async ({ page }) => {
