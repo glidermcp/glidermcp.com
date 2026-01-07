@@ -40,6 +40,7 @@ export interface ClientCard {
 	id: string;
 	name: string;
 	desc: string;
+	href: string;
 }
 
 export interface InstallationContent {

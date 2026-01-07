@@ -32,3 +32,15 @@
 
 	<p class="hint">{@html content.hint}</p>
 </div>
+
+<style>
+	.intro-content {
+		max-width: 650px;
+	}
+
+	.tagline {
+		color: var(--accent);
+		font-size: var(--font-size-base);
+		margin-bottom: var(--spacing-lg);
+	}
+</style>

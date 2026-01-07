@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, untrack } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
 		focusedPanel,
@@ -16,10 +17,10 @@
 
 	interface Props {
 		items: NavItem[];
-		onSelect?: (item: NavItem) => void;
+		currentPath?: string;
 	}
 
-	let { items, onSelect }: Props = $props();
+	let { items, currentPath = '/' }: Props = $props();
 
 	// Flatten items for keyboard navigation
 	interface FlatItem {
@@ -61,6 +62,25 @@
 	const selectedIndex = $derived($navSelectedIndex);
 	const isActive = $derived($focusedPanel === 'left');
 
+	// Track last synced path to detect actual navigation changes
+	let lastSyncedPath = $state('');
+
+	// Sync selection with current path when the path actually changes (user navigated)
+	// This should ONLY run when currentPath changes, not when flatItems changes
+	$effect(() => {
+		const path = currentPath; // Only depend on currentPath
+		if (path !== lastSyncedPath) {
+			lastSyncedPath = path;
+			// Use untrack to prevent flatItems from being a dependency
+			untrack(() => {
+				const pathIndex = flatItems.findIndex(f => f.item.href === path);
+				if (pathIndex >= 0) {
+					setNavIndex(pathIndex);
+				}
+			});
+		}
+	});
+
 	// Keep selection in bounds when items change
 	$effect(() => {
 		if (selectedIndex >= flatItems.length && flatItems.length > 0) {
@@ -68,10 +88,12 @@
 		}
 	});
 
-	// Expand all sections with children by default on mount
+	// Expand all sections with children by default on mount (only once)
+	let hasInitializedExpanded = $state(false);
 	$effect(() => {
-		// Only run once on initial mount when expandedSections is empty
-		if ($expandedSections.size === 0) {
+		// Only run once on initial mount
+		if (!hasInitializedExpanded && $expandedSections.size === 0) {
+			hasInitializedExpanded = true;
 			const sectionsWithChildren = items
 				.filter(item => item.children?.length)
 				.map(item => item.id);
@@ -104,7 +126,6 @@
 				if (!current) return false;
 
 				if (current.hasChildren && current.isExpanded) {
-					// Collapse current section
 					collapseSection(current.item.id);
 				} else if (current.parentId) {
 					// Jump to parent
@@ -123,7 +144,6 @@
 
 				if (current.hasChildren) {
 					if (!current.isExpanded) {
-						// Expand section
 						expandSection(current.item.id);
 					} else {
 						// Move to first child
@@ -137,9 +157,15 @@
 			}
 
 			case 'toggle': {
+				// IMPORTANT: Prevent default immediately to stop Space from triggering
+				// the native anchor click behavior which would navigate to the href
+				event.preventDefault();
+				event.stopPropagation();
+
 				// Space: Toggle expand/collapse for sections with children
 				const current = flatItems[selectedIndex];
-				if (!current || current.item.disabled) return false;
+				if (!current || current.item.disabled) 
+					return true;
 
 				if (current.hasChildren) {
 					toggleSection(current.item.id);
@@ -152,19 +178,21 @@
 				const current = flatItems[selectedIndex];
 				if (!current || current.item.disabled) return false;
 
-				onSelect?.(current.item);
+				goto(current.item.href);
 				return true;
 			}
 
-			case 'home':
+			case 'home': {
 				setNavIndex(0);
 				scrollToSelected();
 				return true;
+			}
 
-			case 'end':
+			case 'end': {
 				setNavIndex(flatItems.length - 1);
 				scrollToSelected();
 				return true;
+			}
 
 			default:
 				return false;
@@ -182,15 +210,37 @@
 		});
 	}
 
-	function handleItemClick(index: number): void {
-		setNavIndex(index);
+	function handleItemClick(event: MouseEvent, index: number): void {
+		// Ignore clicks triggered by keyboard (Space/Enter activate anchors)
+		// We handle keyboard navigation separately in handleKeyboard
+		if (event.detail === 0) return;
+
 		const flat = flatItems[index];
 		if (!flat || flat.item.disabled) return;
+
+		setNavIndex(index);
 
 		if (flat.hasChildren) {
 			toggleSection(flat.item.id);
 		}
-		onSelect?.(flat.item);
+
+		// Navigate via SvelteKit (link will handle it, but prevent default to avoid flash)
+		// Actually let the anchor handle navigation
+	}
+
+	function handleToggleClick(event: MouseEvent, index: number): void {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const flat = flatItems[index];
+		if (!flat || !flat.hasChildren) return;
+
+		toggleSection(flat.item.id);
+	}
+
+	// Check if a path is the current path or is an ancestor
+	function isCurrentPath(href: string): boolean {
+		return currentPath === href;
 	}
 
 	// Register keyboard handler
@@ -208,17 +258,18 @@
 		if (flat.hasChildren) {
 			return flat.isExpanded ? '▼' : '▶';
 		}
-		return flat.depth > 0 ? '•' : '▶';
+		return '•';
 	}
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
 <nav class="nav-tree" class:active={isActive} role="tree" aria-label="Navigation">
 	{#each flatItems as flat, index}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div
+		<a
+			href={flat.item.href}
 			class="nav-item"
 			class:selected={index === selectedIndex}
+			class:current={isCurrentPath(flat.item.href)}
 			class:disabled={flat.item.disabled}
 			class:has-children={flat.hasChildren}
 			class:expanded={flat.isExpanded}
@@ -226,13 +277,26 @@
 			aria-selected={index === selectedIndex}
 			aria-expanded={flat.hasChildren ? flat.isExpanded : undefined}
 			aria-disabled={flat.item.disabled}
+			aria-current={isCurrentPath(flat.item.href) ? 'page' : undefined}
 			tabindex={index === selectedIndex ? 0 : -1}
 			style:padding-left="{flat.depth * 16 + 8}px"
-			onclick={() => handleItemClick(index)}
+			onclick={(e) => handleItemClick(e, index)}
+			onkeydown={(e) => {
+				// Prevent Space from triggering anchor click - we handle it in keyboard manager
+				if (e.key === ' ') {
+					e.preventDefault();
+				}
+			}}
 		>
-			<span class="prefix">{getPrefix(flat)}</span>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<span
+				class="prefix"
+				class:clickable={flat.hasChildren}
+				onclick={(e) => flat.hasChildren && handleToggleClick(e, index)}
+			>{getPrefix(flat)}</span>
 			<span class="label">{flat.item.label}</span>
-		</div>
+		</a>
 	{/each}
 </nav>
 
@@ -256,6 +320,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		line-height: 1.4;
+		text-decoration: none;
 	}
 
 	.nav-item:hover:not(.disabled) {
@@ -265,6 +330,10 @@
 	.nav-item.selected {
 		background-color: var(--selection-bg);
 		color: var(--selection-fg);
+	}
+
+	.nav-item.current {
+		font-weight: 600;
 	}
 
 	.nav-tree.active .nav-item.selected {
@@ -280,6 +349,7 @@
 	.nav-item.disabled {
 		color: var(--text-muted);
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.nav-item:focus-visible {
@@ -293,6 +363,14 @@
 		margin-right: var(--spacing-xs);
 		color: var(--text-secondary);
 		font-size: var(--font-size-sm);
+	}
+
+	.prefix.clickable {
+		cursor: pointer;
+	}
+
+	.prefix.clickable:hover {
+		color: var(--accent);
 	}
 
 	.nav-item.selected .prefix {

@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
 	import type { InstallationContent } from '$lib/content/types';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { focusedPanel } from '$stores/keyboard';
 
 	interface Props {
 		content: InstallationContent;
-		onSelect: (id: string) => void;
 	}
 
-	let { content, onSelect }: Props = $props();
+	let { content }: Props = $props();
 
 	// Track selected card index for keyboard navigation
 	let selectedIndex = $state(0);
@@ -55,7 +55,7 @@
 				// Enter: Navigate to the selected client
 				const client = content.clients[selectedIndex];
 				if (client) {
-					onSelect(client.id);
+					goto(client.href);
 				}
 				return true;
 			}
@@ -76,7 +76,7 @@
 
 	function handleCardClick(index: number): void {
 		selectedIndex = index;
-		onSelect(content.clients[index].id);
+		// Navigation will be handled by the anchor
 	}
 
 	// Register keyboard handler
@@ -104,7 +104,8 @@
 	aria-label={content.ariaLabel}
 >
 	{#each content.clients as client, index}
-		<button
+		<a
+			href={client.href}
 			class="client-card"
 			class:selected={index === selectedIndex}
 			role="gridcell"
@@ -114,6 +115,74 @@
 		>
 			<span class="client-name">{client.name}</span>
 			<span class="client-desc">{client.desc}</span>
-		</button>
+		</a>
 	{/each}
 </div>
+
+<style>
+	.client-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: var(--spacing-md);
+		margin-top: var(--spacing-lg);
+	}
+
+	.client-card {
+		display: flex;
+		flex-direction: column;
+		padding: var(--spacing-md);
+		background-color: var(--bg-secondary);
+		border: 1px solid var(--border-dim);
+		cursor: pointer;
+		text-align: left;
+		font-family: var(--font-mono);
+		transition: border-color 0.15s;
+		text-decoration: none;
+	}
+
+	.client-card:hover {
+		border-color: var(--accent);
+	}
+
+	.client-card:focus {
+		outline: none;
+		border-color: var(--accent);
+		background-color: var(--selection-bg);
+	}
+
+	.client-card:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+
+	.client-card.selected {
+		border-color: var(--accent);
+		background-color: var(--selection-bg);
+	}
+
+	.client-grid.active .client-card.selected {
+		border-color: var(--accent);
+		background-color: var(--selection-bg);
+	}
+
+	.client-grid.active .client-card.selected .client-name,
+	.client-grid.active .client-card.selected .client-desc {
+		color: var(--selection-fg);
+	}
+
+	.client-grid:not(.active) .client-card.selected {
+		border-color: var(--border);
+		background-color: var(--selection-bg-dim);
+	}
+
+	.client-name {
+		color: var(--accent);
+		font-weight: 600;
+		margin-bottom: var(--spacing-xs);
+	}
+
+	.client-desc {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+	}
+</style>

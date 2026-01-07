@@ -31,3 +31,23 @@
 		</div>
 	{/if}
 {/each}
+
+<style>
+	.tool-category {
+		margin-bottom: var(--spacing-xl);
+	}
+
+	.tool-category :global(h3) {
+		color: var(--accent);
+		font-size: var(--font-size-sm);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin-bottom: var(--spacing-xs);
+	}
+
+	.category-desc {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+		margin-bottom: var(--spacing-md);
+	}
+</style>
