@@ -4,7 +4,11 @@
 	import TUIMenuBar from './TUIMenuBar.svelte';
 	import TUIStatusBar from './TUIStatusBar.svelte';
 	import { keyboardManager } from '$lib/services/keyboard-manager';
-	import { focusedPanel as focusedPanelStore, togglePanel } from '$stores/keyboard';
+	import {
+		focusedPanel as focusedPanelStore,
+		mobileNavOpen as mobileNavOpenStore,
+		setMobileNavOpen
+	} from '$stores/keyboard';
 
 	interface Props {
 		title?: string;
@@ -25,6 +29,7 @@
 	}: Props = $props();
 
 	const focusedPanel = $derived($focusedPanelStore);
+	const mobileNavOpen = $derived($mobileNavOpenStore);
 
 	// Initialize keyboard manager on mount
 	onMount(() => {
@@ -39,7 +44,7 @@
 <div class="tui-layout">
 	<TUIMenuBar {title} />
 
-	<div class="tui-main">
+	<div class="tui-main" class:mobile-nav-open={mobileNavOpen}>
 		<div
 			class="tui-panel tui-panel-left"
 			class:tui-panel-focused={focusedPanel === 'left'}
@@ -62,6 +67,13 @@
 				<span class="box-br">┘</span>
 			</div>
 		</div>
+
+		<button
+			class="tui-panel-overlay"
+			class:visible={mobileNavOpen}
+			aria-label="Close navigation"
+			onclick={() => setMobileNavOpen(false)}
+		></button>
 
 		<div class="tui-panel-divider">
 			<span class="box-v">│</span>
@@ -111,6 +123,7 @@
 		overflow: hidden;
 		padding: var(--spacing-xs);
 		gap: 0;
+		position: relative;
 	}
 
 	.tui-panel {
@@ -201,5 +214,55 @@
 		display: flex;
 		flex-direction: column;
 		color: var(--border-dim);
+	}
+
+	.tui-panel-overlay {
+		display: none;
+	}
+
+	@media (max-width: 768px) {
+		.tui-main {
+			padding: 0;
+		}
+
+		.tui-panel-left {
+			position: absolute;
+			top: var(--spacing-xs);
+			bottom: var(--spacing-xs);
+			left: var(--spacing-xs);
+			width: min(80vw, 280px);
+			transform: translateX(-120%);
+			transition: transform 0.2s ease;
+			z-index: 3;
+			background-color: var(--bg-primary);
+		}
+
+		.tui-main.mobile-nav-open .tui-panel-left {
+			transform: translateX(0);
+		}
+
+		.tui-panel-right {
+			width: 100%;
+		}
+
+		.tui-panel-overlay {
+			position: absolute;
+			inset: 0;
+			display: block;
+			background: rgba(0, 0, 0, 0.45);
+			border: none;
+			cursor: pointer;
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
+			transition: opacity 0.2s ease;
+			z-index: 2;
+		}
+
+		.tui-panel-overlay.visible {
+			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
+		}
 	}
 </style>
