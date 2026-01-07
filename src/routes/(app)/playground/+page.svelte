@@ -17,6 +17,18 @@
 </section>
 
 <style>
+	.playground-page {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		min-height: 0;
+	}
+
+	.playground-desktop {
+		flex: 1;
+		min-height: 0;
+	}
+
 	.playground-mobile-message {
 		display: none;
 		margin: 0;
