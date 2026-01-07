@@ -68,7 +68,7 @@
 	function findParentChain(navItems: NavItem[], href: string, parents: string[] = []): string[] | null {
 		for (const item of navItems) {
 			if (item.href === href) {
-				return parents;
+				return item.children?.length ? [...parents, item.id] : parents;
 			}
 
 			if (item.children?.length) {
