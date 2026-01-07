@@ -47,8 +47,8 @@
 	});
 </script>
 
-{#if isAnalyticsEnabled}
-	<svelte:head>
+<svelte:head>
+	{#if isAnalyticsEnabled}
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-MQP7KFQ9YD"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
@@ -56,8 +56,8 @@
 			gtag('js', new Date());
 			gtag('config', 'G-MQP7KFQ9YD');
 		</script>
-	</svelte:head>
-{/if}
+	{/if}
+</svelte:head>
 
 {@render children()}
 <Toast />
