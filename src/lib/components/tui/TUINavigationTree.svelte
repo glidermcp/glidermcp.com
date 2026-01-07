@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
 		focusedPanel,
@@ -16,10 +17,10 @@
 
 	interface Props {
 		items: NavItem[];
-		onSelect?: (item: NavItem) => void;
+		currentPath?: string;
 	}
 
-	let { items, onSelect }: Props = $props();
+	let { items, currentPath = '/' }: Props = $props();
 
 	// Flatten items for keyboard navigation
 	interface FlatItem {
@@ -60,6 +61,25 @@
 
 	const selectedIndex = $derived($navSelectedIndex);
 	const isActive = $derived($focusedPanel === 'left');
+
+	// Find the index of the current path in flatItems
+	function findCurrentPathIndex(): number {
+		return flatItems.findIndex(f => f.item.href === currentPath);
+	}
+
+	// Track the last path to only sync when it actually changes
+	let lastSyncedPath = $state('');
+
+	// Sync selection with current path only when the path changes (not on every render)
+	$effect(() => {
+		if (currentPath !== lastSyncedPath) {
+			lastSyncedPath = currentPath;
+			const pathIndex = findCurrentPathIndex();
+			if (pathIndex >= 0) {
+				setNavIndex(pathIndex);
+			}
+		}
+	});
 
 	// Keep selection in bounds when items change
 	$effect(() => {
@@ -152,7 +172,7 @@
 				const current = flatItems[selectedIndex];
 				if (!current || current.item.disabled) return false;
 
-				onSelect?.(current.item);
+				goto(current.item.href);
 				return true;
 			}
 
@@ -182,15 +202,33 @@
 		});
 	}
 
-	function handleItemClick(index: number): void {
-		setNavIndex(index);
+	function handleItemClick(event: MouseEvent, index: number): void {
 		const flat = flatItems[index];
 		if (!flat || flat.item.disabled) return;
+
+		setNavIndex(index);
 
 		if (flat.hasChildren) {
 			toggleSection(flat.item.id);
 		}
-		onSelect?.(flat.item);
+
+		// Navigate via SvelteKit (link will handle it, but prevent default to avoid flash)
+		// Actually let the anchor handle navigation
+	}
+
+	function handleToggleClick(event: MouseEvent, index: number): void {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const flat = flatItems[index];
+		if (!flat || !flat.hasChildren) return;
+
+		toggleSection(flat.item.id);
+	}
+
+	// Check if a path is the current path or is an ancestor
+	function isCurrentPath(href: string): boolean {
+		return currentPath === href;
 	}
 
 	// Register keyboard handler
@@ -215,10 +253,11 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
 <nav class="nav-tree" class:active={isActive} role="tree" aria-label="Navigation">
 	{#each flatItems as flat, index}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div
+		<a
+			href={flat.item.href}
 			class="nav-item"
 			class:selected={index === selectedIndex}
+			class:current={isCurrentPath(flat.item.href)}
 			class:disabled={flat.item.disabled}
 			class:has-children={flat.hasChildren}
 			class:expanded={flat.isExpanded}
@@ -226,13 +265,20 @@
 			aria-selected={index === selectedIndex}
 			aria-expanded={flat.hasChildren ? flat.isExpanded : undefined}
 			aria-disabled={flat.item.disabled}
+			aria-current={isCurrentPath(flat.item.href) ? 'page' : undefined}
 			tabindex={index === selectedIndex ? 0 : -1}
 			style:padding-left="{flat.depth * 16 + 8}px"
-			onclick={() => handleItemClick(index)}
+			onclick={(e) => handleItemClick(e, index)}
 		>
-			<span class="prefix">{getPrefix(flat)}</span>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<span
+				class="prefix"
+				class:clickable={flat.hasChildren}
+				onclick={(e) => flat.hasChildren && handleToggleClick(e, index)}
+			>{getPrefix(flat)}</span>
 			<span class="label">{flat.item.label}</span>
-		</div>
+		</a>
 	{/each}
 </nav>
 
@@ -256,6 +302,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		line-height: 1.4;
+		text-decoration: none;
 	}
 
 	.nav-item:hover:not(.disabled) {
@@ -265,6 +312,10 @@
 	.nav-item.selected {
 		background-color: var(--selection-bg);
 		color: var(--selection-fg);
+	}
+
+	.nav-item.current {
+		font-weight: 600;
 	}
 
 	.nav-tree.active .nav-item.selected {
@@ -280,6 +331,7 @@
 	.nav-item.disabled {
 		color: var(--text-muted);
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	.nav-item:focus-visible {
@@ -293,6 +345,14 @@
 		margin-right: var(--spacing-xs);
 		color: var(--text-secondary);
 		font-size: var(--font-size-sm);
+	}
+
+	.prefix.clickable {
+		cursor: pointer;
+	}
+
+	.prefix.clickable:hover {
+		color: var(--accent);
 	}
 
 	.nav-item.selected .prefix {

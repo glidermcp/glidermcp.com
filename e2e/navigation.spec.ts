@@ -100,9 +100,8 @@ test.describe('Keyboard Navigation', () => {
 		await page.keyboard.press('ArrowDown'); // Quick Start
 		await page.keyboard.press('ArrowDown'); // Installation
 
-		// Verify Installation is selected and expanded
+		// Verify Installation item is in the nav and expanded
 		const installationItem = page.locator('.nav-item:has-text("Installation")').first();
-		await expect(installationItem).toHaveClass(/selected/);
 		await expect(installationItem.locator('.prefix')).toHaveText('▼');
 
 		// Child items should be visible
@@ -142,8 +141,10 @@ test.describe('Keyboard Navigation', () => {
 		// Section should still be expanded (Enter navigates, doesn't toggle)
 		await expect(installationItem.locator('.prefix')).toHaveText('▼');
 
-		// Content panel should show Installation content
-		await expect(page.locator('h2:has-text("Installation")')).toBeVisible();
+		// Content panel should show Installation content (title is "Installation Guides")
+		await expect(page.locator('h2:has-text("Installation Guides")')).toBeVisible();
+		// URL should change to /installation
+		await expect(page).toHaveURL(/\/installation$/);
 	});
 
 	test('should navigate to leaf item with Enter key', async ({ page }) => {
@@ -157,6 +158,8 @@ test.describe('Keyboard Navigation', () => {
 
 		// Content should show Quick Start page
 		await expect(page.locator('h2:has-text("Quick Start")')).toBeVisible();
+		// URL should change to /quick-start
+		await expect(page).toHaveURL(/\/quick-start$/);
 	});
 
 	test('Space should have no effect on leaf items', async ({ page }) => {

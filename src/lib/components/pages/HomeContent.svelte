@@ -28,7 +28,7 @@
 {:else if selectedId === 'quick-start'}
 	<QuickStart content={content.quickStart} />
 {:else if selectedId === 'installation'}
-	<InstallationOverview content={content.installation} onSelect={onSelect} />
+	<InstallationOverview content={content.installation} />
 {:else if selectedId.startsWith('install-')}
 	{#if selectedId === content.installationOther.id}
 		<InstallationOther content={content.installationOther} />

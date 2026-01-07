@@ -66,3 +66,49 @@
 {:else}
 	<p class="muted">{content.notFoundText}</p>
 {/if}
+
+<style>
+	.tool-category-badge {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+		margin-top: calc(-1 * var(--spacing-sm));
+	}
+
+	.params-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: var(--font-size-sm);
+		margin: var(--spacing-md) 0;
+	}
+
+	.params-table th {
+		text-align: left;
+		color: var(--text-muted);
+		font-weight: 500;
+		padding: var(--spacing-xs) var(--spacing-sm);
+		border-bottom: 1px solid var(--border-dim);
+	}
+
+	.params-table td {
+		padding: var(--spacing-xs) var(--spacing-sm);
+		color: var(--text-secondary);
+		vertical-align: top;
+		border-bottom: 1px solid var(--border-dim);
+	}
+
+	.param-name {
+		color: var(--accent);
+		font-family: var(--font-mono);
+	}
+
+	.param-type {
+		color: var(--text-muted);
+		font-family: var(--font-mono);
+	}
+
+	.example-desc {
+		color: var(--text-muted);
+		font-size: var(--font-size-sm);
+		margin-bottom: var(--spacing-xs);
+	}
+</style>

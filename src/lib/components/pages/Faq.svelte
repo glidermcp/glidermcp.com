@@ -18,3 +18,26 @@
 		{/each}
 	</div>
 {/each}
+
+<style>
+	.faq-item {
+		margin-bottom: var(--spacing-lg);
+		padding-bottom: var(--spacing-lg);
+		border-bottom: 1px solid var(--border-dim);
+	}
+
+	.faq-item:last-child {
+		border-bottom: none;
+	}
+
+	.faq-item :global(h3) {
+		color: var(--text-primary);
+		margin-top: 0;
+	}
+
+	.faq-item :global(code) {
+		background-color: var(--bg-secondary);
+		padding: 2px var(--spacing-xs);
+		color: var(--accent);
+	}
+</style>

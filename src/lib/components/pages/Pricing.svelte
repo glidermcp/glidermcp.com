@@ -38,3 +38,25 @@
 
 <h3>{content.licenseTitle}</h3>
 <p>{content.licenseText}</p>
+
+<style>
+	.pricing-card {
+		background-color: var(--bg-secondary);
+		border: 1px solid var(--accent);
+		padding: var(--spacing-lg);
+		margin: var(--spacing-lg) 0;
+		max-width: 300px;
+	}
+
+	.pricing-card :global(h3) {
+		margin: 0 0 var(--spacing-sm) 0;
+		color: var(--accent);
+	}
+
+	.price {
+		font-size: 2rem;
+		color: var(--text-primary);
+		font-weight: 700;
+		margin: 0 0 var(--spacing-md) 0;
+	}
+</style>

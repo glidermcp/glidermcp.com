@@ -9,12 +9,12 @@ export const installation: InstallationContent = {
 	ariaLabel: 'Installation guides',
 	notFoundText: 'Installation guide not found.',
 	clients: [
-		{ id: 'install-claude-code', name: 'Claude Code', desc: "Anthropic's CLI for Claude" },
-		{ id: 'install-codex', name: 'Codex CLI', desc: "OpenAI's terminal agent" },
-		{ id: 'install-gemini', name: 'Gemini CLI', desc: "Google's AI assistant" },
-		{ id: 'install-cursor', name: 'Cursor', desc: 'AI-first code editor' },
-		{ id: 'install-copilot', name: 'GitHub Copilot', desc: "GitHub's AI coding assistant" },
-		{ id: 'install-other', name: 'Other Clients', desc: 'Generic MCP configuration' }
+		{ id: 'install-claude-code', name: 'Claude Code', desc: "Anthropic's CLI for Claude", href: '/installation/claude-code' },
+		{ id: 'install-codex', name: 'Codex CLI', desc: "OpenAI's terminal agent", href: '/installation/codex' },
+		{ id: 'install-gemini', name: 'Gemini CLI', desc: "Google's AI assistant", href: '/installation/gemini' },
+		{ id: 'install-cursor', name: 'Cursor', desc: 'AI-first code editor', href: '/installation/cursor' },
+		{ id: 'install-copilot', name: 'GitHub Copilot', desc: "GitHub's AI coding assistant", href: '/installation/copilot' },
+		{ id: 'install-other', name: 'Other Clients', desc: 'Generic MCP configuration', href: '/installation/other' }
 	]
 };
 
