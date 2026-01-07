@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { CodeBlock } from '$components/docs';
 	import type { PricingContent } from '$lib/content/types';
 
@@ -10,8 +11,13 @@
 
 	// Assemble email from parts to obfuscate from bots
 	const emailParts = ['bogdan', 'sacrorum.com'];
-	const email = emailParts.join('@');
-	const mailto = `mailto:${email}`;
+	let email = $state('');
+	let mailto = $state('');
+
+	onMount(() => {
+		email = emailParts.join('@');
+		mailto = `mailto:${email}`;
+	});
 </script>
 
 <h2>{content.title}</h2>
@@ -34,7 +40,9 @@
 
 <h3>{content.authorTitle}</h3>
 <p>{content.authorLabel} <a href={content.authorUrl} class="link">{content.authorName}</a></p>
-<p class="muted"><a href={mailto} class="link">{email}</a></p>
+{#if email}
+	<p class="muted"><a href={mailto} class="link">{email}</a></p>
+{/if}
 
 <h3>{content.licenseTitle}</h3>
 <p>{content.licenseText}</p>
