@@ -132,7 +132,8 @@
 		gap: var(--spacing-sm);
 		padding: var(--spacing-xs);
 		overflow-y: auto;
-		max-height: 200px;
+		flex: 1;
+		min-height: 0;
 	}
 
 	.category {
