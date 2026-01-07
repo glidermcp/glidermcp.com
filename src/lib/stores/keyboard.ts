@@ -22,6 +22,9 @@ export const modalOpen = atom<boolean>(false);
 // Current content scroll position
 export const contentScrollTop = atom<number>(0);
 
+// Mobile navigation drawer open state
+export const mobileNavOpen = atom<boolean>(false);
+
 // Derived: is left panel focused
 export const isLeftFocused = computed(focusedPanel, (panel: FocusedPanel) => panel === 'left');
 
@@ -34,6 +37,21 @@ export const isRightFocused = computed(focusedPanel, (panel: FocusedPanel) => pa
 export function togglePanel(): void {
 	if (modalOpen.get()) return;
 	focusedPanel.set(focusedPanel.get() === 'left' ? 'right' : 'left');
+}
+
+/**
+ * Toggle mobile navigation drawer
+ */
+export function toggleMobileNav(): void {
+	if (modalOpen.get()) return;
+	mobileNavOpen.set(!mobileNavOpen.get());
+}
+
+/**
+ * Set mobile navigation drawer state
+ */
+export function setMobileNavOpen(open: boolean): void {
+	mobileNavOpen.set(open);
 }
 
 /**
@@ -131,4 +149,5 @@ export function resetNavigation(): void {
 	expandedSections.set(new Set());
 	modalOpen.set(false);
 	contentScrollTop.set(0);
+	mobileNavOpen.set(false);
 }
