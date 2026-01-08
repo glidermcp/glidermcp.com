@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { getHighlighter, resolveLanguage } from '$lib/utils/shiki';
+	import { theme } from '$stores/theme';
 
 	interface Props {
 		code: string;
@@ -14,16 +14,27 @@
 	let copied = $state(false);
 	let highlightedHtml = $state('');
 	let shikiLoaded = $state(false);
+	let renderToken = 0;
 
-	async function loadShiki() {
+	const currentTheme = $derived($theme);
+
+	function getShikiTheme(themeValue: string) {
+		return themeValue === 'total-commander' ? 'github-light' : 'github-dark';
+	}
+
+	async function loadShiki(themeValue: string, sourceCode: string, languageValue: string) {
+		const token = ++renderToken;
 		try {
 			const highlighter = await getHighlighter();
-			const resolvedLanguage = resolveLanguage(language);
+			const resolvedLanguage = resolveLanguage(languageValue);
+			const shikiTheme = getShikiTheme(themeValue);
 
-			highlightedHtml = highlighter.codeToHtml(code, {
+			const nextHtml = highlighter.codeToHtml(sourceCode, {
 				lang: resolvedLanguage,
-				theme: 'github-light'
+				theme: shikiTheme
 			});
+			if (token !== renderToken) return;
+			highlightedHtml = nextHtml;
 			shikiLoaded = true;
 		} catch (e) {
 			// Fallback to plain text
@@ -32,8 +43,12 @@
 		}
 	}
 
-	onMount(() => {
-		loadShiki();
+	$effect(() => {
+		// Re-render when theme, code, or language changes
+		const themeValue = currentTheme;
+		const sourceCode = code;
+		const languageValue = language;
+		loadShiki(themeValue, sourceCode, languageValue);
 	});
 
 	async function copyToClipboard() {

@@ -14,7 +14,7 @@ export function getHighlighter() {
 	if (!highlighterPromise) {
 		highlighterPromise = import('shiki').then(({ createHighlighter }) =>
 			createHighlighter({
-				themes: ['github-dark'],
+				themes: ['github-dark', 'github-light'],
 				langs: Array.from(supportedLanguages)
 			})
 		);
