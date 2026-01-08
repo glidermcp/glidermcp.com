@@ -6,13 +6,14 @@ Glider is distributed as a .NET global tool and exposes powerful code analysis t
 
 ## Features
 
-Glider provides 12 core tools for comprehensive C# code analysis and refactoring:
+Glider provides 14 core tools for comprehensive C# code analysis and refactoring:
+
+### Diagnostics
+- **get_diagnostics** - Compiler diagnostics (errors, warnings, info) for the loaded solution
 
 ### Solution Management
-- **server_status** - Health check and solution state
 - **load_solution** - Load C# solution for analysis
 - **load_project** - Load standalone C# project when no solution exists
-- **unload_solution** - Unload current solution from memory
 
 ### Code Analysis
 - **find_usages** - Find all references to a symbol
@@ -28,6 +29,10 @@ Glider provides 12 core tools for comprehensive C# code analysis and refactoring
 
 ### External Source
 - **view_external_definition** - View source code of NuGet/framework types (via SourceLink or decompilation)
+
+### Architecture & Metrics
+- **get_type_dependencies** - Analyze type dependencies (uses/used-by)
+- **analyze_complexity** - Complexity metrics (cyclomatic complexity, LOC, method counts)
 
 ## Transports
 
@@ -188,32 +193,6 @@ Use the get_type_info tool to analyze the UserController class
 
 ## Tool Reference
 
-### server_status
-
-Returns the current server state and loaded solution information.
-
-**Parameters:** None
-
-**Example Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "serverRunning": true,
-    "solutionLoaded": true,
-    "solutionPath": "/path/to/solution.sln",
-    "projectCount": 4,
-    "projects": [
-      {
-        "name": "Glider",
-        "filePath": "/path/to/Glider.csproj"
-      }
-    ]
-  },
-  "error": null
-}
-```
-
 ### load_solution
 
 Loads a C# solution file for analysis.
@@ -241,12 +220,6 @@ Loads a standalone C# project file for analysis. Use this when no solution file 
   "projectPath": "/Users/yourname/projects/MyApp/MyApp.csproj"
 }
 ```
-
-### unload_solution
-
-Unloads the currently loaded solution from memory.
-
-**Parameters:** None
 
 ### find_usages
 
@@ -512,6 +485,157 @@ Views the source code of external symbols (types, methods, properties, etc.) fro
 }
 ```
 
+### get_diagnostics
+
+Gets compiler diagnostics (warnings, errors, info) for the loaded solution.
+
+**Parameters:**
+- `filePath` (string, optional) - Limit diagnostics to a specific file path
+- `projectName` (string, optional) - Limit diagnostics to a specific project
+- `severity` (string, optional) - Minimum severity (`error`, `warning`, `info`, `hidden`). Default: `warning`
+
+**Example Request:**
+```json
+{
+  "filePath": "/path/to/File.cs",
+  "severity": "error"
+}
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "diagnosticCount": 3,
+    "errorCount": 1,
+    "warningCount": 2,
+    "infoCount": 0,
+    "diagnostics": [
+      {
+        "id": "CS1002",
+        "severity": "Error",
+        "message": "; expected",
+        "filePath": "/path/to/File.cs",
+        "lineNumber": 42,
+        "column": 17,
+        "endLineNumber": 42,
+        "endColumn": 18,
+        "category": "Syntax",
+        "projectName": "MyProject"
+      }
+    ]
+  },
+  "error": null
+}
+```
+
+### get_type_dependencies
+
+Analyzes type dependencies to show what types a given type uses and what types use it.
+
+**Parameters:**
+- `typeName` (string) - Name of the type to analyze
+- `projectName` (string, optional) - Limit search to specific project
+- `direction` (string, optional) - `uses`, `used_by`, or `both` (default)
+
+**Example Request:**
+```json
+{
+  "typeName": "SolutionManager",
+  "direction": "both"
+}
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "typeName": "SolutionManager",
+    "fullName": "Glider.Services.SolutionManager",
+    "filePath": "/path/to/SolutionManager.cs",
+    "usesCount": 4,
+    "usedByCount": 2,
+    "uses": [
+      {
+        "typeName": "Workspace",
+        "fullName": "Microsoft.CodeAnalysis.Workspace",
+        "namespace": "Microsoft.CodeAnalysis",
+        "usageKind": "Field",
+        "filePath": null,
+        "isExternal": true
+      }
+    ],
+    "usedBy": [
+      {
+        "typeName": "SolutionTools",
+        "fullName": "Glider.Server.SolutionTools",
+        "namespace": "Glider.Server",
+        "usageKind": "Method",
+        "filePath": "/path/to/SolutionTools.cs",
+        "isExternal": false
+      }
+    ]
+  },
+  "error": null
+}
+```
+
+### analyze_complexity
+
+Analyzes code complexity metrics including cyclomatic complexity, lines of code, and method counts.
+
+**Parameters:**
+- `typeName` (string, optional) - Analyze a specific type
+- `filePath` (string, optional) - Analyze a specific file
+- `projectName` (string, optional) - Limit search to specific project
+
+**Example Request:**
+```json
+{
+  "projectName": "MyProject"
+}
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "totalTypes": 12,
+      "totalMethods": 84,
+      "totalLinesOfCode": 3200,
+      "averageComplexity": 3.1,
+      "maxComplexity": 12,
+      "highComplexityMethodCount": 4
+    },
+    "types": [
+      {
+        "name": "SolutionManager",
+        "fullName": "Glider.Services.SolutionManager",
+        "kind": "Class",
+        "filePath": "/path/to/SolutionManager.cs",
+        "linesOfCode": 240,
+        "methodCount": 8,
+        "averageComplexity": 2.4,
+        "methods": [
+          {
+            "name": "LoadSolutionAsync",
+            "cyclomaticComplexity": 4,
+            "linesOfCode": 32,
+            "parameterCount": 1,
+            "lineNumber": 58
+          }
+        ]
+      }
+    ]
+  },
+  "error": null
+}
+```
+
 ## Important: Version Expiration
 
 Each version of Glider expires 1 month after release. This ensures users stay on recent versions with the latest fixes and features.
@@ -534,14 +658,19 @@ Glider follows a clean service-oriented architecture:
 - **IMethodAnalysisService** - Method signature analysis
 - **IRefactoringService** - Code refactoring (rename, move type, move member)
 - **IExternalSourceService** - External source retrieval (SourceLink/decompilation)
+- **IDiagnosticsService** - Compiler diagnostics retrieval
+- **IDependencyAnalysisService** - Type dependency analysis (uses/used-by)
+- **ICodeMetricsService** - Code complexity metrics
 
 ### MCP Tool Layer (Glider.Server)
-- **DiagnosticTools** - Server health and status
+- **DiagnosticTools** - Server health/status and diagnostics
 - **SolutionTools** - Solution and project management
 - **CodeFinderTools** - Symbol finding and type search
 - **CodeAnalysisTools** - Type and method analysis
 - **RefactoringTools** - Rename and move operations
 - **ExternalSourceTools** - External source viewing
+- **DependencyTools** - Type dependency analysis
+- **MetricsTools** - Code complexity metrics
 
 ### Response Format
 

@@ -15,6 +15,18 @@
 		return TOOLS.find(t => t.id === toolId);
 	}
 
+	function buildRequest(toolName: string, params: Record<string, unknown>) {
+		return {
+			jsonrpc: '2.0',
+			id: 1,
+			method: 'tools/call',
+			params: {
+				name: toolName,
+				arguments: params ?? {}
+			}
+		};
+	}
+
 	const tool = $derived.by(() => getToolFromNavId(selectedId));
 </script>
 
@@ -53,7 +65,18 @@
 		<h3>{content.examplesTitle}</h3>
 		{#each tool.examples as example}
 			<p class="example-desc">{example.description}</p>
-			<CodeBlock code={JSON.stringify(example.params, null, 2)} language="json" />
+			<CodeBlock
+				code={JSON.stringify(buildRequest(tool.name, example.params), null, 2)}
+				language="json"
+				title={content.exampleRequestTitle}
+			/>
+			{#if tool.responseExample}
+				<CodeBlock
+					code={JSON.stringify(tool.responseExample, null, 2)}
+					language="json"
+					title={content.exampleResponseTitle}
+				/>
+			{/if}
 		{/each}
 	{/if}
 

@@ -48,8 +48,8 @@ describe('playground store', () => {
 	});
 
 	describe('selectedToolId', () => {
-		it('should default to server_status', () => {
-			expect(selectedToolId.get()).toBe('server_status');
+		it('should default to get_diagnostics', () => {
+			expect(selectedToolId.get()).toBe('get_diagnostics');
 		});
 	});
 
@@ -61,16 +61,16 @@ describe('playground store', () => {
 
 		it('should not change tool for invalid id', () => {
 			selectTool('invalid_tool');
-			expect(selectedToolId.get()).toBe('server_status');
+			expect(selectedToolId.get()).toBe('get_diagnostics');
 		});
 	});
 
 	describe('selectedTool computed', () => {
 		it('should return tool metadata for valid id', () => {
-			selectTool('server_status');
+			selectTool('get_diagnostics');
 			const tool = selectedTool.get();
 			expect(tool).toBeDefined();
-			expect(tool?.id).toBe('server_status');
+			expect(tool?.id).toBe('get_diagnostics');
 		});
 	});
 
@@ -162,7 +162,7 @@ describe('playground store', () => {
 
 			resetPlayground();
 
-			expect(selectedToolId.get()).toBe('server_status');
+			expect(selectedToolId.get()).toBe('get_diagnostics');
 			expect(toolParams.get()).toEqual({});
 			expect(executionState.get()).toBe('idle');
 			expect(lastResponse.get()).toBeNull();

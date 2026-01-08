@@ -1,6 +1,6 @@
 /**
  * Tool Metadata Definitions
- * All 12 Glider MCP tools with their schemas, parameters, and examples
+ * All 14 Glider MCP tools with their schemas, parameters, and examples
  */
 
 export type ToolCategory = 'diagnostics' | 'solution' | 'search' | 'analysis' | 'refactoring' | 'external';
@@ -28,6 +28,7 @@ export interface ToolMetadata {
 	parameters: ToolParameter[];
 	examples: ToolExample[];
 	responseDescription?: string;
+	responseExample?: Record<string, unknown>;
 }
 
 /**
@@ -36,7 +37,7 @@ export interface ToolMetadata {
 export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description: string }> = {
 	diagnostics: {
 		label: 'Diagnostics',
-		description: 'Check server status and health'
+		description: 'Compiler diagnostics and build health'
 	},
 	solution: {
 		label: 'Solution Management',
@@ -48,7 +49,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	analysis: {
 		label: 'Analysis',
-		description: 'Get detailed type and method information'
+		description: 'Type information, dependencies, and complexity metrics'
 	},
 	refactoring: {
 		label: 'Refactoring',
@@ -61,24 +62,74 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 };
 
 /**
- * All 12 tool metadata
+ * All 14 tool metadata
  */
 export const TOOLS: ToolMetadata[] = [
 	// Diagnostics
 	{
-		id: 'server_status',
-		name: 'server_status',
-		displayName: 'Server Status',
-		description: 'Returns server running status and solution loaded state.',
+		id: 'get_diagnostics',
+		name: 'get_diagnostics',
+		displayName: 'Get Diagnostics',
+		description: 'Gets compiler diagnostics (warnings, errors, info) for the loaded solution.',
 		category: 'diagnostics',
-		parameters: [],
-		examples: [
+		parameters: [
 			{
-				description: 'Check if server is running',
-				params: {}
+				name: 'filePath',
+				type: 'string',
+				description: 'Limit diagnostics to a specific file path.',
+				required: false,
+				placeholder: '/path/to/File.cs'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Limit diagnostics to a specific project.',
+				required: false,
+				placeholder: 'MyProject'
+			},
+			{
+				name: 'severity',
+				type: 'string',
+				description: 'Minimum severity: error, warning, info, hidden.',
+				required: false,
+				default: 'warning'
 			}
 		],
-		responseDescription: 'Returns status, version, and loaded solution info'
+		examples: [
+			{
+				description: 'Get diagnostics with default severity',
+				params: {}
+			},
+			{
+				description: 'Get errors for a specific file',
+				params: { filePath: '/path/to/File.cs', severity: 'error' }
+			}
+		],
+		responseDescription: 'Returns diagnostics grouped by severity with location details',
+		responseExample: {
+			success: true,
+			data: {
+				diagnosticCount: 3,
+				errorCount: 1,
+				warningCount: 2,
+				infoCount: 0,
+				diagnostics: [
+					{
+						id: 'CS1002',
+						severity: 'Error',
+						message: '; expected',
+						filePath: '/path/to/File.cs',
+						lineNumber: 42,
+						column: 17,
+						endLineNumber: 42,
+						endColumn: 18,
+						category: 'Syntax',
+						projectName: 'MyProject'
+					}
+				]
+			},
+			error: null
+		}
 	},
 
 	// Solution Management
@@ -103,7 +154,25 @@ export const TOOLS: ToolMetadata[] = [
 				params: { solutionPath: '/Users/dev/MyProject/MyProject.sln' }
 			}
 		],
-		responseDescription: 'Returns list of projects in the solution'
+		responseDescription: 'Returns list of projects in the solution',
+		responseExample: {
+			success: true,
+			data: {
+				solutionPath: '/Users/dev/MyProject/MyProject.sln',
+				projectCount: 2,
+				projects: [
+					{
+						name: 'MyProject',
+						filePath: '/Users/dev/MyProject/MyProject.csproj'
+					},
+					{
+						name: 'MyProject.Tests',
+						filePath: '/Users/dev/MyProject/MyProject.Tests.csproj'
+					}
+				]
+			},
+			error: null
+		}
 	},
 	{
 		id: 'load_project',
@@ -126,21 +195,16 @@ export const TOOLS: ToolMetadata[] = [
 				params: { projectPath: '/Users/dev/MyProject/MyProject.csproj' }
 			}
 		],
-		responseDescription: 'Returns project information'
-	},
-	{
-		id: 'unload_solution',
-		name: 'unload_solution',
-		displayName: 'Unload Solution',
-		description: 'Unloads the currently loaded solution from memory.',
-		category: 'solution',
-		parameters: [],
-		examples: [
-			{
-				description: 'Unload current solution',
-				params: {}
-			}
-		]
+		responseDescription: 'Returns project information',
+		responseExample: {
+			success: true,
+			data: {
+				projectName: 'MyProject',
+				projectPath: '/Users/dev/MyProject/MyProject.csproj',
+				frameworks: ['net8.0']
+			},
+			error: null
+		}
 	},
 
 	// Search
@@ -180,7 +244,26 @@ export const TOOLS: ToolMetadata[] = [
 				params: { pattern: '*Repository', projectName: 'DataLayer' }
 			}
 		],
-		responseDescription: 'Returns list of matching types with names, kinds, paths, and line numbers'
+		responseDescription: 'Returns list of matching types with names, kinds, paths, and line numbers',
+		responseExample: {
+			success: true,
+			data: {
+				pattern: '*Service',
+				matchCount: 2,
+				matches: [
+					{
+						typeName: 'UserService',
+						fullName: 'MyApp.Services.UserService',
+						kind: 'Class',
+						accessibility: 'Public',
+						filePath: '/path/to/UserService.cs',
+						lineNumber: 12,
+						projectName: 'MyApp'
+					}
+				]
+			},
+			error: null
+		}
 	},
 	{
 		id: 'find_usages',
@@ -214,7 +297,25 @@ export const TOOLS: ToolMetadata[] = [
 				params: { symbolName: 'GetUserById' }
 			}
 		],
-		responseDescription: 'Returns list of usage locations with file paths, line numbers, and snippets'
+		responseDescription: 'Returns list of usage locations with file paths, line numbers, and snippets',
+		responseExample: {
+			success: true,
+			data: {
+				symbolName: 'ISolutionManager',
+				symbolKind: 'Interface',
+				usageCount: 15,
+				usages: [
+					{
+						filePath: '/path/to/Program.cs',
+						lineNumber: 9,
+						column: 35,
+						lineText: 'builder.Services.AddSingleton<ISolutionManager, SolutionManager>();',
+						projectName: 'Glider.StdioServer'
+					}
+				]
+			},
+			error: null
+		}
 	},
 	{
 		id: 'find_implementation',
@@ -248,7 +349,26 @@ export const TOOLS: ToolMetadata[] = [
 				params: { typeName: 'IService', projectName: 'Services' }
 			}
 		],
-		responseDescription: 'Returns list of implementing types with names, paths, and line numbers'
+		responseDescription: 'Returns list of implementing types with names, paths, and line numbers',
+		responseExample: {
+			success: true,
+			data: {
+				baseTypeName: 'ISolutionManager',
+				baseTypeKind: 'Interface',
+				implementationCount: 1,
+				implementations: [
+					{
+						typeName: 'SolutionManager',
+						fullName: 'Glider.Services.SolutionManager',
+						kind: 'Class',
+						filePath: '/path/to/SolutionManager.cs',
+						lineNumber: 10,
+						projectName: 'Glider'
+					}
+				]
+			},
+			error: null
+		}
 	},
 
 	// Analysis
@@ -284,7 +404,28 @@ export const TOOLS: ToolMetadata[] = [
 				params: { typeName: 'MyApp.Services.UserService' }
 			}
 		],
-		responseDescription: 'Returns type details including members, base types, interfaces, and docs'
+		responseDescription: 'Returns type details including members, base types, interfaces, and docs',
+		responseExample: {
+			success: true,
+			data: {
+				name: 'SolutionManager',
+				fullName: 'Glider.Services.SolutionManager',
+				kind: 'Class',
+				accessibility: 'Public',
+				baseType: 'Object',
+				interfaces: ['ISolutionManager'],
+				members: [
+					{
+						name: 'LoadSolutionAsync',
+						kind: 'Method',
+						type: 'Task',
+						accessibility: 'Public',
+						signature: 'Task LoadSolutionAsync(string solutionPath)'
+					}
+				]
+			},
+			error: null
+		}
 	},
 	{
 		id: 'get_method_signature',
@@ -325,7 +466,163 @@ export const TOOLS: ToolMetadata[] = [
 				params: { methodName: 'Save', containingTypeName: 'UserRepository' }
 			}
 		],
-		responseDescription: 'Returns method signature with parameters, return type, and documentation'
+		responseDescription: 'Returns method signature with parameters, return type, and documentation',
+		responseExample: {
+			success: true,
+			data: {
+				name: 'LoadSolutionAsync',
+				returnType: 'Task',
+				containingType: 'ISolutionManager',
+				parameters: [
+					{
+						name: 'solutionPath',
+						type: 'string',
+						defaultValue: null,
+						modifiers: []
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_type_dependencies',
+		name: 'get_type_dependencies',
+		displayName: 'Get Type Dependencies',
+		description: 'Analyzes type dependencies to show what types a given type uses and what types use it.',
+		category: 'analysis',
+		parameters: [
+			{
+				name: 'typeName',
+				type: 'string',
+				description: 'Name of the type to analyze.',
+				required: true,
+				placeholder: 'SolutionManager'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Optional project name to limit the search scope.',
+				required: false,
+				placeholder: 'MyProject'
+			},
+			{
+				name: 'direction',
+				type: 'string',
+				description: 'Dependency direction: uses, used_by, or both.',
+				required: false,
+				default: 'both'
+			}
+		],
+		examples: [
+			{
+				description: 'Analyze dependencies for a type',
+				params: { typeName: 'SolutionManager' }
+			}
+		],
+		responseDescription: 'Returns types used by the target and types that reference it',
+		responseExample: {
+			success: true,
+			data: {
+				typeName: 'SolutionManager',
+				fullName: 'Glider.Services.SolutionManager',
+				filePath: '/path/to/SolutionManager.cs',
+				usesCount: 4,
+				usedByCount: 2,
+				uses: [
+					{
+						typeName: 'Workspace',
+						fullName: 'Microsoft.CodeAnalysis.Workspace',
+						namespace: 'Microsoft.CodeAnalysis',
+						usageKind: 'Field',
+						filePath: null,
+						isExternal: true
+					}
+				],
+				usedBy: [
+					{
+						typeName: 'SolutionTools',
+						fullName: 'Glider.Server.SolutionTools',
+						namespace: 'Glider.Server',
+						usageKind: 'Method',
+						filePath: '/path/to/SolutionTools.cs',
+						isExternal: false
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'analyze_complexity',
+		name: 'analyze_complexity',
+		displayName: 'Analyze Complexity',
+		description: 'Analyzes code complexity metrics including cyclomatic complexity, lines of code, and method counts.',
+		category: 'analysis',
+		parameters: [
+			{
+				name: 'typeName',
+				type: 'string',
+				description: 'Analyze a specific type.',
+				required: false,
+				placeholder: 'SolutionManager'
+			},
+			{
+				name: 'filePath',
+				type: 'string',
+				description: 'Analyze a specific file.',
+				required: false,
+				placeholder: '/path/to/SolutionManager.cs'
+			},
+			{
+				name: 'projectName',
+				type: 'string',
+				description: 'Optional project name to limit the search scope.',
+				required: false,
+				placeholder: 'MyProject'
+			}
+		],
+		examples: [
+			{
+				description: 'Analyze complexity across the solution',
+				params: {}
+			}
+		],
+		responseDescription: 'Returns summary metrics and per-type complexity details',
+		responseExample: {
+			success: true,
+			data: {
+				summary: {
+					totalTypes: 12,
+					totalMethods: 84,
+					totalLinesOfCode: 3200,
+					averageComplexity: 3.1,
+					maxComplexity: 12,
+					highComplexityMethodCount: 4
+				},
+				types: [
+					{
+						name: 'SolutionManager',
+						fullName: 'Glider.Services.SolutionManager',
+						kind: 'Class',
+						filePath: '/path/to/SolutionManager.cs',
+						linesOfCode: 240,
+						methodCount: 8,
+						averageComplexity: 2.4,
+						methods: [
+							{
+								name: 'LoadSolutionAsync',
+								cyclomaticComplexity: 4,
+								linesOfCode: 32,
+								parameterCount: 1,
+								lineNumber: 58
+							}
+						]
+					}
+				]
+			},
+			error: null
+		}
 	},
 
 	// Refactoring
@@ -375,7 +672,20 @@ export const TOOLS: ToolMetadata[] = [
 				params: { symbolName: 'OldName', newName: 'NewName', applyChanges: false }
 			}
 		],
-		responseDescription: 'Returns files changed, locations modified, and unified diff'
+		responseDescription: 'Returns files changed, locations modified, and unified diff',
+		responseExample: {
+			success: true,
+			data: {
+				symbolName: 'OldClassName',
+				newName: 'NewClassName',
+				symbolKind: 'Class',
+				filesChanged: 5,
+				locationsChanged: 12,
+				applied: true,
+				unifiedDiff: '...'
+			},
+			error: null
+		}
 	},
 	{
 		id: 'move_type',
@@ -430,7 +740,21 @@ export const TOOLS: ToolMetadata[] = [
 				params: { typeName: 'MyClass', targetNamespace: 'MyApp.NewNamespace' }
 			}
 		],
-		responseDescription: 'Returns source and target locations, files changed/created, and diff'
+		responseDescription: 'Returns source and target locations, files changed/created, and diff',
+		responseExample: {
+			success: true,
+			data: {
+				symbolName: 'MyClass',
+				symbolKind: 'Class',
+				sourceLocation: '/path/to/OldFile.cs',
+				targetLocation: '/path/to/NewFile.cs',
+				filesChanged: 3,
+				filesCreated: 1,
+				applied: true,
+				unifiedDiff: '...'
+			},
+			error: null
+		}
 	},
 	{
 		id: 'move_member',
@@ -481,7 +805,21 @@ export const TOOLS: ToolMetadata[] = [
 				params: { memberName: 'ProcessData', sourceTypeName: 'OldClass', targetTypeName: 'NewClass' }
 			}
 		],
-		responseDescription: 'Returns source and target types, files changed, and diff'
+		responseDescription: 'Returns source and target types, files changed, and diff',
+		responseExample: {
+			success: true,
+			data: {
+				symbolName: 'MyMethod',
+				symbolKind: 'Method',
+				sourceLocation: 'SourceClass',
+				targetLocation: 'TargetClass',
+				filesChanged: 2,
+				filesCreated: 0,
+				applied: true,
+				unifiedDiff: '...'
+			},
+			error: null
+		}
 	},
 
 	// External Source
@@ -524,7 +862,21 @@ export const TOOLS: ToolMetadata[] = [
 				params: { symbolName: 'JsonSerializer', assemblyHint: 'System.Text.Json' }
 			}
 		],
-		responseDescription: 'Returns source code, assembly info, and source origin (SourceLink or decompiled)'
+		responseDescription: 'Returns source code, assembly info, and source origin (SourceLink or decompiled)',
+		responseExample: {
+			success: true,
+			data: {
+				symbolName: 'JsonSerializer',
+				symbolKind: 'Class',
+				assemblyName: 'System.Text.Json',
+				assemblyVersion: '9.0.0.0',
+				sourceOrigin: 'SourceLink',
+				sourceUrl: 'https://raw.githubusercontent.com/...',
+				sourceCode: 'public static class JsonSerializer { ... }',
+				language: 'C#'
+			},
+			error: null
+		}
 	}
 ];
 

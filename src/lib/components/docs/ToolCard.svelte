@@ -8,6 +8,18 @@
 	}
 
 	let { tool, expanded = false, onToggle }: Props = $props();
+
+	function buildRequest(toolName: string, params: Record<string, unknown>) {
+		return {
+			jsonrpc: '2.0',
+			id: 1,
+			method: 'tools/call',
+			params: {
+				name: toolName,
+				arguments: params ?? {}
+			}
+		};
+	}
 </script>
 
 <div class="tool-card" class:expanded>
@@ -55,7 +67,12 @@
 					{#each tool.examples as example}
 						<div class="example">
 							<p class="example-desc">{example.description}</p>
-							<pre class="example-code">{JSON.stringify(example.params, null, 2)}</pre>
+							<p class="example-label">Request</p>
+							<pre class="example-code">{JSON.stringify(buildRequest(tool.name, example.params), null, 2)}</pre>
+							{#if tool.responseExample}
+								<p class="example-label">Response</p>
+								<pre class="example-code">{JSON.stringify(tool.responseExample, null, 2)}</pre>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -189,6 +206,14 @@
 		color: var(--text-secondary);
 		margin: 0 0 var(--spacing-xs) 0;
 		font-size: var(--font-size-sm);
+	}
+
+	.example-label {
+		color: var(--text-muted);
+		font-size: var(--font-size-xs);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin: var(--spacing-xs) 0;
 	}
 
 	.example-code {
