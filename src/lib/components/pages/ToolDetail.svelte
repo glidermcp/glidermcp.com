@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { CodeBlock } from '$components/docs';
-	import { TOOLS } from '$lib/utils/tool-metadata';
+	import { getDocsToolById } from '$lib/utils/tool-metadata';
 	import type { ToolDetailContent } from '$lib/content/types';
 
 	interface Props {
@@ -12,7 +12,7 @@
 
 	function getToolFromNavId(navId: string) {
 		const toolId = navId.replace('tool-', '').replace(/-/g, '_');
-		return TOOLS.find(t => t.id === toolId);
+		return getDocsToolById(toolId);
 	}
 
 	const tool = $derived.by(() => getToolFromNavId(selectedId));
@@ -53,13 +53,15 @@
 		<h3>{content.examplesTitle}</h3>
 		{#each tool.examples as example}
 			<p class="example-desc">{example.description}</p>
-			<CodeBlock code={JSON.stringify(example.params, null, 2)} language="json" />
+			{#if Object.keys(example.params).length > 0}
+				<CodeBlock code={JSON.stringify(example.params, null, 2)} language="json" />
+			{/if}
 		{/each}
 	{/if}
 
-	{#if tool.responseDescription}
+	{#if tool.responseExample}
 		<h3>{content.responseTitle}</h3>
-		<p>{tool.responseDescription}</p>
+		<CodeBlock code={JSON.stringify(tool.responseExample, null, 2)} language="json" />
 	{/if}
 
 	<p class="hint">{@html content.hint}</p>

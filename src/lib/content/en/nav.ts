@@ -21,15 +21,19 @@ export const navItems: NavItem[] = [
 		label: 'Tools',
 		href: '/tools',
 		children: [
-			{ id: 'tool-server-status', label: 'server_status', href: '/tools/server-status' },
 			{ id: 'tool-load-solution', label: 'load_solution', href: '/tools/load-solution' },
 			{ id: 'tool-load-project', label: 'load_project', href: '/tools/load-project' },
-			{ id: 'tool-unload-solution', label: 'unload_solution', href: '/tools/unload-solution' },
 			{ id: 'tool-find-types', label: 'find_types', href: '/tools/find-types' },
 			{ id: 'tool-find-usages', label: 'find_usages', href: '/tools/find-usages' },
 			{ id: 'tool-find-implementation', label: 'find_implementation', href: '/tools/find-implementation' },
 			{ id: 'tool-get-type-info', label: 'get_type_info', href: '/tools/get-type-info' },
 			{ id: 'tool-get-method-signature', label: 'get_method_signature', href: '/tools/get-method-signature' },
+			{
+				id: 'tool-get-type-dependencies',
+				label: 'get_type_dependencies',
+				href: '/tools/get-type-dependencies'
+			},
+			{ id: 'tool-analyze-complexity', label: 'analyze_complexity', href: '/tools/analyze-complexity' },
 			{ id: 'tool-rename-symbol', label: 'rename_symbol', href: '/tools/rename-symbol' },
 			{ id: 'tool-move-type', label: 'move_type', href: '/tools/move-type' },
 			{ id: 'tool-move-member', label: 'move_member', href: '/tools/move-member' },
