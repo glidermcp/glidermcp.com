@@ -13,7 +13,7 @@ export const privacy: { title: string; intro: string[]; sections: SectionBlock[]
 				'All MCP tooling runs on your machine. Requests are handled locally, and project files remain in your workspace.'
 			],
 			list: [
-				'No telemetry or usage analytics are shipped to Glider.',
+				'No MCP client telemetry or usage analytics are shipped to Glider.',
 				'No customer data is retained or cached outside your machine.',
 				'We do not use your data to train or improve models.'
 			]
