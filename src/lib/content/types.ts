@@ -90,6 +90,8 @@ export interface ToolsListContent {
 export interface ToolDetailContent {
 	parametersTitle: string;
 	examplesTitle: string;
+	exampleRequestTitle: string;
+	exampleResponseTitle: string;
 	responseTitle: string;
 	tableHeaders: {
 		name: string;

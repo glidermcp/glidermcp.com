@@ -120,7 +120,7 @@ describe('MCPClient', () => {
 				})
 			});
 
-			const result = await client.callTool('server_status', {});
+			const result = await client.callTool('get_diagnostics', {});
 			expect(result.success).toBe(true);
 			expect(result.data).toEqual({ data: 'test' });
 			expect(result.duration).toBeGreaterThanOrEqual(0);
@@ -134,7 +134,7 @@ describe('MCPClient', () => {
 				text: async () => 'Server error'
 			});
 
-			const result = await client.callTool('server_status', {});
+			const result = await client.callTool('get_diagnostics', {});
 			expect(result.success).toBe(false);
 			expect(result.error).toContain('500');
 		});

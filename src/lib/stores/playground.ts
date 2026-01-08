@@ -35,7 +35,7 @@ export const connectionStatus = atom<ConnectionStatus>('disconnected');
 export const serverUrl = atom<string>(DEFAULT_SERVER_URL);
 
 // Currently selected tool
-export const selectedToolId = atom<string>('server_status');
+export const selectedToolId = atom<string>('get_diagnostics');
 
 // Parameters for the selected tool
 export const toolParams = atom<Record<string, unknown>>({});
@@ -154,7 +154,7 @@ export function loadExample(toolId: string, exampleIndex: number): void {
  * Reset entire playground state
  */
 export function resetPlayground(): void {
-	selectedToolId.set('server_status');
+	selectedToolId.set('get_diagnostics');
 	toolParams.set({});
 	executionState.set('idle');
 	lastResponse.set(null);
