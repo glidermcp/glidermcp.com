@@ -110,6 +110,7 @@ describe('MCPClient', () => {
 		it('should return success result on valid response', async () => {
 			mockFetch.mockResolvedValueOnce({
 				ok: true,
+				headers: { get: () => 'application/json' },
 				json: async () => ({
 					jsonrpc: '2.0',
 					id: '123',
@@ -141,6 +142,7 @@ describe('MCPClient', () => {
 		it('should return error result on JSON-RPC error', async () => {
 			mockFetch.mockResolvedValueOnce({
 				ok: true,
+				headers: { get: () => 'application/json' },
 				json: async () => ({
 					jsonrpc: '2.0',
 					id: '123',
@@ -159,6 +161,7 @@ describe('MCPClient', () => {
 		it('should clean undefined params', async () => {
 			mockFetch.mockResolvedValueOnce({
 				ok: true,
+				headers: { get: () => 'application/json' },
 				json: async () => ({
 					jsonrpc: '2.0',
 					id: '123',
