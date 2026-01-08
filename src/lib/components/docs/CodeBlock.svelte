@@ -22,7 +22,7 @@
 
 			highlightedHtml = highlighter.codeToHtml(code, {
 				lang: resolvedLanguage,
-				theme: 'github-dark'
+				theme: 'github-light'
 			});
 			shikiLoaded = true;
 		} catch (e) {
