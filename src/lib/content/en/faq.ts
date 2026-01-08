@@ -36,7 +36,7 @@ export const faq: FaqContent = {
 		{
 			question: 'Can I use HTTP transport?',
 			answer: [
-				'Yes! Run <code>glider --transport http</code> to start an HTTP server on port 3001. This is useful for clients like Codex that require HTTP connections.'
+				'Yes! Run <code>glider --transport http</code> to start an HTTP server on port 5001. This is useful for clients like Codex that require HTTP connections.'
 			]
 		},
 		{

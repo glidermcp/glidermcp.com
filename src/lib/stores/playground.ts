@@ -7,6 +7,10 @@ import { atom, computed } from 'nanostores';
 import type { ConnectionStatus } from '$lib/types/mcp';
 import type { ToolMetadata } from '$lib/utils/tool-metadata';
 import { TOOLS, getDefaultParams } from '$lib/utils/tool-metadata';
+import { mcpClient } from '$lib/services/mcp-client';
+
+// Default server URL
+const DEFAULT_SERVER_URL = 'http://localhost:5001';
 
 /**
  * Execution state
@@ -26,6 +30,9 @@ export interface PlaygroundResponse {
 
 // Connection status
 export const connectionStatus = atom<ConnectionStatus>('disconnected');
+
+// Server URL (configurable)
+export const serverUrl = atom<string>(DEFAULT_SERVER_URL);
 
 // Currently selected tool
 export const selectedToolId = atom<string>('server_status');
@@ -93,6 +100,21 @@ export function resetParams(): void {
  */
 export function setConnectionStatus(status: ConnectionStatus): void {
 	connectionStatus.set(status);
+}
+
+/**
+ * Set server URL and update MCP client
+ */
+export function setServerUrl(url: string): void {
+	serverUrl.set(url);
+	mcpClient.setBaseUrl(url);
+}
+
+/**
+ * Get current server URL
+ */
+export function getServerUrl(): string {
+	return serverUrl.get();
 }
 
 /**

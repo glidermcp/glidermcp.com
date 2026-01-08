@@ -59,7 +59,7 @@ export const installationGuides: InstallationGuides = {
 			{
 				title: 'Start Glider in HTTP mode',
 				description: 'Codex uses HTTP transport. Run Glider as an HTTP server.',
-				code: 'glider --transport http\n# Listens on http://localhost:3001/mcp'
+				code: 'glider --transport http\n# Listens on http://localhost:5001/mcp'
 			},
 			{
 				title: 'Configure Codex',
@@ -68,7 +68,7 @@ export const installationGuides: InstallationGuides = {
 {
   "mcpServers": {
     "glider": {
-      "url": "http://localhost:3001/mcp"
+      "url": "http://localhost:5001/mcp"
     }
   }
 }`,
@@ -205,7 +205,7 @@ export const installationOther: OtherInstallContent = {
 glider --transport http
 
 # Then configure your client to connect to:
-# http://localhost:3001/mcp`,
+# http://localhost:5001/mcp`,
 				language: 'bash'
 			}
 		},

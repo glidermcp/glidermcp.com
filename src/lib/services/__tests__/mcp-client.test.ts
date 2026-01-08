@@ -6,7 +6,7 @@ describe('MCPClient', () => {
 	let mockFetch: Mock;
 
 	beforeEach(() => {
-		client = new MCPClient({ baseUrl: 'http://localhost:3001' });
+		client = new MCPClient({ baseUrl: 'http://localhost:5001' });
 		mockFetch = vi.fn();
 		globalThis.fetch = mockFetch;
 	});
@@ -14,7 +14,7 @@ describe('MCPClient', () => {
 	describe('constructor', () => {
 		it('should use default base URL when not provided', () => {
 			const defaultClient = new MCPClient();
-			expect(defaultClient.getBaseUrl()).toBe('http://localhost:3001');
+			expect(defaultClient.getBaseUrl()).toBe('http://localhost:5001');
 		});
 
 		it('should use provided base URL', () => {
@@ -45,7 +45,7 @@ describe('MCPClient', () => {
 			const result = await client.checkHealth();
 			expect(result).toBe(true);
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:3001/health',
+				'http://localhost:5001/health',
 				expect.objectContaining({
 					method: 'GET',
 					headers: { Accept: 'application/json' }
@@ -110,6 +110,7 @@ describe('MCPClient', () => {
 		it('should return success result on valid response', async () => {
 			mockFetch.mockResolvedValueOnce({
 				ok: true,
+				headers: { get: () => 'application/json' },
 				json: async () => ({
 					jsonrpc: '2.0',
 					id: '123',
@@ -141,6 +142,7 @@ describe('MCPClient', () => {
 		it('should return error result on JSON-RPC error', async () => {
 			mockFetch.mockResolvedValueOnce({
 				ok: true,
+				headers: { get: () => 'application/json' },
 				json: async () => ({
 					jsonrpc: '2.0',
 					id: '123',
@@ -159,6 +161,7 @@ describe('MCPClient', () => {
 		it('should clean undefined params', async () => {
 			mockFetch.mockResolvedValueOnce({
 				ok: true,
+				headers: { get: () => 'application/json' },
 				json: async () => ({
 					jsonrpc: '2.0',
 					id: '123',
