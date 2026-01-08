@@ -21,6 +21,7 @@ export const navItems: NavItem[] = [
 		label: 'Tools',
 		href: '/tools',
 		children: [
+			{ id: 'tool-get-diagnostics', label: 'get_diagnostics', href: '/tools/get-diagnostics' },
 			{ id: 'tool-load-solution', label: 'load_solution', href: '/tools/load-solution' },
 			{ id: 'tool-load-project', label: 'load_project', href: '/tools/load-project' },
 			{ id: 'tool-find-types', label: 'find_types', href: '/tools/find-types' },
@@ -37,7 +38,11 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-rename-symbol', label: 'rename_symbol', href: '/tools/rename-symbol' },
 			{ id: 'tool-move-type', label: 'move_type', href: '/tools/move-type' },
 			{ id: 'tool-move-member', label: 'move_member', href: '/tools/move-member' },
-			{ id: 'tool-view-external', label: 'view_external_definition', href: '/tools/view-external' }
+			{
+				id: 'tool-view-external-definition',
+				label: 'view_external_definition',
+				href: '/tools/view-external-definition'
+			}
 		]
 	},
 	{ id: 'playground', label: 'Playground', href: '/playground' },

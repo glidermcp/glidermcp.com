@@ -11,7 +11,8 @@
 	let { selectedId, content }: Props = $props();
 
 	function getToolFromNavId(navId: string) {
-		const toolId = navId.replace('tool-', '').replace(/-/g, '_');
+		const rawToolId = navId.replace('tool-', '').replace(/-/g, '_');
+		const toolId = rawToolId === 'view_external' ? 'view_external_definition' : rawToolId;
 		return getDocsToolById(toolId);
 	}
 

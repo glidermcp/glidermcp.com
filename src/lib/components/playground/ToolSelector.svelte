@@ -176,9 +176,8 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		white-space: normal;
+		word-break: break-word;
 	}
 
 	.tool-item:hover {

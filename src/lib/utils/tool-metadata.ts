@@ -143,7 +143,6 @@ export const TOOLS: ToolMetadata[] = [
 				params: { severity: 'warning' }
 			}
 		],
-		showInDocs: false,
 		responseExample: {
 			success: true,
 			data: {

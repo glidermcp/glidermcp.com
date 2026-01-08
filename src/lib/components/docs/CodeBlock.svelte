@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { getHighlighter, resolveLanguage } from '$lib/utils/shiki';
 
 	interface Props {
@@ -32,8 +31,8 @@
 		}
 	}
 
-	onMount(() => {
-		loadShiki();
+	$effect(() => {
+		void loadShiki();
 	});
 
 	async function copyToClipboard() {
