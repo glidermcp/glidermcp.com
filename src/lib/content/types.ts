@@ -144,6 +144,12 @@ export interface PricingContent {
 	licenseText: string;
 }
 
+export interface PrivacyContent {
+	title: string;
+	intro: string[];
+	sections: SectionBlock[];
+}
+
 export interface HomeContent {
 	meta: PageMeta;
 	navItems: NavItem[];
@@ -157,4 +163,5 @@ export interface HomeContent {
 	prompts: PromptsContent;
 	faq: FaqContent;
 	pricing: PricingContent;
+	privacy: PrivacyContent;
 }

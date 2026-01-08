@@ -7,3 +7,4 @@ export { toolsList, toolDetail } from './tools';
 export { prompts } from './prompts';
 export { faq } from './faq';
 export { pricing } from './pricing';
+export { privacy } from './privacy';

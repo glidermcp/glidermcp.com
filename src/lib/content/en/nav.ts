@@ -39,5 +39,6 @@ export const navItems: NavItem[] = [
 	{ id: 'playground', label: 'Playground', href: '/playground' },
 	{ id: 'prompts', label: 'Prompts', href: '/prompts' },
 	{ id: 'faq', label: 'FAQ', href: '/faq' },
+	{ id: 'privacy', label: 'Privacy', href: '/privacy' },
 	{ id: 'pricing', label: 'Pricing', href: '/pricing' }
 ];
