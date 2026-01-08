@@ -21,9 +21,9 @@ export const navItems: NavItem[] = [
 		label: 'Tools',
 		href: '/tools',
 		children: [
-			{ id: 'tool-get-diagnostics', label: 'get_diagnostics', href: '/tools/get-diagnostics' },
 			{ id: 'tool-load-solution', label: 'load_solution', href: '/tools/load-solution' },
 			{ id: 'tool-load-project', label: 'load_project', href: '/tools/load-project' },
+			{ id: 'tool-get-diagnostics', label: 'get_diagnostics', href: '/tools/get-diagnostics' },
 			{ id: 'tool-find-types', label: 'find_types', href: '/tools/find-types' },
 			{ id: 'tool-find-usages', label: 'find_usages', href: '/tools/find-usages' },
 			{ id: 'tool-find-implementation', label: 'find_implementation', href: '/tools/find-implementation' },

@@ -47,13 +47,13 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 		label: 'Debug',
 		description: 'Server status and health checks'
 	},
-	diagnostics: {
-		label: 'Diagnostics',
-		description: 'Compiler diagnostics and build health'
-	},
 	solution: {
 		label: 'Solution Management',
 		description: 'Load and unload .NET solutions and projects'
+	},
+	diagnostics: {
+		label: 'Diagnostics',
+		description: 'Compiler diagnostics and build health'
 	},
 	search: {
 		label: 'Search',

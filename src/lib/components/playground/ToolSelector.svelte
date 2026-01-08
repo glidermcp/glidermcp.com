@@ -35,8 +35,8 @@
 		const result: { toolId: string; categoryIndex: number }[] = [];
 		const categories: ToolCategory[] = [
 			'debug',
-			'diagnostics',
 			'solution',
+			'diagnostics',
 			'search',
 			'analysis',
 			'refactoring',
