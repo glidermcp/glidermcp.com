@@ -14,7 +14,8 @@ const contentByLocale: Record<Locale, HomeContent> = {
 		toolDetail: en.toolDetail,
 		prompts: en.prompts,
 		faq: en.faq,
-		pricing: en.pricing
+		pricing: en.pricing,
+		privacy: en.privacy
 	}
 };
 
