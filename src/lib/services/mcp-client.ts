@@ -234,11 +234,15 @@ class MCPClient {
 
 			if (contentType.includes('text/event-stream')) {
 				const text = await response.text();
-				// Parse SSE format: extract JSON from "data: {...}" lines
+				// Parse SSE format: extract JSON from "data:{...}" lines
+				// SSE spec allows "data:" with or without space after colon
 				const dataLines = text
 					.split('\n')
-					.filter((line) => line.startsWith('data: '))
-					.map((line) => line.slice(6)); // Remove "data: " prefix
+					.filter((line) => line.startsWith('data:'))
+					.map((line) => {
+						const content = line.slice(5); // Remove "data:" prefix
+						return content.startsWith(' ') ? content.slice(1) : content; // Trim optional space
+					});
 
 				// Find the last complete JSON response (tool result)
 				let lastValidJson: JsonRpcResponse<MCPToolResponse<T>> | null = null;
