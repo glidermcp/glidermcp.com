@@ -312,6 +312,7 @@
 		display: flex;
 		flex-direction: column;
 		outline: none;
+		padding-right: var(--spacing-md);
 	}
 
 	.nav-item {
@@ -399,6 +400,7 @@
 	.label {
 		overflow: hidden;
 		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	@media (max-width: 768px) {

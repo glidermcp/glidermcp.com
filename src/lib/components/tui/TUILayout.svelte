@@ -135,6 +135,7 @@
 
 	.tui-panel-left {
 		flex-shrink: 0;
+		max-width: 45vw;
 	}
 
 	.tui-panel-right {

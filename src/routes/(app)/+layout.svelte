@@ -60,7 +60,7 @@
 	<meta name="description" content={content.meta.description} />
 </svelte:head>
 
-<TUILayout title="Glider MCP">
+<TUILayout title="Glider MCP" leftPanelWidth="max-content">
 	{#snippet leftPanel()}
 		<TUINavigationTree items={content.navItems} currentPath={$page.url.pathname} />
 	{/snippet}
