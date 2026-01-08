@@ -10,7 +10,9 @@
 		setExecutionState,
 		setResponse,
 		isConnected,
-		isExecuting
+		isExecuting,
+		serverUrl,
+		setServerUrl
 	} from '$stores/playground';
 	import { addHistoryEntry } from '$stores/history';
 	import { validateToolParams } from '$lib/utils/tool-metadata';
@@ -23,8 +25,10 @@
 	const params = $derived($toolParams);
 	const connected = $derived($isConnected);
 	const executing = $derived($isExecuting);
+	const currentServerUrl = $derived($serverUrl);
 
 	let connectionAttempted = $state(false);
+	let serverUrlInput = $state('');
 
 	async function connect(): Promise<void> {
 		connectionAttempted = true;
@@ -55,7 +59,7 @@
 		if (!connected) {
 			setResponse({
 				success: false,
-				error: 'Not connected to MCP server. Start the server at localhost:3001.',
+				error: `Not connected to MCP server. Start the server at ${currentServerUrl}.`,
 				duration: 0,
 				timestamp: Date.now()
 			});
@@ -107,10 +111,33 @@
 		return false;
 	}
 
+	function handleServerUrlChange(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		serverUrlInput = input.value;
+	}
+
+	function applyServerUrl(): void {
+		if (serverUrlInput && serverUrlInput !== currentServerUrl) {
+			setServerUrl(serverUrlInput);
+			// Disconnect and reconnect with new URL
+			mcpClient.disconnect();
+			connect();
+		}
+	}
+
+	function handleServerUrlKeydown(event: KeyboardEvent): void {
+		if (event.key === 'Enter') {
+			applyServerUrl();
+		}
+	}
+
 	let unsubscribeKeyboard: (() => void) | null = null;
 	let unsubscribeStatus: (() => void) | null = null;
 
 	onMount(() => {
+		// Initialize server URL input from store
+		serverUrlInput = currentServerUrl;
+
 		unsubscribeKeyboard = keyboardManager.addHandler(handleKeyboard);
 
 		// Subscribe to MCP client status changes
@@ -132,6 +159,19 @@
 	<div class="playground-header">
 		<h2>Playground</h2>
 		<div class="header-right">
+			<div class="server-url-group">
+				<label for="server-url" class="server-url-label">Server:</label>
+				<input
+					id="server-url"
+					type="text"
+					class="server-url-input"
+					value={serverUrlInput}
+					oninput={handleServerUrlChange}
+					onkeydown={handleServerUrlKeydown}
+					onblur={applyServerUrl}
+					placeholder="http://localhost:5001"
+				/>
+			</div>
 			<ConnectionIndicator />
 			{#if !connected}
 				<button type="button" class="connect-btn" onclick={connect}>
@@ -208,6 +248,36 @@
 	.connect-btn:hover {
 		color: var(--text-primary);
 		border-color: var(--accent);
+	}
+
+	.server-url-group {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-xs);
+	}
+
+	.server-url-label {
+		font-size: var(--font-size-xs);
+		color: var(--text-muted);
+	}
+
+	.server-url-input {
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		color: var(--text-primary);
+		background: var(--bg-secondary);
+		border: 1px solid var(--border-dim);
+		padding: var(--spacing-xs) var(--spacing-sm);
+		width: 200px;
+	}
+
+	.server-url-input:focus {
+		outline: none;
+		border-color: var(--accent);
+	}
+
+	.server-url-input::placeholder {
+		color: var(--text-muted);
 	}
 
 	.playground-content {

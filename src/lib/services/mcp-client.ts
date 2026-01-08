@@ -1,6 +1,6 @@
 /**
  * MCP Client Service
- * HTTP client for communicating with local Glider MCP server at localhost:3001
+ * HTTP client for communicating with local Glider MCP server at localhost:5001
  * Uses JSON-RPC 2.0 protocol
  */
 
@@ -26,8 +26,8 @@ export interface CallToolResult<T = unknown> {
 	duration: number;
 }
 
-const DEFAULT_BASE_URL = 'http://localhost:3001';
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
+const DEFAULT_BASE_URL = 'http://localhost:5001';
+const DEFAULT_TIMEOUT = 120000; // 120 seconds - solution loading can take a while
 const HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
 
 class MCPClient {
@@ -212,7 +212,7 @@ class MCPClient {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'Accept': 'application/json'
+					'Accept': 'application/json, text/event-stream'
 				},
 				body: JSON.stringify(request)
 			}, this.timeout);
@@ -228,7 +228,42 @@ class MCPClient {
 				};
 			}
 
-			const jsonResponse = await response.json() as JsonRpcResponse<MCPToolResponse<T>>;
+			// Handle SSE (Server-Sent Events) response format from MCP Streamable HTTP transport
+			const contentType = response.headers.get('content-type') || '';
+			let jsonResponse: JsonRpcResponse<MCPToolResponse<T>>;
+
+			if (contentType.includes('text/event-stream')) {
+				const text = await response.text();
+				// Parse SSE format: extract JSON from "data: {...}" lines
+				const dataLines = text
+					.split('\n')
+					.filter((line) => line.startsWith('data: '))
+					.map((line) => line.slice(6)); // Remove "data: " prefix
+
+				// Find the last complete JSON response (tool result)
+				let lastValidJson: JsonRpcResponse<MCPToolResponse<T>> | null = null;
+				for (const dataLine of dataLines) {
+					try {
+						const parsed = JSON.parse(dataLine);
+						if (parsed.result || parsed.error) {
+							lastValidJson = parsed;
+						}
+					} catch {
+						// Skip non-JSON lines
+					}
+				}
+
+				if (!lastValidJson) {
+					return {
+						success: false,
+						error: 'No valid JSON response found in SSE stream',
+						duration
+					};
+				}
+				jsonResponse = lastValidJson;
+			} else {
+				jsonResponse = (await response.json()) as JsonRpcResponse<MCPToolResponse<T>>;
+			}
 
 			if (jsonResponse.error) {
 				return {
