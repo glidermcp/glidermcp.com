@@ -3,7 +3,14 @@
  * All 14 Glider MCP tools with their schemas, parameters, and examples
  */
 
-export type ToolCategory = 'diagnostics' | 'solution' | 'search' | 'analysis' | 'refactoring' | 'external';
+export type ToolCategory =
+	| 'debug'
+	| 'diagnostics'
+	| 'solution'
+	| 'search'
+	| 'analysis'
+	| 'refactoring'
+	| 'external';
 
 export interface ToolParameter {
 	name: string;
@@ -29,12 +36,17 @@ export interface ToolMetadata {
 	examples: ToolExample[];
 	responseDescription?: string;
 	responseExample?: Record<string, unknown>;
+	showInDocs?: boolean;
 }
 
 /**
  * Tool categories with display info
  */
 export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description: string }> = {
+	debug: {
+		label: 'Debug',
+		description: 'Server status and health checks'
+	},
 	diagnostics: {
 		label: 'Diagnostics',
 		description: 'Compiler diagnostics and build health'
@@ -65,6 +77,40 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
  * All 14 tool metadata
  */
 export const TOOLS: ToolMetadata[] = [
+	// Debug
+	{
+		id: 'server_status',
+		name: 'server_status',
+		displayName: 'Server Status',
+		description: 'Returns server running status and solution loaded state.',
+		category: 'debug',
+		parameters: [],
+		examples: [
+			{
+				description: 'Check if the server is running',
+				params: {}
+			}
+		],
+		responseDescription: 'Returns status, version, and loaded solution info',
+		responseExample: {
+			success: true,
+			data: {
+				serverRunning: true,
+				solutionLoaded: true,
+				solutionPath: '/path/to/solution.sln',
+				projectCount: 4,
+				projects: [
+					{
+						name: 'Glider',
+						filePath: '/path/to/Glider.csproj'
+					}
+				]
+			},
+			error: null
+		},
+		showInDocs: false
+	},
+
 	// Diagnostics
 	{
 		id: 'get_diagnostics',

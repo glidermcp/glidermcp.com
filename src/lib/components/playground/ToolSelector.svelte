@@ -14,6 +14,7 @@
 	// Group tools by category
 	const toolsByCategory = $derived.by(() => {
 		const grouped: Record<ToolCategory, typeof TOOLS> = {
+			debug: [],
 			diagnostics: [],
 			solution: [],
 			search: [],
@@ -32,7 +33,15 @@
 	// Flatten for keyboard navigation
 	const flatTools = $derived.by(() => {
 		const result: { toolId: string; categoryIndex: number }[] = [];
-		const categories: ToolCategory[] = ['diagnostics', 'solution', 'search', 'analysis', 'refactoring', 'external'];
+		const categories: ToolCategory[] = [
+			'debug',
+			'diagnostics',
+			'solution',
+			'search',
+			'analysis',
+			'refactoring',
+			'external'
+		];
 
 		for (let ci = 0; ci < categories.length; ci++) {
 			for (const tool of toolsByCategory[categories[ci]]) {

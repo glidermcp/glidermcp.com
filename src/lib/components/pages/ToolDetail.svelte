@@ -27,7 +27,10 @@
 		};
 	}
 
-	const tool = $derived.by(() => getToolFromNavId(selectedId));
+	const tool = $derived.by(() => {
+		const found = getToolFromNavId(selectedId);
+		return found && found.showInDocs === false ? undefined : found;
+	});
 </script>
 
 {#if tool}

@@ -16,7 +16,7 @@
 <p>{content.intro}</p>
 
 {#each Object.entries(TOOL_CATEGORIES) as [category, info]}
-	{@const tools = getToolsByCategory(category as ToolCategory)}
+	{@const tools = getToolsByCategory(category as ToolCategory).filter((tool) => tool.showInDocs !== false)}
 	{#if tools.length > 0}
 		<div class="tool-category">
 			<h3>{info.label}</h3>

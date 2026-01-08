@@ -34,7 +34,7 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-rename-symbol', label: 'rename_symbol', href: '/tools/rename-symbol' },
 			{ id: 'tool-move-type', label: 'move_type', href: '/tools/move-type' },
 			{ id: 'tool-move-member', label: 'move_member', href: '/tools/move-member' },
-			{ id: 'tool-view-external', label: 'view_external_definition', href: '/tools/view-external' }
+			{ id: 'tool-view-external-definition', label: 'view_external_definition', href: '/tools/view-external-definition' }
 		]
 	},
 	{ id: 'playground', label: 'Playground', href: '/playground' },
