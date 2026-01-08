@@ -55,16 +55,18 @@
 					{#each tool.examples as example}
 						<div class="example">
 							<p class="example-desc">{example.description}</p>
-							<pre class="example-code">{JSON.stringify(example.params, null, 2)}</pre>
+							{#if Object.keys(example.params).length > 0}
+								<pre class="example-code">{JSON.stringify(example.params, null, 2)}</pre>
+							{/if}
 						</div>
 					{/each}
 				</div>
 			{/if}
 
-			{#if tool.responseDescription}
+			{#if tool.responseExample}
 				<div class="section">
 					<h4>Response</h4>
-					<p class="response-desc">{tool.responseDescription}</p>
+					<pre class="example-code">{JSON.stringify(tool.responseExample, null, 2)}</pre>
 				</div>
 			{/if}
 		</div>
@@ -202,8 +204,4 @@
 		margin: 0;
 	}
 
-	.response-desc {
-		color: var(--text-secondary);
-		margin: 0;
-	}
 </style>

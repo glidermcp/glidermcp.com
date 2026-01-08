@@ -5,58 +5,49 @@ export const prompts: PromptsContent = {
 	intro: 'Effective prompts for working with Glider MCP.',
 	groups: [
 		{
-			title: 'Loading Solutions',
-			description: 'Start by loading your .NET solution or project.',
-			prompts: [
-				'Load the solution at /path/to/MySolution.sln',
-				'Load the project at /path/to/MyProject.csproj'
-			]
+			title: 'Load a Solution',
+			description: 'Start by loading your C# solution.',
+			prompts: ['Load the C# solution at /path/to/YourProject.sln']
 		},
 		{
-			title: 'Finding Types',
-			description: 'Search for types using patterns and wildcards.',
-			prompts: [
-				'Find all types matching *Service',
-				'Find types that start with I (interfaces)',
-				'Find all types in the DataLayer project'
-			]
+			title: 'Find Symbol References',
+			description: 'Locate where a symbol is used across the solution.',
+			prompts: ['Find all usages of the ISolutionManager interface']
 		},
 		{
-			title: 'Exploring Code',
-			description: 'Navigate and understand your codebase.',
-			prompts: [
-				'Show me the type hierarchy for UserService',
-				'What methods does IAuthService define?',
-				'Find all usages of the Login method',
-				'Find all implementations of IRepository'
-			]
+			title: 'Analyze a Type',
+			description: 'Inspect a class or interface in detail.',
+			prompts: ['Get detailed information about the SolutionManager class']
 		},
 		{
-			title: 'Getting Details',
-			description: 'Get detailed information about specific symbols.',
-			prompts: [
-				'Get detailed info about the UserController class',
-				'What is the signature of GetUserById method?',
-				'Show me the source of JsonSerializer from System.Text.Json'
-			]
+			title: 'Find Implementations',
+			description: 'List concrete implementations of an interface.',
+			prompts: ['Find all implementations of the ISymbolFinderService interface']
 		},
 		{
-			title: 'Refactoring',
-			description: 'Perform semantic refactoring operations.',
-			prompts: [
-				'Rename the OldClassName to NewClassName',
-				'Move the Helper class to the Utils namespace',
-				'Move the ProcessData method from OldClass to NewClass',
-				'Preview renaming UserService to UserManager without applying'
-			]
+			title: 'Search for Types',
+			description: 'Search by name pattern with wildcards.',
+			prompts: ['Find all types that end with "Manager" in the solution']
+		},
+		{
+			title: 'Get Method Details',
+			description: 'Fetch the signature for a specific method.',
+			prompts: ['Get the signature for the LoadSolutionAsync method in the ISolutionManager interface']
 		},
 		{
 			title: 'Complex Analysis',
 			description: 'Multi-step analysis workflows.',
 			prompts: [
-				'I need to understand how authentication works. Find the IAuthService interface, list its methods, and show where Login is called.',
-				'Find all classes that implement IRepository and show their public methods.',
-				'Show me the dependency chain from UserController to the database layer.'
+				'I need to understand how the solution loading works. Can you:\n1. Find the ISolutionManager interface\n2. Find all its implementations\n3. Show me the LoadSolutionAsync method signature\n4. Find where LoadSolutionAsync is being called'
+			]
+		},
+		{
+			title: 'Use Tools Directly',
+			description: 'Be explicit about the tool you want to run.',
+			prompts: [
+				'Use the load_solution tool to load /Users/yourname/projects/MyApp/MyApp.sln',
+				'Use the find_types tool with pattern "*Service" to find all service classes',
+				'Use the get_type_info tool to analyze the UserController class'
 			]
 		}
 	]

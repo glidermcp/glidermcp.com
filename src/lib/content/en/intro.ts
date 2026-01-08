@@ -4,11 +4,12 @@ export const intro: IntroContent = {
 	title: 'Glider MCP',
 	tagline: 'Roslyn-powered C# code analysis for AI assistants',
 	paragraphs: [
-		'Glider is an MCP (Model Context Protocol) server that gives AI assistants deep semantic understanding of C# codebases. Built on Roslyn, it provides 12 powerful tools for code navigation, analysis, and refactoring.'
+		'Glider is an MCP (Model Context Protocol) server that gives AI assistants deep semantic understanding of C# codebases. Built on Roslyn, it provides 15 powerful tools for diagnostics, code navigation, analysis, and refactoring.'
 	],
 	featuresTitle: 'Key Features',
 	features: [
 		'Load and analyze .NET solutions and projects',
+		'Review compiler diagnostics across your codebase',
 		'Find type definitions, implementations, and usages',
 		'Get detailed type and method information',
 		'Semantic rename across entire solutions',

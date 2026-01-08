@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ToolCard } from '$components/docs';
-	import { TOOL_CATEGORIES, getToolsByCategory, type ToolCategory } from '$lib/utils/tool-metadata';
+	import { TOOL_CATEGORIES, getDocsToolsByCategory, type ToolCategory } from '$lib/utils/tool-metadata';
 	import type { ToolsListContent } from '$lib/content/types';
 
 	interface Props {
@@ -16,7 +16,7 @@
 <p>{content.intro}</p>
 
 {#each Object.entries(TOOL_CATEGORIES) as [category, info]}
-	{@const tools = getToolsByCategory(category as ToolCategory)}
+	{@const tools = getDocsToolsByCategory(category as ToolCategory)}
 	{#if tools.length > 0}
 		<div class="tool-category">
 			<h3>{info.label}</h3>
