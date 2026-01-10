@@ -1,23 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { getContent } from '$lib/content';
+	import { INSTALLATION_SLUG_TO_ID } from '$lib/seo/routes';
 	import InstallationGuidePage from '$components/pages/InstallationGuidePage.svelte';
 	import InstallationOther from '$components/pages/InstallationOther.svelte';
 
 	const content = getContent('en');
 
-	// Map URL slugs to installation guide IDs
-	const slugToId: Record<string, string> = {
-		'claude-code': 'install-claude-code',
-		'codex': 'install-codex',
-		'gemini': 'install-gemini',
-		'cursor': 'install-cursor',
-		'copilot': 'install-copilot',
-		'other': 'install-other'
-	};
-
 	const clientSlug = $derived($page.params.client ?? '');
-	const guideId = $derived(clientSlug ? slugToId[clientSlug] : undefined);
+	const guideId = $derived(clientSlug ? INSTALLATION_SLUG_TO_ID[clientSlug] : undefined);
 	const guide = $derived(guideId ? content.installationGuides[guideId] : undefined);
 	const isOther = $derived(clientSlug === 'other');
 </script>

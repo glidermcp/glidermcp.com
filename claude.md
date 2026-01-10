@@ -173,3 +173,18 @@ When modifying content, ensure the build passes: `yarn build`
 3. **Consistency**: Match existing patterns in similar content files
 4. **Escape HTML**: In regular text fields, use HTML entities if needed (`&amp;`, `&lt;`)
 5. **Test Locally**: Run `yarn dev` to preview changes before committing
+
+## Generated Files
+
+### PWA Manifest
+The PWA manifest at `static/manifest.json` is generated during `yarn dev` / `yarn build`.
+
+- Source of truth: `src/lib/pwa/manifest.ts`
+- Icon list is derived from PNG files in `static/icons/` (e.g. `icon-192.png`, `icon-maskable-512.png`)
+
+### Sitemap
+The sitemap at `static/sitemap.xml` is generated during `yarn dev` / `yarn build`.
+
+- Source of truth: `src/lib/seo/sitemap.ts`
+- Routes: `src/lib/seo/routes.ts` (includes dynamic expansions for tools and installation clients)
+- Set the origin with `SITE_ORIGIN` (defaults to `https://glidermcp.com`)
