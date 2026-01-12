@@ -314,4 +314,12 @@
 	.step-description :global(li) {
 		margin: 0;
 	}
+
+	@media (max-width: 768px) {
+		.step-select {
+			padding: 10px 0;
+			min-height: 44px;
+			font-size: var(--font-size-lg);
+		}
+	}
 </style>

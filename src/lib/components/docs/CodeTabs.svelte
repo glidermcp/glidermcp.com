@@ -98,5 +98,17 @@
 		border: none;
 		margin: 0;
 	}
-</style>
 
+	@media (max-width: 768px) {
+		.tab-bar {
+			gap: var(--spacing-sm);
+			padding: var(--spacing-sm);
+		}
+
+		.tab {
+			font-size: var(--font-size-base);
+			padding: 8px 10px;
+			min-height: 40px;
+		}
+	}
+</style>
