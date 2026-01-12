@@ -2,15 +2,10 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { toggleTheme } from '$stores/theme';
-	import { togglePanel } from '$stores/keyboard';
+	import { focusedPanel, togglePanel } from '$stores/keyboard';
 	import { showGame } from '$stores/game';
-
-	interface StatusKey {
-		key: string;
-		label: string;
-		action: KeyboardAction;
-		handler?: () => void;
-	}
+	import { statusBarKeys } from '$stores/statusbar';
+	import type { StatusKey } from '$types/statusbar';
 
 	interface Props {
 		keys?: StatusKey[];
@@ -23,7 +18,10 @@
 		{ key: '^G', label: 'Game', action: 'game' }
 	];
 
-	let { keys = defaultKeys, onAction }: Props = $props();
+	let { keys: keysProp, onAction }: Props = $props();
+
+	const effectiveKeys = $derived(keysProp ?? $statusBarKeys ?? defaultKeys);
+	const isLeftPanelFocused = $derived($focusedPanel === 'left');
 
 	// Built-in handlers for common actions
 	function handleAction(action: KeyboardAction): boolean {
@@ -32,8 +30,13 @@
 				toggleTheme();
 				return true;
 			case 'tab':
-				togglePanel();
-				return true;
+				// Tab is used as an in-panel key on some pages (e.g. OS tabs in install guides).
+				// Keep panel switching on Tab when left panel is focused.
+				if (isLeftPanelFocused) {
+					togglePanel();
+					return true;
+				}
+				return false;
 			case 'game':
 				showGame();
 				return true;
@@ -47,7 +50,7 @@
 	// Handle keyboard events
 	function handleKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
 		// Check if this action is in our keys list
-		const keyItem = keys.find(k => k.action === action);
+		const keyItem = effectiveKeys.find(k => k.action === action);
 		if (keyItem) {
 			if (keyItem.handler) {
 				keyItem.handler();
@@ -80,7 +83,7 @@
 
 <footer class="tui-statusbar">
 	<div class="statusbar-content">
-		{#each keys as item}
+		{#each effectiveKeys as item}
 			<button
 				class="status-key"
 				onclick={() => handleClick(item)}

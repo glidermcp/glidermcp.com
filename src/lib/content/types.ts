@@ -12,6 +12,13 @@ export interface CodeSample {
 	language: string;
 }
 
+export interface CodeVariant {
+	id: string;
+	label: string;
+	code: string;
+	language?: string;
+}
+
 export interface IntroContent {
 	title: string;
 	tagline: string;
@@ -57,6 +64,7 @@ export interface InstallStep {
 	description?: string;
 	code?: string;
 	language?: string;
+	codeVariants?: CodeVariant[];
 }
 
 export interface InstallationGuide {
@@ -73,6 +81,7 @@ export interface OtherInstallSection {
 	title: string;
 	description?: string;
 	code?: CodeSample;
+	codeVariants?: CodeVariant[];
 }
 
 export interface OtherInstallContent {
