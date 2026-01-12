@@ -28,7 +28,8 @@ export const prompts: PromptsContent = {
 				'Show me the type hierarchy for UserService',
 				'What methods does IAuthService define?',
 				'Find all usages of the Login method',
-				'Find all implementations of IRepository'
+				'Find all implementations of IRepository',
+				'I changed some files on disk. Reload the current solution and then re-run diagnostics.'
 			]
 		},
 		{
@@ -56,7 +57,8 @@ export const prompts: PromptsContent = {
 			prompts: [
 				'I need to understand how authentication works. Find the IAuthService interface, list its methods, and show where Login is called.',
 				'Find all classes that implement IRepository and show their public methods.',
-				'Show me the dependency chain from UserController to the database layer.'
+				'Show me the dependency chain from UserController to the database layer.',
+				'Run a batch: get_type_info for UserController, then find_usages of Login, then summarize the results.'
 			]
 		}
 	]

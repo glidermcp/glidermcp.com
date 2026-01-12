@@ -23,6 +23,8 @@ export const navItems: NavItem[] = [
 		children: [
 			{ id: 'tool-load-solution', label: 'load_solution', href: '/tools/load-solution' },
 			{ id: 'tool-load-project', label: 'load_project', href: '/tools/load-project' },
+			{ id: 'tool-reload-current', label: 'reload_current', href: '/tools/reload-current' },
+			{ id: 'tool-solution-cache', label: 'solution_cache', href: '/tools/solution-cache' },
 			{ id: 'tool-get-diagnostics', label: 'get_diagnostics', href: '/tools/get-diagnostics' },
 			{ id: 'tool-find-types', label: 'find_types', href: '/tools/find-types' },
 			{ id: 'tool-find-usages', label: 'find_usages', href: '/tools/find-usages' },
@@ -34,7 +36,8 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-rename-symbol', label: 'rename_symbol', href: '/tools/rename-symbol' },
 			{ id: 'tool-move-type', label: 'move_type', href: '/tools/move-type' },
 			{ id: 'tool-move-member', label: 'move_member', href: '/tools/move-member' },
-			{ id: 'tool-view-external-definition', label: 'view_external_definition', href: '/tools/view-external-definition' }
+			{ id: 'tool-view-external-definition', label: 'view_external_definition', href: '/tools/view-external-definition' },
+			{ id: 'tool-batch', label: 'batch', href: '/tools/batch' }
 		]
 	},
 	{ id: 'playground', label: 'Playground', href: '/playground' },

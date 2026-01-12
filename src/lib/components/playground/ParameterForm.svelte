@@ -13,15 +13,18 @@
 	const executing = $derived($isExecuting);
 
 	function handleInputChange(param: ToolParameter, event: Event): void {
-		const target = event.target as HTMLInputElement;
+		const target = event.target as HTMLInputElement | HTMLTextAreaElement;
 		let value: unknown;
 
 		switch (param.type) {
 			case 'boolean':
-				value = target.checked;
+				value = (target as HTMLInputElement).checked;
 				break;
 			case 'number':
 				value = target.value ? Number(target.value) : '';
+				break;
+			case 'json':
+				value = target.value;
 				break;
 			default:
 				value = target.value;
@@ -85,16 +88,29 @@
 								<span class="checkbox-label">{param.description}</span>
 							</label>
 						{:else}
-							<input
-								type={param.type === 'number' ? 'number' : 'text'}
-								id={param.name}
-								class="param-input"
-								value={params[param.name] ?? ''}
-								placeholder={param.placeholder}
-								oninput={(e) => handleInputChange(param, e)}
-								disabled={executing}
-							/>
-							<p class="param-description">{param.description}</p>
+							{#if param.type === 'json'}
+								<textarea
+									id={param.name}
+									class="param-textarea"
+									rows="6"
+									value={String(params[param.name] ?? '')}
+									placeholder={param.placeholder}
+									oninput={(e) => handleInputChange(param, e)}
+									disabled={executing}
+								></textarea>
+								<p class="param-description">{param.description}</p>
+							{:else}
+								<input
+									type={param.type === 'number' ? 'number' : 'text'}
+									id={param.name}
+									class="param-input"
+									value={params[param.name] ?? ''}
+									placeholder={param.placeholder}
+									oninput={(e) => handleInputChange(param, e)}
+									disabled={executing}
+								/>
+								<p class="param-description">{param.description}</p>
+							{/if}
 						{/if}
 					</div>
 				{/each}
@@ -210,6 +226,28 @@
 	}
 
 	.param-input:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.param-textarea {
+		width: 100%;
+		min-height: 110px;
+		padding: var(--spacing-xs) var(--spacing-sm);
+		font-family: var(--font-mono);
+		font-size: var(--font-size-sm);
+		color: var(--text-primary);
+		background-color: var(--bg-secondary);
+		border: 1px solid var(--border-dim);
+		resize: vertical;
+	}
+
+	.param-textarea:focus {
+		outline: none;
+		border-color: var(--accent);
+	}
+
+	.param-textarea:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
 	}

@@ -49,6 +49,9 @@
     <loc>https://glidermcp.com/tools/analyze-complexity</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/batch</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/find-implementation</loc>
   </url>
   <url>
@@ -82,7 +85,13 @@
     <loc>https://glidermcp.com/tools/move-type</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/reload-current</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/rename-symbol</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/solution-cache</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/view-external-definition</loc>

@@ -15,6 +15,7 @@
 	const toolsByCategory = $derived.by(() => {
 		const grouped: Record<ToolCategory, typeof TOOLS> = {
 			debug: [],
+			batch: [],
 			diagnostics: [],
 			solution: [],
 			search: [],
@@ -40,7 +41,8 @@
 			'search',
 			'analysis',
 			'refactoring',
-			'external'
+			'external',
+			'batch'
 		];
 
 		for (let ci = 0; ci < categories.length; ci++) {

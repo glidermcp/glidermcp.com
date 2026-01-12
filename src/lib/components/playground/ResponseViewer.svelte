@@ -17,7 +17,9 @@
 			'get_method_signature',
 			'find_usages',
 			'find_implementation',
-			'load_solution'
+			'load_solution',
+			'load_project',
+			'reload_current'
 		];
 		return visualizableTools.includes(toolId);
 	});

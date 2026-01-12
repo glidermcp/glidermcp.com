@@ -119,6 +119,26 @@ test.describe('Keyboard Navigation', () => {
 		await expect(page.locator('.nav-item:has-text("Claude Code")')).not.toBeVisible();
 	});
 
+	test('should show new tools when Tools section is expanded', async ({ page }) => {
+		await page.goto('/');
+
+		// Navigate to Tools section (Introduction, Quick Start, Installation, Tools)
+		await page.keyboard.press('ArrowDown'); // Quick Start
+		await page.keyboard.press('ArrowDown'); // Installation
+		await page.keyboard.press('ArrowDown'); // Tools
+
+		const toolsItem = page.locator('.nav-item:has-text("Tools")').first();
+		await expect(toolsItem.locator('.prefix')).toHaveText('▶');
+
+		// Expand Tools
+		await page.keyboard.press(' ');
+		await expect(toolsItem.locator('.prefix')).toHaveText('▼');
+
+		await expect(page.locator('.nav-item:has-text("reload_current")')).toBeVisible();
+		await expect(page.locator('.nav-item:has-text("solution_cache")')).toBeVisible();
+		await expect(page.locator('.nav-item:has-text("batch")')).toBeVisible();
+	});
+
 	test('should navigate to page with Enter key without toggling', async ({ page }) => {
 		await page.goto('/');
 
