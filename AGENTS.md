@@ -1,4 +1,4 @@
-# Claude Code Instructions for glidermcp.com
+# Agents Instructions for glidermcp.com
 
 This document provides guidelines for AI assistants (Claude, etc.) when generating or modifying content for the Glider MCP website.
 

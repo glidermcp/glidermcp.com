@@ -143,4 +143,19 @@
 	.content-area :global(.link:hover) {
 		text-decoration: underline;
 	}
+
+	/* Default link styling for content (including {@html} content) */
+	.content-area :global(a) {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.content-area :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	.content-area :global(a:focus-visible) {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
 </style>

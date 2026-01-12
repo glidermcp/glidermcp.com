@@ -7,6 +7,7 @@ export type KeyboardAction =
 	| 'execute'        // F5
 	| 'theme'          // F9
 	| 'game'           // Ctrl+G
+	| 'copy'           // Ctrl+C / Cmd+C
 	| 'up'             // Arrow Up
 	| 'down'           // Arrow Down
 	| 'left'           // Arrow Left
@@ -24,6 +25,7 @@ interface KeyBinding {
 	key: string;
 	action: KeyboardAction;
 	ctrl?: boolean;
+	meta?: boolean;
 	alt?: boolean;
 	shift?: boolean;
 }
@@ -33,6 +35,8 @@ const KEY_BINDINGS: KeyBinding[] = [
 	{ key: 'F5', action: 'execute' },
 	{ key: 'F9', action: 'theme' },
 	{ key: 'g', action: 'game', ctrl: true },
+	{ key: 'c', action: 'copy', ctrl: true },
+	{ key: 'c', action: 'copy', meta: true },
 
 	// Navigation keys
 	{ key: 'ArrowUp', action: 'up' },
@@ -130,9 +134,12 @@ class KeyboardManager {
 	 * Match an event to a key binding
 	 */
 	private matchKeyBinding(event: KeyboardEvent): KeyboardAction | null {
+		const eventKey = event.key.length === 1 ? event.key.toLowerCase() : event.key;
 		for (const binding of KEY_BINDINGS) {
-			if (binding.key !== event.key) continue;
+			const bindingKey = binding.key.length === 1 ? binding.key.toLowerCase() : binding.key;
+			if (bindingKey !== eventKey) continue;
 			if (binding.ctrl && !event.ctrlKey) continue;
+			if (binding.meta && !event.metaKey) continue;
 			if (binding.alt && !event.altKey) continue;
 			if (binding.shift && !event.shiftKey) continue;
 			return binding.action;
@@ -149,6 +156,7 @@ class KeyboardManager {
 
 		const parts: string[] = [];
 		if (binding.ctrl) parts.push('Ctrl');
+		if (binding.meta) parts.push('Cmd');
 		if (binding.alt) parts.push('Alt');
 		if (binding.shift) parts.push('Shift');
 		parts.push(binding.key);

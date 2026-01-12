@@ -31,6 +31,8 @@
 			case 'find_implementation':
 				return 'graph';
 			case 'load_solution':
+			case 'load_project':
+			case 'reload_current':
 				return 'solution';
 			default:
 				return 'raw';
@@ -107,13 +109,14 @@
 			const propertyChildren: TreeNode[] = [];
 
 			for (const member of members) {
+				const kind = String(member.kind || '').toLowerCase();
 				const memberNode: TreeNode = {
 					name: String(member.name || 'unknown'),
-					type: member.kind === 'method' ? 'method' : 'property',
+					type: kind === 'method' ? 'method' : 'property',
 					meta: String(member.signature || member.type || '')
 				};
 
-				if (member.kind === 'method') {
+				if (kind === 'method') {
 					methodChildren.push(memberNode);
 				} else {
 					propertyChildren.push(memberNode);
@@ -139,9 +142,9 @@
 
 		return {
 			name: String(d.name || d.typeName || 'Type'),
-			type: d.kind === 'interface' ? 'interface' : 'class',
+			type: String(d.kind || '').toLowerCase() === 'interface' ? 'interface' : 'class',
 			children,
-			meta: d.namespace ? `in ${d.namespace}` : undefined
+			meta: undefined
 		};
 	}
 
@@ -187,9 +190,9 @@
 			type: (d.symbolType as 'class' | 'interface' | 'method' | 'property') || 'class',
 			references: usages.map((u) => ({
 				location: String(u.filePath || u.file || u.location || 'unknown'),
-				line: typeof u.line === 'number' ? u.line : undefined,
-				column: typeof u.column === 'number' ? u.column : undefined,
-				snippet: u.snippet ? String(u.snippet) : undefined,
+				line: typeof u.lineNumber === 'number' ? (u.lineNumber as number) : undefined,
+				column: typeof u.column === 'number' ? (u.column as number) : undefined,
+				snippet: u.lineText ? String(u.lineText) : u.snippet ? String(u.snippet) : undefined,
 				type: 'usage' as const
 			}))
 		};
@@ -203,7 +206,7 @@
 			type: 'interface',
 			references: implementations.map((impl) => ({
 				location: String(impl.filePath || impl.file || impl.location || 'unknown'),
-				line: typeof impl.line === 'number' ? impl.line : undefined,
+				line: typeof impl.lineNumber === 'number' ? (impl.lineNumber as number) : undefined,
 				snippet: impl.typeName ? String(impl.typeName) : undefined,
 				type: 'implementation' as const
 			}))
@@ -212,14 +215,16 @@
 
 	function convertToSolution(d: Record<string, unknown>): SolutionNode {
 		const projects = (d.projects || []) as Array<Record<string, unknown>>;
+		const name =
+			String(d.solutionPath || d.projectPath || d.reloadedPath || d.solutionName || d.name || 'Solution');
 
 		return {
-			name: String(d.solutionName || d.name || 'Solution.sln'),
+			name,
 			type: 'solution',
 			children: projects.map((p) => ({
 				name: String(p.name || 'Project'),
 				type: 'project' as const,
-				fileCount: typeof p.fileCount === 'number' ? p.fileCount : undefined,
+				fileCount: typeof p.documentCount === 'number' ? (p.documentCount as number) : undefined,
 				meta: p.targetFramework ? String(p.targetFramework) : undefined
 			}))
 		};

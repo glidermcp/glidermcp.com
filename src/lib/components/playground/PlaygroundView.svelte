@@ -70,25 +70,51 @@
 		setExecutionState('executing');
 
 		try {
-			const result = await mcpClient.callTool(tool.name, params);
+			const result = await mcpClient.callTool(tool.name, validation.normalizedParams);
+
+			if (!result.success) {
+				setResponse({
+					success: false,
+					error: result.error,
+					duration: result.duration,
+					timestamp: Date.now()
+				});
+				setExecutionState('error');
+				addHistoryEntry({
+					toolId: tool.id,
+					toolName: tool.name,
+					params: { ...params },
+					success: false,
+					error: result.error,
+					duration: result.duration
+				});
+				return;
+			}
+
+			const envelope = result.data as Record<string, unknown> | null;
+			const hasEnvelope = !!envelope && typeof envelope === 'object' && typeof envelope.success === 'boolean';
+
+			const toolSuccess = hasEnvelope ? (envelope.success as boolean) : true;
+			const toolData = hasEnvelope ? envelope.data : result.data;
+			const toolError = hasEnvelope ? (envelope.error as string | undefined | null) : undefined;
 
 			setResponse({
-				success: result.success,
-				data: result.data,
-				error: result.error,
+				success: toolSuccess,
+				data: toolData,
+				error: toolSuccess ? undefined : toolError ?? 'Unknown error',
 				duration: result.duration,
 				timestamp: Date.now()
 			});
 
-			setExecutionState(result.success ? 'success' : 'error');
+			setExecutionState(toolSuccess ? 'success' : 'error');
 
 			// Add to history
 			addHistoryEntry({
 				toolId: tool.id,
 				toolName: tool.name,
 				params: { ...params },
-				success: result.success,
-				error: result.error,
+				success: toolSuccess,
+				error: toolSuccess ? undefined : toolError ?? 'Unknown error',
 				duration: result.duration
 			});
 		} catch (error) {

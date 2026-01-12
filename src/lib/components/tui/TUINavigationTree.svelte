@@ -286,7 +286,7 @@
 			aria-disabled={flat.item.disabled}
 			aria-current={isCurrentPath(flat.item.href) ? 'page' : undefined}
 			tabindex={index === selectedIndex ? 0 : -1}
-			style:padding-left="{flat.depth * 16 + 8}px"
+			style:padding-left={"calc(" + flat.depth + " * var(--nav-indent-step) + var(--nav-indent-base))"}
 			onclick={(e) => handleItemClick(e, index)}
 			onkeydown={(e) => {
 				// Prevent Space from triggering anchor click - we handle it in keyboard manager
@@ -309,6 +309,8 @@
 
 <style>
 	.nav-tree {
+		--nav-indent-base: 8px;
+		--nav-indent-step: 16px;
 		display: flex;
 		flex-direction: column;
 		outline: none;
@@ -404,6 +406,25 @@
 	}
 
 	@media (max-width: 768px) {
+		.nav-tree {
+			padding-right: 0;
+			--nav-indent-base: 12px;
+		}
+
+		.nav-item {
+			font-size: var(--font-size-lg);
+			padding-top: 10px;
+			padding-right: 12px;
+			padding-bottom: 10px;
+			min-height: 44px;
+		}
+
+		.prefix {
+			width: 18px;
+			margin-right: 8px;
+			font-size: var(--font-size-lg);
+		}
+
 		.nav-item.playground {
 			display: none;
 		}

@@ -38,7 +38,8 @@ dotnet tool list -g
 				code: `"Load the solution at /path/to/MySolution.sln"
 "Find all types matching *Service"
 "What methods does IUserRepository define?"
-"Find all usages of the Login method"`,
+"Find all usages of the Login method"
+"I changed some files on disk. Reload the current solution and then re-run diagnostics."`,
 				language: 'plaintext'
 			}
 		},
