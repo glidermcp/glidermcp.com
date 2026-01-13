@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.glidermcp/glider",
+  "description": "A Roslyn-powered MCP server that provides C# code analysis capabilities to LLMs. Supports stdio and HTTP transports.",
+  "version": "3.3.1",
+  "homepage": "https://glidermcp.com",
+  "license": "Proprietary",
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  },
+  "keywords": [
+    "roslyn",
+    "csharp",
+    "dotnet",
+    "code-analysis",
+    "refactoring",
+    "semantic-analysis",
+    "mcp"
+  ],
+  "packages": [
+    {
+      "registry_type": "nuget",
+      "identifier": "glider",
+      "version": "3.3.1"
+    }
+  ],
+  "author": {
+    "name": "Bogdan Novosad"
+  }
+}
