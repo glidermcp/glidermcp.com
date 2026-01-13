@@ -23,9 +23,18 @@
     {
       "registryType": "nuget",
       "identifier": "glider",
-      "version": "3.4.0"
+      "version": "3.4.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [],
+      "environmentVariables": []
     }
   ],
+  "repository": {
+    "url": "https://github.com/glidermcp/glidermcp.com",
+    "source": "github"
+  },
   "author": {
     "name": "Bogdan Novosad"
   }
