@@ -26,6 +26,19 @@
 	--selection-fg: #ffffff;
 	--selection-bg-dim: rgba(0, 0, 170, 0.2);
 
+	/* Syntax highlighting (CodeBlock) */
+	--syntax-comment: #6a737d;
+	--syntax-keyword: #d73a49;
+	--syntax-string: #032f62;
+	--syntax-number: #005cc5;
+	--syntax-constant: #005cc5;
+	--syntax-function: #6f42c1;
+	--syntax-type: #005cc5;
+	--syntax-property: #e36209;
+	--syntax-variable: #24292e;
+	--syntax-operator: #24292e;
+	--syntax-punctuation: #24292e;
+
 	/* Status colors */
 	--success: #008800;
 	--warning: #cc8800;
