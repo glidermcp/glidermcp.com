@@ -1,0 +1,39 @@
+/_app/immutable/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/logo/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/og-image.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/og-image.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/apple-touch-icon-precomposed.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/manifest.json
+  Cache-Control: public, max-age=86400
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+
+/service-worker.js
+  Cache-Control: no-cache
+

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
-	import type { Snippet } from 'svelte';
+	import type { Component, Snippet } from 'svelte';
 	import TUILayout from '$components/tui/TUILayout.svelte';
 	import TUINavigationTree from '$components/tui/TUINavigationTree.svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
@@ -10,8 +10,7 @@
 		setFocusedPanel
 	} from '$stores/keyboard';
 	import { getContent, type Locale } from '$lib/content';
-	import { FlappyBird } from '$components/game';
-	import { showGame } from '$stores/game';
+	import { gameVisible, showGame } from '$stores/game';
 
 	interface Props {
 		children: Snippet;
@@ -24,6 +23,24 @@
 
 	let locale = $state<Locale>('en');
 	const content = $derived(getContent(locale));
+
+	let GameComponent = $state<Component | null>(null);
+	let gameLoadPromise: Promise<void> | null = null;
+
+	function ensureGameLoaded(): void {
+		if (GameComponent || gameLoadPromise) return;
+
+		gameLoadPromise = import('$components/game/FlappyBird.svelte').then((mod) => {
+			GameComponent = mod.default;
+		});
+	}
+
+	$effect(() => {
+		// If something else toggles the game on (status bar, etc.), load the chunk on demand.
+		if ($gameVisible) {
+			ensureGameLoaded();
+		}
+	});
 
 	// Handle content panel keyboard navigation
 	function handleContentKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
@@ -72,7 +89,9 @@
 	{/snippet}
 </TUILayout>
 
-<FlappyBird />
+{#if $gameVisible && GameComponent}
+	<GameComponent />
+{/if}
 
 <style>
 	.content-area {
