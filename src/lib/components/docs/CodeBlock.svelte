@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { getHighlighter, resolveLanguage } from '$lib/utils/shiki';
-	import { theme } from '$stores/theme';
+	import { highlightToHtml, resolveLanguage } from '$lib/utils/highlight';
 
 	interface Props {
 		code: string;
@@ -12,44 +11,8 @@
 	let { code, language = 'bash', showLineNumbers = false, title }: Props = $props();
 
 	let copied = $state(false);
-	let highlightedHtml = $state('');
-	let shikiLoaded = $state(false);
-	let renderToken = 0;
-
-	const currentTheme = $derived($theme);
-
-	function getShikiTheme(themeValue: string) {
-		return themeValue === 'total-commander' ? 'github-light' : 'github-dark';
-	}
-
-	async function loadShiki(themeValue: string, sourceCode: string, languageValue: string) {
-		const token = ++renderToken;
-		try {
-			const highlighter = await getHighlighter();
-			const resolvedLanguage = resolveLanguage(languageValue);
-			const shikiTheme = getShikiTheme(themeValue);
-
-			const nextHtml = highlighter.codeToHtml(sourceCode, {
-				lang: resolvedLanguage,
-				theme: shikiTheme
-			});
-			if (token !== renderToken) return;
-			highlightedHtml = nextHtml;
-			shikiLoaded = true;
-		} catch (e) {
-			// Fallback to plain text
-			console.warn('Shiki failed to load, using plain text:', e);
-			shikiLoaded = false;
-		}
-	}
-
-	$effect(() => {
-		// Re-render when theme, code, or language changes
-		const themeValue = currentTheme;
-		const sourceCode = code;
-		const languageValue = language;
-		loadShiki(themeValue, sourceCode, languageValue);
-	});
+	const resolvedLanguage = $derived(resolveLanguage(language));
+	const highlightedHtml = $derived(highlightToHtml(code, resolvedLanguage));
 
 	async function copyToClipboard() {
 		try {
@@ -91,11 +54,7 @@
 		{/if}
 
 		<div class="code-content">
-			{#if shikiLoaded && highlightedHtml}
-				{@html highlightedHtml}
-			{:else}
-				<pre class="fallback-code"><code>{code}</code></pre>
-			{/if}
+			<pre class="highlighted"><code class={`language-${resolvedLanguage}`}>{@html highlightedHtml}</code></pre>
 		</div>
 	</div>
 </div>
@@ -173,28 +132,64 @@
 		overflow-x: auto;
 	}
 
-	.code-content :global(pre) {
+	.highlighted {
 		margin: 0;
 		padding: 0;
-		background: transparent !important;
+		background: transparent;
 		overflow: visible;
+		white-space: pre;
 	}
 
-	.code-content :global(code) {
+	.highlighted code {
 		font-family: var(--font-mono);
 		font-size: var(--font-size-sm);
 		line-height: 1.5;
 	}
 
-	.fallback-code {
-		margin: 0;
-		padding: 0;
-		color: var(--text-primary);
-		white-space: pre-wrap;
-		word-break: break-word;
+	/* Minimal syntax highlighting theme driven by CSS variables (set per site theme) */
+	.highlighted :global(.token.comment) {
+		color: var(--syntax-comment);
 	}
 
-	.fallback-code code {
-		font-family: var(--font-mono);
+	.highlighted :global(.token.keyword) {
+		color: var(--syntax-keyword);
+	}
+
+	.highlighted :global(.token.string) {
+		color: var(--syntax-string);
+	}
+
+	.highlighted :global(.token.number) {
+		color: var(--syntax-number);
+	}
+
+	.highlighted :global(.token.boolean),
+	.highlighted :global(.token.null) {
+		color: var(--syntax-constant);
+	}
+
+	.highlighted :global(.token.function) {
+		color: var(--syntax-function);
+	}
+
+	.highlighted :global(.token.class-name),
+	.highlighted :global(.token.type) {
+		color: var(--syntax-type);
+	}
+
+	.highlighted :global(.token.property) {
+		color: var(--syntax-property);
+	}
+
+	.highlighted :global(.token.operator) {
+		color: var(--syntax-operator);
+	}
+
+	.highlighted :global(.token.punctuation) {
+		color: var(--syntax-punctuation);
+	}
+
+	.highlighted :global(.token.variable) {
+		color: var(--syntax-variable);
 	}
 </style>
