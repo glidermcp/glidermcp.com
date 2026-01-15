@@ -97,33 +97,44 @@ export const installationGuides: InstallationGuides = {
 			{
 				title: 'macOS / Windows / Linux: ensure glider is on PATH',
 				description:
-					'Codex can launch stdio MCP servers using the <code>command</code> you configure. Make sure <code>glider</code> is available on PATH.',
+					'You’ll run Glider as a local HTTP server. Make sure <code>glider</code> is available on PATH.',
 				codeVariants: gliderPathByOsVariants
 			},
 			{
-				title: 'Project scope (recommended): enable via a Codex profile',
+				title: 'Start Glider (Streamable HTTP)',
 				description:
-					'This keeps Glider available without starting it for unrelated projects. Edit: macOS/Linux <code>~/.codex/config.toml</code>, Windows <code>%USERPROFILE%\\.codex\\config.toml</code>. See Codex MCP docs: <a href="https://developers.openai.com/codex/mcp/" target="_blank" rel="noreferrer">developers.openai.com/codex/mcp</a> and config docs: <a href="https://developers.openai.com/codex/config/" target="_blank" rel="noreferrer">developers.openai.com/codex/config</a>.',
+					'Codex currently supports MCP servers over <strong>Streamable HTTP</strong>. Start Glider in HTTP mode (default endpoint: <code>http://localhost:5001/mcp</code>).',
+				code: 'glider --transport http',
+				language: 'bash'
+			},
+			{
+				title: 'Add Glider to Codex (global config)',
+				description:
+					'Edit: macOS/Linux <code>~/.codex/config.toml</code>, Windows <code>%USERPROFILE%\\.codex\\config.toml</code>. Codex does not currently support per-repo MCP config, so this is user-scoped. Codex docs: <a href="https://developers.openai.com/codex/mcp/" target="_blank" rel="noreferrer">developers.openai.com/codex/mcp</a>.',
+				code: `# ~/.codex/config.toml
+[mcp_servers.glider]
+url = "http://localhost:5001/mcp"`,
+				language: 'plaintext'
+			},
+			{
+				title: 'Verify',
+				description:
+					'Start a new Codex session, then run <code>/mcp</code> to confirm the server is available.',
+				code: 'codex\n# Then run: /mcp',
+				language: 'plaintext'
+			},
+			{
+				title: 'Optional: keep Glider off by default (profile)',
+				description:
+					'If you prefer, put Glider under a profile and start Codex with <code>--profile glider</code>. Note: some Codex builds only show globally-configured servers in <code>/mcp</code>; if Glider doesn’t appear, move it back to <code>[mcp_servers.glider]</code>.',
 				code: `# ~/.codex/config.toml
 [profiles.glider]
 
 [profiles.glider.mcp_servers.glider]
-command = "glider"`,
-				language: 'plaintext'
-			},
-			{
-				title: 'Use the profile in your project',
-				description:
-					'Run Codex with the profile when you want Glider enabled (profiles are currently CLI-only).',
-				code: 'codex --profile glider'
-			},
-			{
-				title: 'Global scope: add Glider to the default MCP server list',
-				description:
-					'This makes Glider available in every Codex run (including unrelated projects).',
-				code: `# ~/.codex/config.toml
-[mcp_servers.glider]
-command = "glider"`,
+url = "http://localhost:5001/mcp"
+
+# Run with:
+# codex --profile glider`,
 				language: 'plaintext'
 			}
 		]
