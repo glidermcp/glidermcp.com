@@ -225,6 +225,54 @@ export const TOOLS: ToolMetadata[] = [
 		}
 	},
 	{
+		id: 'sync_documents',
+		name: 'sync_documents',
+		displayName: 'Sync Documents',
+		description: 'Synchronizes one or more documents from disk into the in-memory workspace (faster than reload_current for .cs edits).',
+		category: 'solution',
+		parameters: [
+			{
+				name: 'filePaths',
+				type: 'json',
+				description: 'Optional file paths to sync. JSON array of strings. If omitted/empty, syncs all documents in the loaded solution/project.',
+				required: false,
+				placeholder: '["/path/to/File.cs"]'
+			},
+			{
+				name: 'pathStyle',
+				type: 'string',
+				description: "Path style: 'absolute' (default) or 'relative' (to solution root).",
+				required: false,
+				default: 'absolute'
+			},
+			{
+				name: 'timeout_ms',
+				type: 'number',
+				description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.',
+				required: false,
+				default: 60000
+			}
+		],
+		examples: [
+			{ description: 'Sync all documents', params: {} },
+			{ description: 'Sync a specific file', params: { filePaths: '["/Users/dev/MyProject/Program.cs"]' } }
+		],
+		responseDescription: 'Returns updated and skipped files plus revision info',
+		responseExample: {
+			success: true,
+			data: {
+				updated: ['/Users/dev/MyProject/Program.cs'],
+				skipped: [],
+				totalSynced: 1,
+				revisionBefore: 3,
+				revisionAfter: 4,
+				fallbackToReload: false,
+				fallbackReason: null
+			},
+			error: null
+		}
+	},
+	{
 		id: 'solution_cache',
 		name: 'solution_cache',
 		displayName: 'Solution Cache',
@@ -319,6 +367,125 @@ export const TOOLS: ToolMetadata[] = [
 	},
 
 	// Search
+	{
+		id: 'search_symbols',
+		name: 'search_symbols',
+		displayName: 'Search Symbols',
+		description: 'Searches for symbols (types and members) by pattern and returns stable symbol keys for follow-up tool calls.',
+		category: 'search',
+		parameters: [
+			{ name: 'query', type: 'string', description: "Search pattern. Supports '*' and '?', or plain text for substring match.", required: true, placeholder: '*Service' },
+			{
+				name: 'kinds',
+				type: 'string',
+				description: "Optional kinds filter (comma-separated): 'Type,Method,Property,Field,Event'.",
+				required: false,
+				placeholder: 'Type,Method'
+			},
+			{ name: 'namespaceFilter', type: 'string', description: "Optional namespace prefix filter (e.g., 'MyApp.Services').", required: false, placeholder: 'MyApp.Services' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'sortBy', type: 'string', description: "Optional sort: 'name', 'kind', 'filePath', 'projectName', 'namespace'.", required: false, placeholder: 'name' },
+			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+		],
+		examples: [
+			{ description: 'Search for service types', params: { query: '*Service', kinds: 'Type' } },
+			{ description: 'Search methods containing "Login"', params: { query: '*Login*', kinds: 'Method' } }
+		],
+		responseDescription: 'Returns matching symbols (with paging) including stable symbol keys',
+		responseExample: {
+			success: true,
+			data: {
+				query: '*Service',
+				matchCount: 2,
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
+				matches: [
+					{
+						name: 'UserService',
+						fullName: 'MyApp.Services.UserService',
+						kind: 'Type',
+						containingType: null,
+						namespace: 'MyApp.Services',
+						filePath: '/path/to/UserService.cs',
+						lineNumber: 12,
+						symbolKey: '...'
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_symbol_at_position',
+		name: 'get_symbol_at_position',
+		displayName: 'Get Symbol at Position',
+		description: 'Resolves the symbol at a file position and returns a stable symbol key.',
+		category: 'search',
+		parameters: [
+			{ name: 'filePath', type: 'string', description: 'Absolute file path.', required: true, placeholder: '/path/to/File.cs' },
+			{ name: 'line', type: 'number', description: '1-based line number.', required: true, default: 1 },
+			{ name: 'column', type: 'number', description: '1-based column number.', required: true, default: 1 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+		],
+		examples: [{ description: 'Get symbol key under cursor', params: { filePath: '/Users/dev/MyProject/Program.cs', line: 10, column: 15 } }],
+		responseDescription: 'Returns a symbol key and basic symbol details',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				displayName: 'MyApp.Services.UserService',
+				kind: 'Type',
+				containingType: null,
+				filePath: '/path/to/UserService.cs',
+				lineNumber: 12
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_symbol_info',
+		name: 'get_symbol_info',
+		displayName: 'Get Symbol Info',
+		description: 'Gets detailed information for a symbol by stable symbol key (from search_symbols or get_symbol_at_position).',
+		category: 'search',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key.', required: true, placeholder: '...' },
+			{ name: 'includeLocations', type: 'boolean', description: 'Include all definition locations. Default is true.', required: false, default: true },
+			{ name: 'includeDocumentation', type: 'boolean', description: 'Include XML documentation. Default is true.', required: false, default: true },
+			{
+				name: 'maxDocumentationChars',
+				type: 'number',
+				description: 'Maximum documentation characters. Use 0 for unlimited. Default is 2000.',
+				required: false,
+				default: 2000
+			},
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+		],
+		examples: [{ description: 'Get symbol info from a symbol key', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns rich symbol information including signature and locations',
+		responseExample: {
+			success: true,
+			data: {
+				name: 'UserService',
+				fullName: 'MyApp.Services.UserService',
+				kind: 'Type',
+				namespace: 'MyApp.Services',
+				filePath: '/path/to/UserService.cs',
+				lineNumber: 12,
+				projectName: 'MyProject',
+				accessibility: 'Public',
+				signature: 'public class UserService',
+				documentation: '...',
+				locations: [{ filePath: '/path/to/UserService.cs', lineNumber: 12, column: 1, lineText: 'public class UserService', projectName: 'MyProject' }]
+			},
+			error: null
+		}
+	},
 	{
 		id: 'find_types',
 		name: 'find_types',
@@ -477,6 +644,37 @@ export const TOOLS: ToolMetadata[] = [
 		}
 	},
 	{
+		id: 'get_type_source',
+		name: 'get_type_source',
+		displayName: 'Get Type Source',
+		description: 'Gets source code for a type (bounded by max lines).',
+		category: 'analysis',
+		parameters: [
+			{ name: 'typeName', type: 'string', description: 'Type name (simple or fully qualified).', required: true, placeholder: 'UserService' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'maxLines', type: 'number', description: 'Max lines to return. Use 0 for unlimited. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+		],
+		examples: [{ description: 'Get type source', params: { typeName: 'UserService' } }],
+		responseDescription: 'Returns type source (possibly truncated)',
+		responseExample: {
+			success: true,
+			data: {
+				typeName: 'UserService',
+				fullName: 'MyApp.Services.UserService',
+				kind: 'Class',
+				filePath: '/path/to/UserService.cs',
+				startLine: 1,
+				endLine: 120,
+				lineCount: 120,
+				truncated: true,
+				source: '...'
+			},
+			error: null
+		}
+	},
+	{
 		id: 'get_method_signature',
 		name: 'get_method_signature',
 		displayName: 'Get Method Signature',
@@ -499,6 +697,38 @@ export const TOOLS: ToolMetadata[] = [
 				filePath: '/path/to/SolutionManager.cs',
 				lineNumber: 58,
 				parameters: [{ name: 'solutionPath', type: 'string', defaultValue: null, modifiers: [] }]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_method_source',
+		name: 'get_method_source',
+		displayName: 'Get Method Source',
+		description: 'Gets source code for a method (bounded by max lines).',
+		category: 'analysis',
+		parameters: [
+			{ name: 'methodName', type: 'string', description: 'Method name.', required: true, placeholder: 'LoadSolutionAsync' },
+			{ name: 'containingTypeName', type: 'string', description: 'Optional containing type name filter.', required: false, placeholder: 'SolutionManager' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'maxLines', type: 'number', description: 'Max lines to return. Use 0 for unlimited. Default is 120.', required: false, default: 120 },
+			{ name: 'bodyOnly', type: 'boolean', description: 'If true, return only the method body (no signature). Default is false.', required: false, default: false },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+		],
+		examples: [{ description: 'Get method source', params: { methodName: 'LoadSolutionAsync', containingTypeName: 'SolutionManager' } }],
+		responseDescription: 'Returns method source (possibly truncated)',
+		responseExample: {
+			success: true,
+			data: {
+				methodName: 'LoadSolutionAsync',
+				containingType: 'SolutionManager',
+				filePath: '/path/to/SolutionManager.cs',
+				startLine: 50,
+				endLine: 80,
+				lineCount: 31,
+				truncated: false,
+				source: '...'
 			},
 			error: null
 		}
@@ -704,6 +934,142 @@ export const TOOLS: ToolMetadata[] = [
 			error: null
 		}
 	},
+	{
+		id: 'get_code_fixes',
+		name: 'get_code_fixes',
+		displayName: 'Get Code Fixes',
+		description: 'Lists available code fixes for diagnostics at a specific location.',
+		category: 'refactoring',
+		parameters: [
+			{ name: 'filePath', type: 'string', description: 'File path containing the diagnostic.', required: true, placeholder: '/path/to/File.cs' },
+			{ name: 'lineNumber', type: 'number', description: '1-based line number.', required: true, default: 1 },
+			{ name: 'column', type: 'number', description: '1-based column number.', required: true, default: 1 },
+			{ name: 'diagnosticId', type: 'string', description: "Optional diagnostic ID filter (e.g., 'CS0246').", required: false, placeholder: 'CS0246' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'maxFixes', type: 'number', description: 'Max fixes per diagnostic. Default is 10.', required: false, default: 10 },
+			{ name: 'includePreviewDiff', type: 'boolean', description: 'Include preview diff for each fix. Default is false.', required: false, default: false },
+			{ name: 'maxPreviewDiffChars', type: 'number', description: 'Max characters for preview diffs. Default is 2000.', required: false, default: 2000 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+		],
+		examples: [
+			{ description: 'Get code fixes at a location', params: { filePath: '/Users/dev/MyProject/Program.cs', lineNumber: 10, column: 15 } }
+		],
+		responseDescription: 'Returns fixes grouped by diagnostic at the location',
+		responseExample: {
+			success: true,
+			data: {
+				filePath: '/path/to/File.cs',
+				lineNumber: 10,
+				column: 15,
+				diagnosticsAtLocation: 1,
+				totalFixesAvailable: 2,
+				diagnostics: [
+					{
+						diagnosticId: 'CS0246',
+						severity: 'Error',
+						message: "The type or namespace name 'X' could not be found",
+						span: { startLine: 10, startColumn: 15, endLine: 10, endColumn: 16 },
+						fixes: [{ fixId: '...', title: 'Add using ...', equivalenceKey: '...', previewDiff: null }]
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'apply_code_fix',
+		name: 'apply_code_fix',
+		displayName: 'Apply Code Fix',
+		description: 'Applies a specific code fix (or returns a preview) and returns diff output.',
+		category: 'refactoring',
+		parameters: [
+			{ name: 'filePath', type: 'string', description: 'File path containing the diagnostic.', required: true, placeholder: '/path/to/File.cs' },
+			{ name: 'lineNumber', type: 'number', description: '1-based line number.', required: true, default: 1 },
+			{ name: 'column', type: 'number', description: '1-based column number.', required: true, default: 1 },
+			{ name: 'fixId', type: 'string', description: 'Fix ID from get_code_fixes.', required: true, placeholder: '...' },
+			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns preview only.', required: false, default: true },
+			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
+			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
+			{ name: 'includePerFileDiff', type: 'boolean', description: 'Include per-file diffs. Default is true.', required: false, default: true },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+		],
+		examples: [{ description: 'Preview applying a code fix', params: { filePath: '/Users/dev/MyProject/Program.cs', lineNumber: 10, column: 15, fixId: '...', applyChanges: false } }],
+		responseDescription: 'Returns diff output and per-file diffs when enabled',
+		responseExample: {
+			success: true,
+			data: {
+				fixId: '...',
+				title: 'Add using ...',
+				applied: false,
+				filesChanged: 1,
+				unifiedDiff: '...',
+				changedFiles: [{ filePath: '/path/to/File.cs', changeCount: 1, diff: '...' }]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'organize_usings',
+		name: 'organize_usings',
+		displayName: 'Organize Usings',
+		description: 'Organizes using directives in a C# file (sort + remove unused) and returns diff output.',
+		category: 'refactoring',
+		parameters: [
+			{ name: 'filePath', type: 'string', description: 'File path to organize.', required: true, placeholder: '/path/to/File.cs' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns preview only.', required: false, default: true },
+			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
+			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+		],
+		examples: [{ description: 'Preview organize usings', params: { filePath: '/Users/dev/MyProject/Program.cs', applyChanges: false } }],
+		responseDescription: 'Returns diff output for the formatting operation',
+		responseExample: {
+			success: true,
+			data: {
+				filePath: '/path/to/File.cs',
+				changed: true,
+				applied: false,
+				filesChanged: 1,
+				unifiedDiff: '...',
+				changedFiles: [{ filePath: '/path/to/File.cs', changeCount: 1, diff: '...' }]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'format_document',
+		name: 'format_document',
+		displayName: 'Format Document',
+		description: "Formats a C# document according to the project's formatting rules and returns diff output.",
+		category: 'refactoring',
+		parameters: [
+			{ name: 'filePath', type: 'string', description: 'File path to format.', required: true, placeholder: '/path/to/File.cs' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns preview only.', required: false, default: true },
+			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
+			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+		],
+		examples: [{ description: 'Preview formatting a file', params: { filePath: '/Users/dev/MyProject/Program.cs', applyChanges: false } }],
+		responseDescription: 'Returns diff output for the formatting operation',
+		responseExample: {
+			success: true,
+			data: {
+				filePath: '/path/to/File.cs',
+				changed: true,
+				applied: false,
+				filesChanged: 1,
+				unifiedDiff: '...',
+				changedFiles: [{ filePath: '/path/to/File.cs', changeCount: 1, diff: '...' }]
+			},
+			error: null
+		}
+	},
 
 	// External source
 	{
@@ -874,4 +1240,3 @@ export function getDefaultParams(tool: ToolMetadata): Record<string, unknown> {
 
 	return params;
 }
-
