@@ -32,6 +32,9 @@
 	{#if expanded}
 		<div class="tool-content">
 			<p class="tool-description">{tool.description}</p>
+			<p class="tool-link">
+				<a class="link" href={`/playground/${tool.id.replace(/_/g, '-')}`}>Open in Playground</a>
+			</p>
 
 			{#if tool.parameters.length > 0}
 				<div class="section">
@@ -142,6 +145,19 @@
 		color: var(--text-secondary);
 		margin: var(--spacing-md) 0;
 		line-height: 1.5;
+	}
+
+	.tool-link {
+		margin: 0 0 var(--spacing-md) 0;
+	}
+
+	.link {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.link:hover {
+		text-decoration: underline;
 	}
 
 	.section {

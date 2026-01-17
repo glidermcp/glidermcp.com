@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { mcpClient } from '$lib/services/mcp-client';
 	import {
 		selectedToolId,
 		selectedTool,
+		selectTool,
 		toolParams,
 		setConnectionStatus,
 		setExecutingTool,
@@ -23,13 +26,25 @@
 	import ResponseViewer from './ResponseViewer.svelte';
 
 	const tool = $derived($selectedTool);
+	const currentToolId = $derived($selectedToolId);
 	const params = $derived($toolParams);
 	const connected = $derived($isConnected);
 	const executing = $derived($isExecuting);
 	const currentServerUrl = $derived($serverUrl);
+	const toolSlug = $derived($page.params.tool);
 
 	let connectionAttempted = $state(false);
 	let serverUrlInput = $state('');
+	let lastUrlSyncedToolId = $state<string | null>(null);
+	let lastProcessedToolSlug = $state<string | undefined>(undefined);
+
+	function toToolId(slug: string): string {
+		return slug.replace(/-/g, '_');
+	}
+
+	function toToolSlug(toolId: string): string {
+		return toolId.replace(/_/g, '-');
+	}
 
 	async function connect(): Promise<void> {
 		connectionAttempted = true;
@@ -191,6 +206,47 @@
 
 		// Try to connect on mount
 		connect();
+	});
+
+	$effect(() => {
+		if (!toolSlug) {
+			lastProcessedToolSlug = undefined;
+			return;
+		}
+
+		if (toolSlug === lastProcessedToolSlug) return;
+		lastProcessedToolSlug = toolSlug;
+
+		const targetToolId = toToolId(toolSlug);
+		if (targetToolId) {
+			selectTool(targetToolId);
+		}
+	});
+
+	$effect(() => {
+		if (!currentToolId) return;
+
+		const desiredSlug = toToolSlug(currentToolId);
+		if (!desiredSlug) return;
+
+		const toolChanged = lastUrlSyncedToolId !== null && lastUrlSyncedToolId !== currentToolId;
+		lastUrlSyncedToolId = currentToolId;
+
+		if (toolSlug === desiredSlug) return;
+
+		// Only push a param route when either:
+		// - we're already on a param route, or
+		// - the user just changed the tool selection
+		if (!toolSlug) {
+			if (!toolChanged) return;
+			if (currentToolId === 'get_diagnostics') return;
+		}
+
+		goto(`/playground/${desiredSlug}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true
+		});
 	});
 
 	onDestroy(() => {
