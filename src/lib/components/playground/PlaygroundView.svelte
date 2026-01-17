@@ -7,6 +7,7 @@
 		selectedTool,
 		toolParams,
 		setConnectionStatus,
+		setExecutingTool,
 		setExecutionState,
 		setResponse,
 		isConnected,
@@ -42,10 +43,16 @@
 	async function executeCurrentTool(): Promise<void> {
 		if (!tool || executing) return;
 
+		const executingTool = tool;
+		const executingToolId = executingTool.id;
+		const executingToolName = executingTool.name;
+
 		// Validate params
-		const validation = validateToolParams(tool, params);
+		const validation = validateToolParams(executingTool, params);
 		if (!validation.valid) {
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: false,
 				error: `Validation failed:\n${validation.errors.join('\n')}`,
 				duration: 0,
@@ -58,6 +65,8 @@
 		// Check connection
 		if (!connected) {
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: false,
 				error: `Not connected to MCP server. Start the server at ${currentServerUrl}.`,
 				duration: 0,
@@ -67,13 +76,16 @@
 			return;
 		}
 
+		setExecutingTool(executingToolId);
 		setExecutionState('executing');
 
 		try {
-			const result = await mcpClient.callTool(tool.name, validation.normalizedParams);
+			const result = await mcpClient.callTool(executingTool.name, validation.normalizedParams);
 
 			if (!result.success) {
 				setResponse({
+					toolId: executingToolId,
+					toolName: executingToolName,
 					success: false,
 					error: result.error,
 					duration: result.duration,
@@ -81,9 +93,9 @@
 				});
 				setExecutionState('error');
 				addHistoryEntry({
-					toolId: tool.id,
-					toolName: tool.name,
-					params: { ...params },
+					toolId: executingToolId,
+					toolName: executingToolName,
+					params: { ...validation.normalizedParams },
 					success: false,
 					error: result.error,
 					duration: result.duration
@@ -99,6 +111,8 @@
 			const toolError = hasEnvelope ? (envelope.error as string | undefined | null) : undefined;
 
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: toolSuccess,
 				data: toolData,
 				error: toolSuccess ? undefined : toolError ?? 'Unknown error',
@@ -110,9 +124,9 @@
 
 			// Add to history
 			addHistoryEntry({
-				toolId: tool.id,
-				toolName: tool.name,
-				params: { ...params },
+				toolId: executingToolId,
+				toolName: executingToolName,
+				params: { ...validation.normalizedParams },
 				success: toolSuccess,
 				error: toolSuccess ? undefined : toolError ?? 'Unknown error',
 				duration: result.duration
@@ -120,12 +134,16 @@
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: false,
 				error: errorMessage,
 				duration: 0,
 				timestamp: Date.now()
 			});
 			setExecutionState('error');
+		} finally {
+			setExecutingTool(null);
 		}
 	}
 

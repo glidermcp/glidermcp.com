@@ -1,11 +1,21 @@
 <script lang="ts">
-	import { lastResponse, executionState, clearResponse, selectedToolId } from '$stores/playground';
+	import {
+		selectedToolResponse,
+		executionState,
+		executingToolId,
+		clearResponse,
+		selectedToolId
+	} from '$stores/playground';
 	import { formatDuration } from '$stores/history';
 	import ResponseVisualizer from './ResponseVisualizer.svelte';
 
-	const response = $derived($lastResponse);
+	const response = $derived($selectedToolResponse);
 	const executionStateValue = $derived($executionState);
 	const toolId = $derived($selectedToolId);
+	const currentlyExecutingToolId = $derived($executingToolId);
+	const isExecutingThisTool = $derived.by(
+		() => executionStateValue === 'executing' && currentlyExecutingToolId === toolId
+	);
 
 	// Toggle between raw and visual view
 	let viewMode: 'raw' | 'visual' = $state('visual');
@@ -65,14 +75,27 @@
 						class:active={viewMode === 'visual'}
 						onclick={toggleViewMode}
 						title="Toggle visualization"
+						disabled={executionStateValue === 'executing'}
 					>
 						{viewMode === 'visual' ? 'Raw' : 'Visual'}
 					</button>
 				{/if}
-				<button type="button" class="action-btn" onclick={copyToClipboard} title="Copy to clipboard">
+				<button
+					type="button"
+					class="action-btn"
+					onclick={copyToClipboard}
+					title="Copy to clipboard"
+					disabled={executionStateValue === 'executing'}
+				>
 					Copy
 				</button>
-				<button type="button" class="action-btn" onclick={clearResponse} title="Clear response">
+				<button
+					type="button"
+					class="action-btn"
+					onclick={clearResponse}
+					title="Clear response"
+					disabled={executionStateValue === 'executing'}
+				>
 					Clear
 				</button>
 			</div>
@@ -80,7 +103,7 @@
 	</div>
 
 	<div class="response-content">
-		{#if executionStateValue === 'executing'}
+		{#if isExecutingThisTool}
 			<div class="executing">
 				<span class="spinner"></span>
 				<span>Executing...</span>
