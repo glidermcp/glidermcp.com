@@ -21,6 +21,8 @@ export type ExecutionState = 'idle' | 'executing' | 'success' | 'error';
  * Response data
  */
 export interface PlaygroundResponse {
+	toolId: string;
+	toolName: string;
 	success: boolean;
 	data?: unknown;
 	error?: string;
@@ -43,13 +45,25 @@ export const toolParams = atom<Record<string, unknown>>({});
 // Current execution state
 export const executionState = atom<ExecutionState>('idle');
 
+// Tool currently executing (for UI correctness when switching tools mid-execution)
+export const executingToolId = atom<string | null>(null);
+
 // Last response
 export const lastResponse = atom<PlaygroundResponse | null>(null);
+
+// Most recent response per tool (keyed by tool id)
+export const responsesByToolId = atom<Record<string, PlaygroundResponse | undefined>>({});
 
 // Derived: get selected tool metadata
 export const selectedTool = computed(selectedToolId, (id: string): ToolMetadata | undefined => {
 	return TOOLS.find((t) => t.id === id);
 });
+
+// Derived: response for selected tool
+export const selectedToolResponse = computed(
+	[selectedToolId, responsesByToolId],
+	(id: string, byTool: Record<string, PlaygroundResponse | undefined>) => byTool[id] ?? null
+);
 
 // Derived: is executing
 export const isExecuting = computed(executionState, (state: ExecutionState) => state === 'executing');
@@ -66,7 +80,7 @@ export function selectTool(toolId: string): void {
 
 	selectedToolId.set(toolId);
 	toolParams.set(getDefaultParams(tool));
-	// Don't clear response on tool switch - user might want to compare
+	// Keep existing response for this tool; switching should not mix responses between tools.
 }
 
 /**
@@ -125,18 +139,39 @@ export function setExecutionState(state: ExecutionState): void {
 }
 
 /**
+ * Set which tool is currently executing
+ */
+export function setExecutingTool(toolId: string | null): void {
+	executingToolId.set(toolId);
+}
+
+/**
  * Set response
  */
-export function setResponse(response: PlaygroundResponse | null): void {
+export function setResponse(response: PlaygroundResponse): void {
 	lastResponse.set(response);
+
+	const current = responsesByToolId.get();
+	responsesByToolId.set({ ...current, [response.toolId]: response });
 }
 
 /**
  * Clear response
  */
 export function clearResponse(): void {
-	lastResponse.set(null);
+	const toolId = selectedToolId.get();
+
+	const current = { ...responsesByToolId.get() };
+	delete current[toolId];
+	responsesByToolId.set(current);
+
+	const last = lastResponse.get();
+	if (last?.toolId === toolId) {
+		lastResponse.set(null);
+	}
+
 	executionState.set('idle');
+	executingToolId.set(null);
 }
 
 /**
@@ -157,5 +192,7 @@ export function resetPlayground(): void {
 	selectedToolId.set('get_diagnostics');
 	toolParams.set({});
 	executionState.set('idle');
+	executingToolId.set(null);
 	lastResponse.set(null);
+	responsesByToolId.set({});
 }

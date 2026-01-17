@@ -2,7 +2,7 @@ import type { ToolDetailContent, ToolsListContent } from '../types';
 
 export const toolsList: ToolsListContent = {
 	title: 'Available Tools',
-	intro: 'Glider provides 18 MCP tools for C# code analysis and refactoring.'
+	intro: 'Glider provides 28 MCP tools for C# code analysis and refactoring.'
 };
 
 export const toolDetail: ToolDetailContent = {
@@ -10,7 +10,9 @@ export const toolDetail: ToolDetailContent = {
 	examplesTitle: 'Examples',
 	exampleRequestTitle: 'Request',
 	exampleResponseTitle: 'Response',
-	responseTitle: 'Response',
+	responseTitle: 'Response Notes',
+	playgroundHintPrefixHtml: 'Try this tool in ',
+	playgroundLinkLabelHtml: '<strong>Playground</strong>.',
 	tableHeaders: {
 		name: 'Name',
 		type: 'Type',
@@ -22,6 +24,5 @@ export const toolDetail: ToolDetailContent = {
 		no: 'No'
 	},
 	noParametersText: 'This tool requires no parameters.',
-	notFoundText: 'Tool not found.',
-	hint: 'Go to <strong>Playground</strong> to test this tool interactively.'
+	notFoundText: 'Tool not found.'
 };

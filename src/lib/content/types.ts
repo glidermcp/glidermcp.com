@@ -102,6 +102,8 @@ export interface ToolDetailContent {
 	exampleRequestTitle: string;
 	exampleResponseTitle: string;
 	responseTitle: string;
+	playgroundHintPrefixHtml: string;
+	playgroundLinkLabelHtml: string;
 	tableHeaders: {
 		name: string;
 		type: string;
@@ -114,7 +116,6 @@ export interface ToolDetailContent {
 	};
 	noParametersText: string;
 	notFoundText: string;
-	hint: string;
 }
 
 export interface PromptGroup {

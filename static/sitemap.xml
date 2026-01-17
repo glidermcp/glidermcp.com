@@ -49,6 +49,9 @@
     <loc>https://glidermcp.com/tools/analyze-complexity</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/apply-code-fix</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/batch</loc>
   </url>
   <url>
@@ -61,16 +64,34 @@
     <loc>https://glidermcp.com/tools/find-usages</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/format-document</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-code-fixes</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/get-diagnostics</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-method-signature</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/get-method-source</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-symbol-at-position</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-symbol-info</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/get-type-dependencies</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-type-info</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-type-source</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/load-project</loc>
@@ -85,13 +106,22 @@
     <loc>https://glidermcp.com/tools/move-type</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/organize-usings</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/reload-current</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/rename-symbol</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/search-symbols</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/solution-cache</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/sync-documents</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/view-external-definition</loc>

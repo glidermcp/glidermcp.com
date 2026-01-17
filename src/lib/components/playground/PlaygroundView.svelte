@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { mcpClient } from '$lib/services/mcp-client';
 	import {
 		selectedToolId,
 		selectedTool,
+		selectTool,
 		toolParams,
 		setConnectionStatus,
+		setExecutingTool,
 		setExecutionState,
 		setResponse,
 		isConnected,
@@ -22,13 +26,25 @@
 	import ResponseViewer from './ResponseViewer.svelte';
 
 	const tool = $derived($selectedTool);
+	const currentToolId = $derived($selectedToolId);
 	const params = $derived($toolParams);
 	const connected = $derived($isConnected);
 	const executing = $derived($isExecuting);
 	const currentServerUrl = $derived($serverUrl);
+	const toolSlug = $derived($page.params.tool);
 
 	let connectionAttempted = $state(false);
 	let serverUrlInput = $state('');
+	let lastUrlSyncedToolId = $state<string | null>(null);
+	let lastProcessedToolSlug = $state<string | undefined>(undefined);
+
+	function toToolId(slug: string): string {
+		return slug.replace(/-/g, '_');
+	}
+
+	function toToolSlug(toolId: string): string {
+		return toolId.replace(/_/g, '-');
+	}
 
 	async function connect(): Promise<void> {
 		connectionAttempted = true;
@@ -42,10 +58,16 @@
 	async function executeCurrentTool(): Promise<void> {
 		if (!tool || executing) return;
 
+		const executingTool = tool;
+		const executingToolId = executingTool.id;
+		const executingToolName = executingTool.name;
+
 		// Validate params
-		const validation = validateToolParams(tool, params);
+		const validation = validateToolParams(executingTool, params);
 		if (!validation.valid) {
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: false,
 				error: `Validation failed:\n${validation.errors.join('\n')}`,
 				duration: 0,
@@ -58,6 +80,8 @@
 		// Check connection
 		if (!connected) {
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: false,
 				error: `Not connected to MCP server. Start the server at ${currentServerUrl}.`,
 				duration: 0,
@@ -67,13 +91,16 @@
 			return;
 		}
 
+		setExecutingTool(executingToolId);
 		setExecutionState('executing');
 
 		try {
-			const result = await mcpClient.callTool(tool.name, validation.normalizedParams);
+			const result = await mcpClient.callTool(executingTool.name, validation.normalizedParams);
 
 			if (!result.success) {
 				setResponse({
+					toolId: executingToolId,
+					toolName: executingToolName,
 					success: false,
 					error: result.error,
 					duration: result.duration,
@@ -81,9 +108,9 @@
 				});
 				setExecutionState('error');
 				addHistoryEntry({
-					toolId: tool.id,
-					toolName: tool.name,
-					params: { ...params },
+					toolId: executingToolId,
+					toolName: executingToolName,
+					params: { ...validation.normalizedParams },
 					success: false,
 					error: result.error,
 					duration: result.duration
@@ -99,6 +126,8 @@
 			const toolError = hasEnvelope ? (envelope.error as string | undefined | null) : undefined;
 
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: toolSuccess,
 				data: toolData,
 				error: toolSuccess ? undefined : toolError ?? 'Unknown error',
@@ -110,9 +139,9 @@
 
 			// Add to history
 			addHistoryEntry({
-				toolId: tool.id,
-				toolName: tool.name,
-				params: { ...params },
+				toolId: executingToolId,
+				toolName: executingToolName,
+				params: { ...validation.normalizedParams },
 				success: toolSuccess,
 				error: toolSuccess ? undefined : toolError ?? 'Unknown error',
 				duration: result.duration
@@ -120,12 +149,16 @@
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 			setResponse({
+				toolId: executingToolId,
+				toolName: executingToolName,
 				success: false,
 				error: errorMessage,
 				duration: 0,
 				timestamp: Date.now()
 			});
 			setExecutionState('error');
+		} finally {
+			setExecutingTool(null);
 		}
 	}
 
@@ -173,6 +206,47 @@
 
 		// Try to connect on mount
 		connect();
+	});
+
+	$effect(() => {
+		if (!toolSlug) {
+			lastProcessedToolSlug = undefined;
+			return;
+		}
+
+		if (toolSlug === lastProcessedToolSlug) return;
+		lastProcessedToolSlug = toolSlug;
+
+		const targetToolId = toToolId(toolSlug);
+		if (targetToolId) {
+			selectTool(targetToolId);
+		}
+	});
+
+	$effect(() => {
+		if (!currentToolId) return;
+
+		const desiredSlug = toToolSlug(currentToolId);
+		if (!desiredSlug) return;
+
+		const toolChanged = lastUrlSyncedToolId !== null && lastUrlSyncedToolId !== currentToolId;
+		lastUrlSyncedToolId = currentToolId;
+
+		if (toolSlug === desiredSlug) return;
+
+		// Only push a param route when either:
+		// - we're already on a param route, or
+		// - the user just changed the tool selection
+		if (!toolSlug) {
+			if (!toolChanged) return;
+			if (currentToolId === 'get_diagnostics') return;
+		}
+
+		goto(`/playground/${desiredSlug}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true
+		});
 	});
 
 	onDestroy(() => {

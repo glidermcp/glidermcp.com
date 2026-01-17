@@ -8,18 +8,22 @@ For full documentation and setup guides, see `https://glidermcp.com`.
 
 - Resolve symbols the same way the compiler does (not grep).
 - Find usages, implementations, and types (supports wildcards like `*Manager`).
+- Search for symbols and get stable keys to use across tool calls.
 - Inspect APIs with detailed type information and method signatures.
 - Surface compiler diagnostics for a loaded solution/project.
 - Refactor safely: rename symbols and move types/members with reference updates.
+- Apply code fixes and deterministic formatting with preview diffs.
 - Analyze architecture via dependency and complexity metrics.
 - Batch multiple tool calls into a single request.
 
 ## Tool overview
 
 - Diagnostics: `server_status`, `get_diagnostics`
-- Solution management: `load_solution`, `load_project`, `reload_current`, `solution_cache`
-- Code analysis: `find_usages`, `find_implementation`, `find_types`, `get_type_info`, `get_method_signature`
+- Solution management: `load_solution`, `load_project`, `reload_current`, `sync_documents`, `solution_cache`
+- Symbol search & discovery: `search_symbols`, `get_symbol_at_position`, `get_symbol_info`, `find_usages`, `find_implementation`, `find_types`
+- Code analysis: `get_type_info`, `get_method_signature`, `get_type_source`, `get_method_source`
 - Refactoring: `rename_symbol`, `move_type`, `move_member`
+- Code fixes & formatting: `get_code_fixes`, `apply_code_fix`, `organize_usings`, `format_document`
 - External source: `view_external_definition`
 - Architecture & metrics: `get_type_dependencies`, `analyze_complexity`
 - Batching: `batch`
@@ -107,4 +111,3 @@ Make sure the .NET tools directory is on your `PATH`:
 ### Solution/project won’t load
 
 Use an absolute path to the `.sln` / `.csproj` file.
-

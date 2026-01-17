@@ -20,6 +20,11 @@
 
 	// Track focused panel from store
 	const currentFocusedPanel = $derived($focusedPanel);
+	const navPath = $derived.by(() => {
+		const path = $page.url.pathname;
+		if (path.startsWith('/playground/')) return '/playground';
+		return path;
+	});
 
 	let locale = $state<Locale>('en');
 	const content = $derived(getContent(locale));
@@ -79,7 +84,7 @@
 
 <TUILayout title="Glider MCP" leftPanelWidth="max-content">
 	{#snippet leftPanel()}
-		<TUINavigationTree items={content.navItems} currentPath={$page.url.pathname} />
+		<TUINavigationTree items={content.navItems} currentPath={navPath} />
 	{/snippet}
 
 	{#snippet rightPanel()}

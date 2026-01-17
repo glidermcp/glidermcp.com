@@ -38,6 +38,11 @@
 	<p class="tool-category-badge">[{tool.category}]</p>
 	<p>{tool.description}</p>
 
+	<p class="hint">
+		{@html content.playgroundHintPrefixHtml}
+		<a class="link" href={`/playground/${tool.id.replace(/_/g, '-')}`}>{@html content.playgroundLinkLabelHtml}</a>
+	</p>
+
 	{#if tool.parameters.length > 0}
 		<h3>{content.parametersTitle}</h3>
 		<table class="params-table">
@@ -87,8 +92,6 @@
 		<h3>{content.responseTitle}</h3>
 		<p>{tool.responseDescription}</p>
 	{/if}
-
-	<p class="hint">{@html content.hint}</p>
 {:else}
 	<p class="muted">{content.notFoundText}</p>
 {/if}
