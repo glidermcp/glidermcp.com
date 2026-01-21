@@ -509,14 +509,22 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_types',
 		name: 'find_types',
 		displayName: 'Find Types',
-		description: "Finds types by name pattern with wildcard support ('*' and '?').",
+		description: "Finds types by name pattern with wildcard support ('*' and '?'). By default, only searches types with source code in the solution (excludes external assemblies/packages).",
 		category: 'search',
 		parameters: [
 			{ name: 'pattern', type: 'string', description: "Search pattern (supports '*' and '?').", required: true, placeholder: '*Service' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{
+				name: 'sourceOnly',
+				type: 'boolean',
+				description: 'Only search types with source in solution (excludes external assemblies/packages). Default is true.',
+				required: false,
+				default: true
+			},
 			{ name: 'summaryOnly', type: 'boolean', description: 'When true, returns summary counts only. Default is false.', required: false, default: false },
 			{ name: 'kind', type: 'string', description: "Optional kind filter (e.g., 'Class', 'Interface').", required: false, placeholder: 'Interface' },
 			{ name: 'accessibility', type: 'string', description: "Optional accessibility filter (e.g., 'Public', 'Internal').", required: false, placeholder: 'Public' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'name', 'kind', 'filePath', 'projectName', 'lineNumber'.", required: false, placeholder: 'name' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
@@ -525,7 +533,8 @@ export const TOOLS: ToolMetadata[] = [
 		],
 		examples: [
 			{ description: 'Find all service types', params: { pattern: '*Service' } },
-			{ description: 'Find public interfaces', params: { pattern: 'I*', kind: 'Interface', accessibility: 'Public' } }
+			{ description: 'Find public interfaces', params: { pattern: 'I*', kind: 'Interface', accessibility: 'Public' } },
+			{ description: 'Include external assemblies', params: { pattern: 'Task', sourceOnly: false } }
 		],
 		responseDescription: 'Returns matching types (with paging)',
 		responseExample: {
