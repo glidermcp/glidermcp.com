@@ -14,8 +14,6 @@ build/
 .vercel/
 .netlify/
 
-# Generated files
-src/lib/generated/
 
 # Environment files
 .env
