@@ -42,6 +42,9 @@ export const selectedToolId = atom<string>('get_diagnostics');
 // Parameters for the selected tool
 export const toolParams = atom<Record<string, unknown>>({});
 
+// Cache of parameters per tool (persists across tool switches)
+export const paramsByToolId = atom<Record<string, Record<string, unknown>>>({});
+
 // Current execution state
 export const executionState = atom<ExecutionState>('idle');
 
@@ -72,15 +75,27 @@ export const isExecuting = computed(executionState, (state: ExecutionState) => s
 export const isConnected = computed(connectionStatus, (status: ConnectionStatus) => status === 'connected');
 
 /**
- * Select a tool and reset params
+ * Select a tool and restore cached params (or defaults)
  */
 export function selectTool(toolId: string): void {
 	const tool = TOOLS.find((t) => t.id === toolId);
 	if (!tool) return;
 
+	// Save current params before switching
+	const currentId = selectedToolId.get();
+	if (currentId) {
+		const currentParams = toolParams.get();
+		paramsByToolId.set({
+			...paramsByToolId.get(),
+			[currentId]: currentParams
+		});
+	}
+
 	selectedToolId.set(toolId);
-	toolParams.set(getDefaultParams(tool));
-	// Keep existing response for this tool; switching should not mix responses between tools.
+
+	// Restore cached params or use defaults
+	const cached = paramsByToolId.get()[toolId];
+	toolParams.set(cached ?? getDefaultParams(tool));
 }
 
 /**
@@ -105,7 +120,13 @@ export function setParams(params: Record<string, unknown>): void {
 export function resetParams(): void {
 	const tool = selectedTool.get();
 	if (tool) {
-		toolParams.set(getDefaultParams(tool));
+		const defaults = getDefaultParams(tool);
+		toolParams.set(defaults);
+		// Also update cache
+		paramsByToolId.set({
+			...paramsByToolId.get(),
+			[tool.id]: defaults
+		});
 	}
 }
 
@@ -191,6 +212,7 @@ export function loadExample(toolId: string, exampleIndex: number): void {
 export function resetPlayground(): void {
 	selectedToolId.set('get_diagnostics');
 	toolParams.set({});
+	paramsByToolId.set({});
 	executionState.set('idle');
 	executingToolId.set(null);
 	lastResponse.set(null);

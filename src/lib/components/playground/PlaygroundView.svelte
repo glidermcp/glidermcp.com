@@ -288,8 +288,19 @@
 		</div>
 
 		<div class="right-section">
-			<div class="params-section">
-				<ParameterForm onSubmit={executeCurrentTool} />
+			<div class="params-wrapper">
+				<div class="params-section">
+					<ParameterForm onSubmit={executeCurrentTool} hideButton={true} />
+				</div>
+				<div class="execute-section">
+					<button type="button" class="execute-btn" onclick={executeCurrentTool} disabled={executing}>
+						{#if executing}
+							Executing...
+						{:else}
+							Execute (F5)
+						{/if}
+					</button>
+				</div>
 			</div>
 
 			<div class="response-section">
@@ -412,10 +423,44 @@
 		overflow: hidden;
 	}
 
-	.params-section {
-		border: 1px solid var(--border-dim);
+	.params-wrapper {
+		display: flex;
+		flex-direction: column;
 		max-height: 50%;
+		border: 1px solid var(--border-dim);
+	}
+
+	.params-section {
+		flex: 1;
 		overflow-y: auto;
+	}
+
+	.execute-section {
+		flex-shrink: 0;
+		padding: var(--spacing-sm);
+		border-top: 1px solid var(--border-dim);
+		background-color: var(--bg-primary);
+	}
+
+	.execute-btn {
+		width: 100%;
+		padding: var(--spacing-sm);
+		font-family: var(--font-mono);
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		color: var(--bg-primary);
+		background-color: var(--accent);
+		border: none;
+		cursor: pointer;
+	}
+
+	.execute-btn:hover:not(:disabled) {
+		opacity: 0.9;
+	}
+
+	.execute-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.response-section {

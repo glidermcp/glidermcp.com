@@ -371,7 +371,8 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'search_symbols',
 		name: 'search_symbols',
 		displayName: 'Search Symbols',
-		description: 'Searches for symbols (types and members) by pattern and returns stable symbol keys for follow-up tool calls.',
+		description:
+			'Searches for symbols (types and members) by pattern and returns stable symbol keys for follow-up tool calls. By default, only searches symbols with source code in the solution (excludes external assemblies/packages).',
 		category: 'search',
 		parameters: [
 			{ name: 'query', type: 'string', description: "Search pattern. Supports '*' and '?', or plain text for substring match.", required: true, placeholder: '*Service' },
@@ -384,6 +385,20 @@ export const TOOLS: ToolMetadata[] = [
 			},
 			{ name: 'namespaceFilter', type: 'string', description: "Optional namespace prefix filter (e.g., 'MyApp.Services').", required: false, placeholder: 'MyApp.Services' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{
+				name: 'sourceOnly',
+				type: 'boolean',
+				description: 'Only search symbols with source in solution (excludes external assemblies/packages). Default is true.',
+				required: false,
+				default: true
+			},
+			{
+				name: 'accessibility',
+				type: 'string',
+				description: "Filter by accessibility: 'Public', 'Internal', 'Private', 'Protected', 'ProtectedOrInternal', 'ProtectedAndInternal'.",
+				required: false,
+				placeholder: 'Public'
+			},
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'name', 'kind', 'filePath', 'projectName', 'namespace'.", required: false, placeholder: 'name' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
@@ -393,7 +408,9 @@ export const TOOLS: ToolMetadata[] = [
 		],
 		examples: [
 			{ description: 'Search for service types', params: { query: '*Service', kinds: 'Type' } },
-			{ description: 'Search methods containing "Login"', params: { query: '*Login*', kinds: 'Method' } }
+			{ description: 'Search methods containing "Login"', params: { query: '*Login*', kinds: 'Method' } },
+			{ description: 'Search public types only', params: { query: '*Manager', kinds: 'Type', accessibility: 'Public' } },
+			{ description: 'Include external assemblies', params: { query: 'Task', kinds: 'Type', sourceOnly: false } }
 		],
 		responseDescription: 'Returns matching symbols (with paging) including stable symbol keys',
 		responseExample: {
@@ -411,7 +428,9 @@ export const TOOLS: ToolMetadata[] = [
 						namespace: 'MyApp.Services',
 						filePath: '/path/to/UserService.cs',
 						lineNumber: 12,
-						symbolKey: '...'
+						symbolKey: '...',
+						projectName: 'MyApp',
+						accessibility: 'Public'
 					}
 				]
 			},
@@ -490,14 +509,22 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_types',
 		name: 'find_types',
 		displayName: 'Find Types',
-		description: "Finds types by name pattern with wildcard support ('*' and '?').",
+		description: "Finds types by name pattern with wildcard support ('*' and '?'). By default, only searches types with source code in the solution (excludes external assemblies/packages).",
 		category: 'search',
 		parameters: [
 			{ name: 'pattern', type: 'string', description: "Search pattern (supports '*' and '?').", required: true, placeholder: '*Service' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{
+				name: 'sourceOnly',
+				type: 'boolean',
+				description: 'Only search types with source in solution (excludes external assemblies/packages). Default is true.',
+				required: false,
+				default: true
+			},
 			{ name: 'summaryOnly', type: 'boolean', description: 'When true, returns summary counts only. Default is false.', required: false, default: false },
 			{ name: 'kind', type: 'string', description: "Optional kind filter (e.g., 'Class', 'Interface').", required: false, placeholder: 'Interface' },
 			{ name: 'accessibility', type: 'string', description: "Optional accessibility filter (e.g., 'Public', 'Internal').", required: false, placeholder: 'Public' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'name', 'kind', 'filePath', 'projectName', 'lineNumber'.", required: false, placeholder: 'name' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
@@ -506,7 +533,8 @@ export const TOOLS: ToolMetadata[] = [
 		],
 		examples: [
 			{ description: 'Find all service types', params: { pattern: '*Service' } },
-			{ description: 'Find public interfaces', params: { pattern: 'I*', kind: 'Interface', accessibility: 'Public' } }
+			{ description: 'Find public interfaces', params: { pattern: 'I*', kind: 'Interface', accessibility: 'Public' } },
+			{ description: 'Include external assemblies', params: { pattern: 'Task', sourceOnly: false } }
 		],
 		responseDescription: 'Returns matching types (with paging)',
 		responseExample: {

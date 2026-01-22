@@ -4,9 +4,10 @@
 
 	interface Props {
 		onSubmit?: () => void;
+		hideButton?: boolean;
 	}
 
-	let { onSubmit }: Props = $props();
+	let { onSubmit, hideButton = false }: Props = $props();
 
 	const tool = $derived($selectedTool);
 	const params = $derived($toolParams);
@@ -117,15 +118,17 @@
 			</div>
 		{/if}
 
-		<div class="form-actions">
-			<button type="submit" class="execute-btn" disabled={executing}>
-				{#if executing}
-					Executing...
-				{:else}
-					Execute (F5)
-				{/if}
-			</button>
-		</div>
+		{#if !hideButton}
+			<div class="form-actions">
+				<button type="submit" class="execute-btn" disabled={executing}>
+					{#if executing}
+						Executing...
+					{:else}
+						Execute (F5)
+					{/if}
+				</button>
+			</div>
+		{/if}
 	{:else}
 		<p class="no-tool">Select a tool to configure.</p>
 	{/if}
@@ -266,7 +269,7 @@
 	.checkbox-wrapper {
 		display: flex;
 		align-items: center;
-		gap: var(--spacing-xs);
+		gap: var(--spacing-sm);
 		cursor: pointer;
 	}
 
