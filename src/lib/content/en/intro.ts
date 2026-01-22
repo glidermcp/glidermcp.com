@@ -9,9 +9,8 @@ export const intro: IntroContent = {
 	featuresTitle: 'Key Features',
 	features: [
 		'Load and analyze .NET solutions and projects',
-		'Sync edited .cs files into the in-memory workspace (faster than full reload)',
 		'Get compiler diagnostics (errors, warnings, info)',
-		'Find types, implementations, and usages (wildcards supported)',
+		'Find types, implementations, and usages (wildcards supported)',		
 		'Search symbols and get stable keys for follow-up tool calls',
 		'Get detailed type and method information',
 		'Semantic rename across entire solutions',
