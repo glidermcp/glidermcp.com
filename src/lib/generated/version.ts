@@ -1,5 +1,5 @@
-// Auto-generated during build. Committed stub for type-checking.
+// Auto-generated. Do not edit.
 export const gliderVersion = {
-	version: '0.0.0',
-	fetchedAt: ''
+	version: '3.7.0',
+	fetchedAt: '2026-01-22T08:38:49.600Z'
 };
