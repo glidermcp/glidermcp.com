@@ -12,7 +12,8 @@ const config = {
 			$stores: 'src/lib/stores',
 			$services: 'src/lib/services',
 			$utils: 'src/lib/utils',
-			$types: 'src/lib/types'
+			$types: 'src/lib/types',
+			$generated: 'src/lib/generated'
 		},
 		serviceWorker: {
 			register: true
