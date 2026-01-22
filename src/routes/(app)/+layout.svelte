@@ -11,6 +11,9 @@
 	} from '$stores/keyboard';
 	import { getContent, type Locale } from '$lib/content';
 	import { gameVisible, showGame } from '$stores/game';
+	import { gliderVersion } from '$generated/version';
+
+	const appTitle = `Glider MCP v${gliderVersion.version}`;
 
 	interface Props {
 		children: Snippet;
@@ -82,7 +85,7 @@
 	<meta name="description" content={content.meta.description} />
 </svelte:head>
 
-<TUILayout title="Glider MCP" leftPanelWidth="max-content">
+<TUILayout title={appTitle} leftPanelWidth="max-content">
 	{#snippet leftPanel()}
 		<TUINavigationTree items={content.navItems} currentPath={navPath} />
 	{/snippet}

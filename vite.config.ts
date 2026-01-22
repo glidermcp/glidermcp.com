@@ -6,6 +6,50 @@ import path from 'node:path';
 import { pwaManifestBase, type PwaManifestIcon } from './src/lib/pwa/manifest';
 import { buildSitemapXml } from './src/lib/seo/sitemap';
 
+const NUGET_API_URL = 'https://api.nuget.org/v3-flatcontainer/glider/index.json';
+const FALLBACK_VERSION = '0.0.0';
+
+async function fetchLatestNuGetVersion(): Promise<string> {
+	try {
+		const response = await fetch(NUGET_API_URL, {
+			signal: AbortSignal.timeout(10000)
+		});
+		if (!response.ok) return FALLBACK_VERSION;
+		const data = await response.json();
+		const versions = data.versions as string[];
+		const stableVersions = versions.filter((v) => !v.includes('-'));
+		return stableVersions[stableVersions.length - 1] ?? FALLBACK_VERSION;
+	} catch {
+		return FALLBACK_VERSION;
+	}
+}
+
+async function writeVersionFile(generatedDir: string): Promise<void> {
+	const versionPath = path.join(generatedDir, 'version.ts');
+	const version = await fetchLatestNuGetVersion();
+	const fetchedAt = new Date().toISOString();
+
+	const contents = `// Auto-generated. Do not edit.
+export const gliderVersion = {
+	version: '${version}',
+	fetchedAt: '${fetchedAt}'
+};
+`;
+
+	await fs.mkdir(generatedDir, { recursive: true });
+
+	try {
+		const existing = await fs.readFile(versionPath, 'utf8');
+		// Only check the version line to avoid updating on every build due to timestamp
+		const existingVersion = existing.match(/version: '([^']+)'/)?.[1];
+		if (existingVersion === version) return;
+	} catch {
+		// ignore missing file
+	}
+
+	await fs.writeFile(versionPath, contents, 'utf8');
+}
+
 async function collectPwaIcons(iconsDir: string): Promise<PwaManifestIcon[]> {
 	const entries = await fs.readdir(iconsDir, { withFileTypes: true });
 	const icons: PwaManifestIcon[] = [];
@@ -60,18 +104,21 @@ async function writePwaManifest(staticDir: string) {
 	await fs.writeFile(manifestPath, contents, 'utf8');
 }
 
-function pwaManifestGenerator() {
+function gliderAssetGenerator() {
 	const staticDir = path.resolve(process.cwd(), 'static');
+	const generatedDir = path.resolve(process.cwd(), 'src/lib/generated');
 
 	return {
-		name: 'glider:pwa-asset-generator',
+		name: 'glider:asset-generator',
 		async buildStart() {
 			await writePwaManifest(staticDir);
 			await writeSitemap(staticDir);
+			await writeVersionFile(generatedDir);
 		},
 		async configureServer() {
 			await writePwaManifest(staticDir);
 			await writeSitemap(staticDir);
+			await writeVersionFile(generatedDir);
 		}
 	};
 }
@@ -92,7 +139,7 @@ async function writeSitemap(staticDir: string) {
 }
 
 export default defineConfig({
-	plugins: [pwaManifestGenerator(), tailwindcss(), sveltekit()],
+	plugins: [gliderAssetGenerator(), tailwindcss(), sveltekit()],
 	server: {
 		fs: {
 			allow: ['..']
