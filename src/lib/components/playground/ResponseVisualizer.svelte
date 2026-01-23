@@ -30,9 +30,8 @@
 			case 'find_usages':
 			case 'find_implementation':
 				return 'graph';
-			case 'load_solution':
-			case 'load_project':
-			case 'reload_current':
+			case 'load':
+			case 'reload':
 				return 'solution';
 			default:
 				return 'raw';
@@ -216,7 +215,7 @@
 	function convertToSolution(d: Record<string, unknown>): SolutionNode {
 		const projects = (d.projects || []) as Array<Record<string, unknown>>;
 		const name =
-			String(d.solutionPath || d.projectPath || d.reloadedPath || d.solutionName || d.name || 'Solution');
+			String(d.loadedPath || d.reloadedPath || d.solutionPath || d.projectPath || d.solutionName || d.name || 'Solution');
 
 		return {
 			name,
