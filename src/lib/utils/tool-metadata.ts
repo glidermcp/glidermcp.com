@@ -83,7 +83,15 @@ export const TOOLS: ToolMetadata[] = [
 		displayName: 'Server Status',
 		description: 'Returns server running status and whether a solution/project is loaded.',
 		category: 'debug',
-		parameters: [],
+		parameters: [
+			{
+				name: 'includeProjects',
+				type: 'boolean',
+				description: 'Include detailed project information in response. Default is false.',
+				required: false,
+				default: false
+			}
+		],
 		examples: [{ description: 'Check if the server is running', params: {} }],
 		responseDescription: 'Returns server/solution status and cache metadata',
 		responseExample: {
@@ -100,7 +108,12 @@ export const TOOLS: ToolMetadata[] = [
 					loadedPath: '/path/to/solution.sln'
 				},
 				projectCount: 2,
-				projects: [{ name: 'MyProject', filePath: '/path/to/MyProject.csproj' }]
+				fileWatcher: {
+					enabled: true,
+					watchedDirectory: '/path/to/workspace',
+					pendingChanges: 0,
+					activeOperations: 0
+				}
 			},
 			error: null
 		},
@@ -109,98 +122,75 @@ export const TOOLS: ToolMetadata[] = [
 
 	// Solution management
 	{
-		id: 'load_solution',
-		name: 'load_solution',
-		displayName: 'Load Solution',
-		description: 'Loads a C# solution (.sln) for analysis and returns the list of projects.',
+		id: 'load',
+		name: 'load',
+		displayName: 'Load',
+		description: 'Loads a C# solution (.sln) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided.',
 		category: 'solution',
 		parameters: [
 			{
-				name: 'solutionPath',
+				name: 'path',
 				type: 'string',
-				description: 'Absolute path to the .sln file to load.',
+				description: 'Absolute path to .sln or .csproj file to load.',
 				required: true,
 				placeholder: '/path/to/Solution.sln'
 			},
 			{
-				name: 'timeout_ms',
-				type: 'number',
-				description: 'Timeout in milliseconds. Use 0 to disable. Default is 120000.',
-				required: false,
-				default: 120000
-			}
-		],
-		examples: [{ description: 'Load a solution', params: { solutionPath: '/Users/dev/MyProject/MyProject.sln' } }],
-		responseDescription: 'Returns projects and cache metadata for the loaded solution',
-		responseExample: {
-			success: true,
-			data: {
-				solutionPath: '/Users/dev/MyProject/MyProject.sln',
-				projectCount: 2,
-				projects: [{ name: 'MyProject', filePath: '/Users/dev/MyProject/MyProject.csproj', documentCount: 42 }],
-				cache: {
-					cacheStatus: 'valid',
-					revision: 1,
-					lastRefreshUtc: '2026-01-12T21:06:33.123Z',
-					loadedKind: 'solution',
-					loadedPath: '/Users/dev/MyProject/MyProject.sln'
-				}
-			},
-			error: null
-		}
-	},
-	{
-		id: 'load_project',
-		name: 'load_project',
-		displayName: 'Load Project',
-		description: 'Loads a standalone C# project (.csproj) for analysis and returns workspace projects.',
-		category: 'solution',
-		parameters: [
-			{
-				name: 'projectPath',
+				name: 'workingDirectory',
 				type: 'string',
-				description: 'Absolute path to the .csproj file to load.',
-				required: true,
-				placeholder: '/path/to/Project.csproj'
+				description: 'Optional working directory to watch for file changes. When provided, enables automatic sync of changed files.',
+				required: false,
+				placeholder: '/path/to/workspace'
+			},
+			{
+				name: 'includeProjects',
+				type: 'boolean',
+				description: 'Include detailed project information in response. Default is false.',
+				required: false,
+				default: false
 			},
 			{
 				name: 'timeout_ms',
 				type: 'number',
-				description: 'Timeout in milliseconds. Use 0 to disable. Default is 120000.',
+				description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
 				required: false,
-				default: 120000
+				default: 300000
 			}
 		],
-		examples: [{ description: 'Load a standalone project', params: { projectPath: '/Users/dev/MyProject/MyProject.csproj' } }],
-		responseDescription: 'Returns projects and cache metadata for the loaded project',
+		examples: [
+			{ description: 'Load a solution', params: { path: '/Users/dev/MyProject/MyProject.sln' } },
+			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject' } },
+			{ description: 'Load a standalone project', params: { path: '/Users/dev/MyProject/MyProject.csproj' } }
+		],
+		responseDescription: 'Returns projects and cache metadata for the loaded solution/project',
 		responseExample: {
 			success: true,
 			data: {
-				projectPath: '/Users/dev/MyProject/MyProject.csproj',
-				projectCount: 1,
-				projects: [{ name: 'MyProject', filePath: '/Users/dev/MyProject/MyProject.csproj', documentCount: 42 }],
+				loadedPath: '/Users/dev/MyProject/MyProject.sln',
+				loadedKind: 'solution',
+				projectCount: 2,
+				watchingEnabled: true,
+				watchedDirectory: '/Users/dev/MyProject',
 				cache: {
 					cacheStatus: 'valid',
 					revision: 1,
-					lastRefreshUtc: '2026-01-12T21:06:33.123Z',
-					loadedKind: 'project',
-					loadedPath: '/Users/dev/MyProject/MyProject.csproj'
+					lastRefreshUtc: '2026-01-23T21:06:33.123Z'
 				}
 			},
 			error: null
 		}
 	},
 	{
-		id: 'reload_current',
-		name: 'reload_current',
-		displayName: 'Reload Current',
+		id: 'reload',
+		name: 'reload',
+		displayName: 'Reload',
 		description: 'Reloads the currently loaded solution/project from disk.',
 		category: 'solution',
 		parameters: [
 			{
 				name: 'timeout_ms',
 				type: 'number',
-				description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.',
+				description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.',
 				required: false,
 				default: 60000
 			}
@@ -225,10 +215,10 @@ export const TOOLS: ToolMetadata[] = [
 		}
 	},
 	{
-		id: 'sync_documents',
-		name: 'sync_documents',
-		displayName: 'Sync Documents',
-		description: 'Synchronizes one or more documents from disk into the in-memory workspace (faster than reload_current for .cs edits).',
+		id: 'sync',
+		name: 'sync',
+		displayName: 'Sync',
+		description: 'Synchronizes one or more documents from disk into the in-memory workspace (faster than reload for .cs edits).',
 		category: 'solution',
 		parameters: [
 			{
@@ -248,7 +238,7 @@ export const TOOLS: ToolMetadata[] = [
 			{
 				name: 'timeout_ms',
 				type: 'number',
-				description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.',
+				description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.',
 				required: false,
 				default: 60000
 			}
@@ -272,46 +262,6 @@ export const TOOLS: ToolMetadata[] = [
 			error: null
 		}
 	},
-	{
-		id: 'solution_cache',
-		name: 'solution_cache',
-		displayName: 'Solution Cache',
-		description: 'Returns cache metadata for the loaded solution/project, and can optionally force a refresh from disk.',
-		category: 'solution',
-		parameters: [
-			{
-				name: 'forceRefresh',
-				type: 'boolean',
-				description: 'When true, reloads from disk before returning cache info. Default is false.',
-				required: false,
-				default: false
-			},
-			{
-				name: 'timeout_ms',
-				type: 'number',
-				description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.',
-				required: false,
-				default: 60000
-			}
-		],
-		examples: [
-			{ description: 'Get cache info', params: {} },
-			{ description: 'Force refresh from disk', params: { forceRefresh: true } }
-		],
-		responseDescription: 'Returns cache status, revision, and last refresh time',
-		responseExample: {
-			success: true,
-			data: {
-				cacheStatus: 'valid',
-				revision: 2,
-				lastRefreshUtc: '2026-01-12T21:07:10.000Z',
-				loadedKind: 'solution',
-				loadedPath: '/Users/dev/MyProject/MyProject.sln',
-				forceRefresh: false
-			},
-			error: null
-		}
-	},
 
 	// Diagnostics
 	{
@@ -331,7 +281,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'Get warnings and errors (default)', params: {} },
@@ -404,7 +354,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'Search for service types', params: { query: '*Service', kinds: 'Type' } },
@@ -448,7 +398,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'line', type: 'number', description: '1-based line number.', required: true, default: 1 },
 			{ name: 'column', type: 'number', description: '1-based column number.', required: true, default: 1 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Get symbol key under cursor', params: { filePath: '/Users/dev/MyProject/Program.cs', line: 10, column: 15 } }],
 		responseDescription: 'Returns a symbol key and basic symbol details',
@@ -483,7 +433,7 @@ export const TOOLS: ToolMetadata[] = [
 				default: 2000
 			},
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Get symbol info from a symbol key', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns rich symbol information including signature and locations',
@@ -529,7 +479,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'Find all service types', params: { pattern: '*Service' } },
@@ -572,7 +522,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'Find usages of an interface', params: { symbolName: 'IUserService' } },
@@ -608,7 +558,7 @@ export const TOOLS: ToolMetadata[] = [
 		parameters: [
 			{ name: 'typeName', type: 'string', description: 'Interface/abstract class name (simple or fully qualified).', required: true, placeholder: 'IRepository' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Find implementations of IRepository', params: { typeName: 'IRepository' } }],
 		responseDescription: 'Returns implementing types',
@@ -643,7 +593,7 @@ export const TOOLS: ToolMetadata[] = [
 		parameters: [
 			{ name: 'typeName', type: 'string', description: 'Type name (simple or fully qualified).', required: true, placeholder: 'UserService' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Get type info', params: { typeName: 'UserService' } }],
 		responseDescription: 'Returns type details including members',
@@ -682,7 +632,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
 			{ name: 'maxLines', type: 'number', description: 'Max lines to return. Use 0 for unlimited. Default is 200.', required: false, default: 200 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Get type source', params: { typeName: 'UserService' } }],
 		responseDescription: 'Returns type source (possibly truncated)',
@@ -712,7 +662,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'methodName', type: 'string', description: 'Method name to analyze.', required: true, placeholder: 'GetUserById' },
 			{ name: 'containingTypeName', type: 'string', description: 'Optional containing type name filter.', required: false, placeholder: 'UserService' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Get method signature', params: { methodName: 'GetUserById' } }],
 		responseDescription: 'Returns method signature with parameters',
@@ -742,7 +692,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'maxLines', type: 'number', description: 'Max lines to return. Use 0 for unlimited. Default is 120.', required: false, default: 120 },
 			{ name: 'bodyOnly', type: 'boolean', description: 'If true, return only the method body (no signature). Default is false.', required: false, default: false },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Get method source', params: { methodName: 'LoadSolutionAsync', containingTypeName: 'SolutionManager' } }],
 		responseDescription: 'Returns method source (possibly truncated)',
@@ -771,7 +721,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'typeName', type: 'string', description: 'Type name to analyze.', required: true, placeholder: 'SolutionManager' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
 			{ name: 'direction', type: 'string', description: "Direction: 'uses', 'used_by', or 'both' (default).", required: false, default: 'both' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [{ description: 'Analyze dependencies', params: { typeName: 'SolutionManager' } }],
 		responseDescription: 'Returns types used by the target and types that reference it',
@@ -822,7 +772,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset over returned types. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size over returned types. Default is 50.', required: false, default: 50 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'Analyze overall complexity', params: {} },
@@ -878,7 +828,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'newName', type: 'string', description: 'New name for the symbol.', required: true, placeholder: 'NewClassName' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit symbol search.', required: false, placeholder: 'MyProject' },
 			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.', required: false, default: 60000 }
 		],
 		examples: [
 			{ description: 'Rename a class', params: { symbolName: 'OldClassName', newName: 'NewClassName' } },
@@ -911,7 +861,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'targetNamespace', type: 'string', description: 'Optional target namespace.', required: false, placeholder: 'MyApp.Utils' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit symbol search.', required: false, placeholder: 'MyProject' },
 			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.', required: false, default: 60000 }
 		],
 		examples: [{ description: 'Move a type to a new namespace', params: { typeName: 'MyClass', targetNamespace: 'MyApp.Utils' } }],
 		responseDescription: 'Returns a unified diff of the change set',
@@ -943,7 +893,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit search.', required: false, placeholder: 'MyProject' },
 			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true },
 			{ name: 'maxReferenceUpdates', type: 'number', description: 'Maximum reference updates when rewriting call sites. Use 0 to disable. Default is 2000.', required: false, default: 2000 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.', required: false, default: 60000 }
 		],
 		examples: [{ description: 'Move a method to another class', params: { memberName: 'ProcessData', sourceTypeName: 'OldClass', targetTypeName: 'NewClass' } }],
 		responseDescription: 'Returns a unified diff of the change set',
@@ -978,7 +928,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'includePreviewDiff', type: 'boolean', description: 'Include preview diff for each fix. Default is false.', required: false, default: false },
 			{ name: 'maxPreviewDiffChars', type: 'number', description: 'Max characters for preview diffs. Default is 2000.', required: false, default: 2000 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'Get code fixes at a location', params: { filePath: '/Users/dev/MyProject/Program.cs', lineNumber: 10, column: 15 } }
@@ -1021,7 +971,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
 			{ name: 'includePerFileDiff', type: 'boolean', description: 'Include per-file diffs. Default is true.', required: false, default: true },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.', required: false, default: 60000 }
 		],
 		examples: [{ description: 'Preview applying a code fix', params: { filePath: '/Users/dev/MyProject/Program.cs', lineNumber: 10, column: 15, fixId: '...', applyChanges: false } }],
 		responseDescription: 'Returns diff output and per-file diffs when enabled',
@@ -1051,7 +1001,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
 			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.', required: false, default: 60000 }
 		],
 		examples: [{ description: 'Preview organize usings', params: { filePath: '/Users/dev/MyProject/Program.cs', applyChanges: false } }],
 		responseDescription: 'Returns diff output for the formatting operation',
@@ -1081,7 +1031,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
 			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 60000.', required: false, default: 60000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.', required: false, default: 60000 }
 		],
 		examples: [{ description: 'Preview formatting a file', params: { filePath: '/Users/dev/MyProject/Program.cs', applyChanges: false } }],
 		responseDescription: 'Returns diff output for the formatting operation',
@@ -1111,7 +1061,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'assemblyHint', type: 'string', description: 'Optional assembly name hint to narrow matches.', required: false, placeholder: 'System.Text.Json' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit referenced assemblies.', required: false, placeholder: 'MyProject' },
 			{ name: 'maxLines', type: 'number', description: 'Maximum number of source lines to return. Use 0 for no limit. Default is 400.', required: false, default: 400 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds. Use 0 to disable. Default is 30000.', required: false, default: 30000 }
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (30 seconds). Use 0 to disable. Default is 30000.', required: false, default: 30000 }
 		],
 		examples: [
 			{ description: 'View JsonSerializer source', params: { symbolName: 'System.Text.Json.JsonSerializer', assemblyHint: 'System.Text.Json' } }
@@ -1162,7 +1112,7 @@ export const TOOLS: ToolMetadata[] = [
 			{
 				name: 'timeout_ms',
 				type: 'number',
-				description: 'Overall batch timeout in milliseconds. Use 0 to disable. Default is 60000.',
+				description: 'Overall batch timeout in milliseconds (1 minute). Use 0 to disable. Default is 60000.',
 				required: false,
 				default: 60000
 			}

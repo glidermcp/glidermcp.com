@@ -6,10 +6,20 @@ export const prompts: PromptsContent = {
 	groups: [
 		{
 			title: 'Loading Solutions',
-			description: 'Start by loading your .NET solution or project.',
+			description: 'Start by loading your .NET solution or project. Enable file watching for automatic sync.',
 			prompts: [
 				'Load the solution at /path/to/MySolution.sln',
+				'Load /path/to/MySolution.sln and watch /path/to/workspace for changes',
 				'Load the project at /path/to/MyProject.csproj'
+			]
+		},
+		{
+			title: 'File Watching & Sync',
+			description: 'Keep your workspace synchronized automatically or manually.',
+			prompts: [
+				'Load this solution with file watching enabled',
+				'The files changed on disk, sync them please',
+				'Reload the entire solution from disk'
 			]
 		},
 		{
@@ -28,8 +38,7 @@ export const prompts: PromptsContent = {
 				'Show me the type hierarchy for UserService',
 				'What methods does IAuthService define?',
 				'Find all usages of the Login method',
-				'Find all implementations of IRepository',
-				'I changed some files on disk. Reload the current solution and then re-run diagnostics.'
+				'Find all implementations of IRepository'
 			]
 		},
 		{
