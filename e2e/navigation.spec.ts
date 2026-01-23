@@ -134,9 +134,9 @@ test.describe('Keyboard Navigation', () => {
 		await page.keyboard.press(' ');
 		await expect(toolsItem.locator('.prefix')).toHaveText('▼');
 
-		await expect(page.locator('.nav-item:has-text("reload_current")')).toBeVisible();
-		await expect(page.locator('.nav-item:has-text("solution_cache")')).toBeVisible();
-		await expect(page.locator('.nav-item:has-text("batch")')).toBeVisible();
+		await expect(page.locator('.nav-item').filter({ hasText: /^• load$/ })).toBeVisible();
+		await expect(page.locator('.nav-item').filter({ hasText: /^• reload$/ })).toBeVisible();
+		await expect(page.locator('.nav-item').filter({ hasText: /^• batch$/ })).toBeVisible();
 	});
 
 	test('should navigate to page with Enter key without toggling', async ({ page }) => {

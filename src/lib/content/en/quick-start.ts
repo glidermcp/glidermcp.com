@@ -36,10 +36,11 @@ dotnet tool list -g
 			paragraphs: ['Once configured, you can ask your AI assistant:'],
 			code: {
 				code: `"Load the solution at /path/to/MySolution.sln"
+"Load the solution at /path/to/MySolution.sln with file watching in /path/to/workspace"
 "Find all types matching *Service"
 "What methods does IUserRepository define?"
 "Find all usages of the Login method"
-"I changed some files on disk. Reload the current solution and then re-run diagnostics."`,
+"I changed some files on disk. Sync the documents to see the latest changes."`,
 				language: 'plaintext'
 			}
 		},

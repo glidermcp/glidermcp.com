@@ -9,11 +9,11 @@ describe('tool-metadata', () => {
 	});
 
 	it('validates required parameters', () => {
-		const tool = getToolById('load_solution');
+		const tool = getToolById('load');
 		expect(tool).toBeDefined();
 		const validation = validateToolParams(tool!, {});
 		expect(validation.valid).toBe(false);
-		expect(validation.errors.join('\n')).toMatch(/solutionPath is required/);
+		expect(validation.errors.join('\n')).toMatch(/path is required/);
 	});
 
 	it('parses json parameters during validation', () => {

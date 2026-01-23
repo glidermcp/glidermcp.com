@@ -94,10 +94,7 @@
     <loc>https://glidermcp.com/tools/get-type-source</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/load-project</loc>
-  </url>
-  <url>
-    <loc>https://glidermcp.com/tools/load-solution</loc>
+    <loc>https://glidermcp.com/tools/load</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/move-member</loc>
@@ -109,7 +106,7 @@
     <loc>https://glidermcp.com/tools/organize-usings</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/reload-current</loc>
+    <loc>https://glidermcp.com/tools/reload</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/rename-symbol</loc>
@@ -118,10 +115,7 @@
     <loc>https://glidermcp.com/tools/search-symbols</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/solution-cache</loc>
-  </url>
-  <url>
-    <loc>https://glidermcp.com/tools/sync-documents</loc>
+    <loc>https://glidermcp.com/tools/sync</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/view-external-definition</loc>

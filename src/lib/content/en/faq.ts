@@ -40,6 +40,13 @@ export const faq: FaqContent = {
 			]
 		},
 		{
+			question: 'How does automatic file watching work?',
+			answer: [
+				'When you load a solution or project with the <code>workingDirectory</code> parameter, Glider watches that directory for file changes and automatically syncs them into the in-memory workspace. This is faster than reloading the entire solution.',
+				'If you prefer manual control, simply use <code>load</code> without <code>workingDirectory</code> and call <code>sync</code> or <code>reload</code> when needed.'
+			]
+		},
+		{
 			question: 'How do I view NuGet package source code?',
 			answer: [
 				'Use the <code>view_external_definition</code> tool. It first tries SourceLink to get original source, then falls back to ILSpy decompilation if SourceLink is unavailable.'
