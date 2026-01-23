@@ -2,7 +2,7 @@
 
 Glider is a Roslyn-powered Model Context Protocol (MCP) server for semantic C# code analysis and refactoring in MCP clients (for example, Claude Code).
 
-For full documentation and setup guides, see `https://glidermcp.com`.
+For full documentation and setup guides, see [glidermcp.com](https://glidermcp.com).
 
 ## What you can do with Glider
 
