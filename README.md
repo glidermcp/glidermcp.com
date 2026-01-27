@@ -19,7 +19,7 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 ## Tool overview
 
 - Diagnostics: `server_status`, `get_diagnostics`
-- Solution management: `load_solution`, `load_project`, `reload_current`, `sync_documents`, `solution_cache`
+- Solution management: `load`, `reload`, `sync`
 - Symbol search & discovery: `search_symbols`, `get_symbol_at_position`, `get_symbol_info`, `find_usages`, `find_implementation`, `find_types`
 - Code analysis: `get_type_info`, `get_method_signature`, `get_type_source`, `get_method_source`
 - Refactoring: `rename_symbol`, `move_type`, `move_member`

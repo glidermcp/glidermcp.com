@@ -83,6 +83,8 @@
 <svelte:head>
 	<title>{content.meta.title}</title>
 	<meta name="description" content={content.meta.description} />
+	<link rel="canonical" href={$page.url.href} />
+	<meta property="og:url" content={$page.url.href} />
 </svelte:head>
 
 <TUILayout title={appTitle} leftPanelWidth="max-content">
