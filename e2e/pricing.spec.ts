@@ -9,9 +9,9 @@ test.describe('Pricing Page', () => {
 
 	test('should display obfuscated email as clickable mailto link', async ({ page }) => {
 		// Wait for client-side render of the email link
-		const emailLink = page.locator('a[href="mailto:bogdan@sacrorum.com"]');
+		const emailLink = page.locator('a[href="mailto:feedback@glidermcp.com"]');
 		await expect(emailLink).toBeVisible();
-		await expect(emailLink).toHaveText('bogdan@sacrorum.com');
+		await expect(emailLink).toHaveText('feedback@glidermcp.com');
 	});
 
 	test('should not have plain text email in page source', async ({ page }) => {
@@ -21,6 +21,6 @@ test.describe('Pricing Page', () => {
 		const content = await response.text();
 
 		// The full email should not be present in the static HTML
-		expect(content).not.toContain('bogdan@sacrorum.com');
+		expect(content).not.toContain('feedback@glidermcp.com');
 	});
 });
