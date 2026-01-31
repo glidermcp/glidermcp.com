@@ -27,8 +27,8 @@
 			case 'get_type_info':
 			case 'get_method_signature':
 				return 'tree';
-			case 'find_usages':
-			case 'find_implementation':
+			case 'find_references':
+			case 'find_implementations':
 				return 'graph';
 			case 'load':
 			case 'reload':
@@ -53,15 +53,15 @@
 		return null;
 	});
 
-	// Convert response to graph format for find_usages
+	// Convert response to graph format for reference/implementation tools
 	const graphData = $derived.by((): SymbolWithReferences | null => {
 		if (visualizationType !== 'graph' || !data) return null;
 
 		const d = data as Record<string, unknown>;
 
-		if (toolId === 'find_usages') {
-			return convertFindUsagesToGraph(d);
-		} else if (toolId === 'find_implementation') {
+		if (toolId === 'find_references') {
+			return convertFindReferencesToGraph(d);
+		} else if (toolId === 'find_implementations') {
 			return convertFindImplementationToGraph(d);
 		}
 
@@ -181,11 +181,11 @@
 		};
 	}
 
-	function convertFindUsagesToGraph(d: Record<string, unknown>): SymbolWithReferences {
+	function convertFindReferencesToGraph(d: Record<string, unknown>): SymbolWithReferences {
 		const usages = (d.usages || d.references || []) as Array<Record<string, unknown>>;
 
 		return {
-			name: String(d.symbolName || d.name || 'Symbol'),
+			name: String(d.symbolName || d.name || d.symbolKey || 'Symbol'),
 			type: (d.symbolType as 'class' | 'interface' | 'method' | 'property') || 'class',
 			references: usages.map((u) => ({
 				location: String(u.filePath || u.file || u.location || 'unknown'),
@@ -248,7 +248,7 @@
 	{:else if visualizationType === 'graph' && graphData}
 		<ASCIIGraph
 			data={graphData}
-			title={toolId === 'find_usages' ? 'Symbol References' : 'Implementations'}
+			title={toolId === 'find_references' ? 'Symbol References' : 'Implementations'}
 			onReferenceSelect={handleReferenceSelect}
 		/>
 	{:else if visualizationType === 'solution' && solutionData}

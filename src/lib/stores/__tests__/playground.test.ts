@@ -59,8 +59,8 @@ describe('playground store', () => {
 
 	describe('selectTool', () => {
 		it('should update selected tool id', () => {
-			selectTool('find_types');
-			expect(selectedToolId.get()).toBe('find_types');
+			selectTool('search_symbols');
+			expect(selectedToolId.get()).toBe('search_symbols');
 		});
 
 		it('should not change tool for invalid id', () => {
@@ -112,8 +112,8 @@ describe('playground store', () => {
 		});
 
 		it('should allow setting executing tool id', () => {
-			setExecutingTool('find_types');
-			expect(executingToolId.get()).toBe('find_types');
+			setExecutingTool('search_symbols');
+			expect(executingToolId.get()).toBe('search_symbols');
 		});
 	});
 
@@ -150,19 +150,19 @@ describe('playground store', () => {
 
 	describe('responsesByToolId / selectedToolResponse', () => {
 		it('should track responses per tool and select by current tool', () => {
-			selectTool('find_types');
-			const findTypesResponse = {
-				toolId: 'find_types',
-				toolName: 'find_types',
+			selectTool('search_symbols');
+			const searchSymbolsResponse = {
+				toolId: 'search_symbols',
+				toolName: 'search_symbols',
 				success: true,
 				data: { ok: true },
 				duration: 12,
 				timestamp: Date.now()
 			};
-			setResponse(findTypesResponse);
+			setResponse(searchSymbolsResponse);
 
-			expect(responsesByToolId.get().find_types).toEqual(findTypesResponse);
-			expect(selectedToolResponse.get()).toEqual(findTypesResponse);
+			expect(responsesByToolId.get().search_symbols).toEqual(searchSymbolsResponse);
+			expect(selectedToolResponse.get()).toEqual(searchSymbolsResponse);
 
 			selectTool('get_diagnostics');
 			expect(selectedToolResponse.get()).toBeNull();
@@ -193,13 +193,13 @@ describe('playground store', () => {
 
 	describe('resetPlayground', () => {
 		it('should reset all state to defaults', () => {
-			selectTool('find_types');
+			selectTool('search_symbols');
 			setParam('pattern', 'test');
 			setExecutionState('success');
-			setExecutingTool('find_types');
+			setExecutingTool('search_symbols');
 			setResponse({
-				toolId: 'find_types',
-				toolName: 'find_types',
+				toolId: 'search_symbols',
+				toolName: 'search_symbols',
 				success: true,
 				data: {},
 				duration: 100,

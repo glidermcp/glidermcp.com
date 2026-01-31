@@ -37,12 +37,18 @@ dotnet tool list -g
 			code: {
 				code: `"Load the solution at /path/to/MySolution.sln"
 "Load the solution at /path/to/MySolution.sln with file watching in /path/to/workspace"
-"Find all types matching *Service"
+"Use search_symbols with query *Service and kinds Type to find all service classes"
 "What methods does IUserRepository define?"
-"Find all usages of the Login method"
+"Resolve the Login method and then find_references for the selected symbolKey"
 "I changed some files on disk. Sync the documents to see the latest changes."`,
 				language: 'plaintext'
 			}
+		},
+		{
+			title: 'Notes',
+			paragraphs: [
+				'In stdio mode, <code>glider</code> waits for MCP input and is intentionally quiet by default. Use <code>glider --verbose</code> if you want startup output/logs (written to stderr).'
+			]
 		},
 		{
 			title: 'Update to Latest',

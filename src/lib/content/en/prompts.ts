@@ -23,22 +23,22 @@ export const prompts: PromptsContent = {
 			]
 		},
 		{
-			title: 'Finding Types',
-			description: 'Search for types using patterns and wildcards.',
+			title: 'Symbol Discovery',
+			description: 'Resolve ambiguous names, search with wildcards, and get stable symbol keys for follow-up calls.',
 			prompts: [
-				'Find all types matching *Service',
-				'Find types that start with I (interfaces)',
-				'Find all types in the DataLayer project'
+				'Use search_symbols with query "*Service" and kinds "Type" to find all service classes',
+				'Use search_symbols with query "I*" and kinds "Type" to find interfaces',
+				'Resolve "UserController" and show me the top candidates with their symbolKey values'
 			]
 		},
 		{
 			title: 'Exploring Code',
-			description: 'Navigate and understand your codebase.',
+			description: 'Navigate and understand your codebase with references, hierarchies, and call graphs.',
 			prompts: [
-				'Show me the type hierarchy for UserService',
+				'Find the symbolKey for UserService, then show me its type hierarchy',
 				'What methods does IAuthService define?',
-				'Find all usages of the Login method',
-				'Find all implementations of IRepository'
+				'Resolve the Login method, then find its callers',
+				'Resolve IRepository, then find its implementations'
 			]
 		},
 		{
@@ -67,7 +67,7 @@ export const prompts: PromptsContent = {
 				'I need to understand how authentication works. Find the IAuthService interface, list its methods, and show where Login is called.',
 				'Find all classes that implement IRepository and show their public methods.',
 				'Show me the dependency chain from UserController to the database layer.',
-				'Run a batch: get_type_info for UserController, then find_usages of Login, then summarize the results.'
+				'Run a batch: search_symbols for "*UserController*" (Type), then get_type_info for the best match, then summarize.'
 			]
 		}
 	]
