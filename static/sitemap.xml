@@ -46,6 +46,9 @@
     <loc>https://glidermcp.com/tools</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/analyze-change-impact</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/analyze-complexity</loc>
   </url>
   <url>
@@ -55,19 +58,28 @@
     <loc>https://glidermcp.com/tools/batch</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/find-implementation</loc>
+    <loc>https://glidermcp.com/tools/find-callers</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/find-types</loc>
+    <loc>https://glidermcp.com/tools/find-implementations</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/find-usages</loc>
+    <loc>https://glidermcp.com/tools/find-member-in-hierarchy</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/find-overrides</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/find-references</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/format-document</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-code-fixes</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-derived-types</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-diagnostics</loc>
@@ -79,6 +91,9 @@
     <loc>https://glidermcp.com/tools/get-method-source</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/get-outgoing-calls</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/get-symbol-at-position</loc>
   </url>
   <url>
@@ -86,6 +101,9 @@
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-type-dependencies</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-type-hierarchy</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-type-info</loc>
@@ -112,7 +130,19 @@
     <loc>https://glidermcp.com/tools/rename-symbol</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/resolve-symbol</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/search-symbols</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/search-text</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/semantic-query</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/server-status</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/sync</loc>
