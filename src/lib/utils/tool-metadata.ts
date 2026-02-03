@@ -189,7 +189,7 @@ export const TOOLS: ToolMetadata[] = [
 		],
 		examples: [
 			{ description: 'Load a solution', params: { path: '/Users/dev/MyProject/MyProject.sln' } },
-			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject' } },
+			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
 			{ description: 'Load a standalone project', params: { path: '/Users/dev/MyProject/MyProject.csproj' } }
 		],
 		responseDescription: 'Returns projects and cache metadata for the loaded solution/project',
@@ -199,14 +199,17 @@ export const TOOLS: ToolMetadata[] = [
 				loadedPath: '/Users/dev/MyProject/MyProject.sln',
 				loadedKind: 'solution',
 				projectCount: 2,
-				watchingEnabled: true,
-				watchedDirectory: '/Users/dev/MyProject',
+				projects: [{ name: 'MyProject', filePath: '/Users/dev/MyProject/MyProject.csproj', documentCount: 42 }],
+				fileWatcher: { enabled: true, watchedDirectory: '/Users/dev/MyProject' },
 				cache: {
 					cacheStatus: 'valid',
 					revision: 1,
-					lastRefreshUtc: '2026-01-23T21:06:33.123Z'
+					lastRefreshUtc: '2026-01-23T21:06:33.123Z',
+					loadedKind: 'solution',
+					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				}
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 600000 },
 			error: null
 		}
 	},
@@ -217,15 +220,22 @@ export const TOOLS: ToolMetadata[] = [
 		description: 'Reloads the currently loaded solution/project from disk.',
 		category: 'solution',
 		parameters: [
-				{
-					name: 'timeout_ms',
-					type: 'number',
-					description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
-					required: false,
-					default: 300000
-				}
-			],
-		examples: [{ description: 'Reload after manual edits', params: {} }],
+			{
+				name: 'includeProjects',
+				type: 'boolean',
+				description: 'Include detailed project information in response. Default is false.',
+				required: false,
+				default: false
+			},
+			{
+				name: 'timeout_ms',
+				type: 'number',
+				description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
+				required: false,
+				default: 300000
+			}
+		],
+		examples: [{ description: 'Reload after manual edits', params: { includeProjects: true } }],
 		responseDescription: 'Returns the reloaded path, project list, and updated cache metadata',
 		responseExample: {
 			success: true,
@@ -241,6 +251,7 @@ export const TOOLS: ToolMetadata[] = [
 					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				}
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
 			error: null
 		}
 	},
@@ -298,15 +309,17 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_diagnostics',
 		name: 'get_diagnostics',
 		displayName: 'Get Diagnostics',
-		description: 'Gets compiler diagnostics for the loaded solution/project.',
+		description: 'Gets diagnostics (warnings, errors) for the loaded solution/project. Use includeAnalyzers=true to include analyzer/IDE diagnostics.',
 		category: 'diagnostics',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'Optional file path filter.', required: false, placeholder: '/path/to/File.cs' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'includeAnalyzers', type: 'boolean', description: 'Include analyzer/IDE diagnostics. Default is false.', required: false, default: false },
 			{ name: 'summaryOnly', type: 'boolean', description: 'When true, returns summary counts only. Default is false.', required: false, default: false },
 			{ name: 'severity', type: 'string', description: "Minimum severity: 'error', 'warning', 'info', or 'hidden'. Default is 'warning'.", required: false, default: 'warning' },
 			{ name: 'category', type: 'string', description: "Optional category filter (e.g., 'Compiler', 'Style').", required: false, placeholder: 'Compiler' },
 			{ name: 'idPrefix', type: 'string', description: "Optional diagnostic ID prefix filter (e.g., 'CS', 'CA', 'IDE').", required: false, placeholder: 'CS' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'severity', 'filePath', 'id', 'lineNumber', 'projectName'.", required: false, placeholder: 'severity' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
@@ -342,6 +355,7 @@ export const TOOLS: ToolMetadata[] = [
 					}
 				]
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
 			error: null
 		}
 	},
@@ -374,16 +388,17 @@ export const TOOLS: ToolMetadata[] = [
 				candidateCount: 2,
 				candidates: [
 					{
-						name: 'SolutionManager',
+						symbolKey: '...',
 						fullName: 'MyApp.Services.SolutionManager',
 						kind: 'Type',
-						symbolKey: '...',
 						filePath: '/path/to/SolutionManager.cs',
 						lineNumber: 12,
 						projectName: 'MyProject'
 					}
-				]
+				],
+				hints: { nextSteps: ['Use get_symbol_info with a candidate symbolKey for details', 'Use find_references with symbolKey to locate usages'] }
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
 			error: null
 		}
 	},
@@ -707,7 +722,8 @@ export const TOOLS: ToolMetadata[] = [
 		description: 'Searches for a literal string or regex pattern across solution documents (non-semantic).',
 		category: 'semantic',
 		parameters: [
-			{ name: 'pattern', type: 'string', description: 'Literal pattern (unless useRegex is true).', required: true, placeholder: 'TODO' },
+			{ name: 'query', type: 'string', description: 'Search query (literal string by default). Preferred argument name.', required: false, placeholder: 'TODO' },
+			{ name: 'pattern', type: 'string', description: 'Backward-compatible alias for query.', required: false, placeholder: 'TODO' },
 			{ name: 'useRegex', type: 'boolean', description: 'Treat pattern as a .NET regex. Default is false.', required: false, default: false },
 			{ name: 'caseSensitive', type: 'boolean', description: 'Case-sensitive match. Default is false.', required: false, default: false },
 			{ name: 'scope', type: 'json', description: 'Optional search scope.', required: false, placeholder: '{ "kind": "solution" }' },
@@ -717,13 +733,23 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [{ description: 'Find TODO comments', params: { pattern: 'TODO' } }],
+		examples: [{ description: 'Find TODO comments', params: { query: 'TODO' } }],
 		responseDescription: 'Returns matching text occurrences (with paging)',
 		responseExample: {
 			success: true,
 			data: {
 				pattern: 'TODO',
+				useRegex: false,
+				caseSensitive: false,
+				scopeUsed: { mode: 'solution' },
 				matchCount: 2,
+				projectsSearched: 2,
+				totalProjectsInWorkspace: 2,
+				documentsMatchedScope: 120,
+				documentsSearched: 120,
+				documentsWithMatches: 1,
+				documentsUnreadable: 0,
+				totalDocumentsInWorkspace: 120,
 				paging: { skip: 0, take: 200, returned: 2, total: 2 },
 				matches: [
 					{
@@ -733,8 +759,15 @@ export const TOOLS: ToolMetadata[] = [
 						lineText: '// TODO: refactor this',
 						projectName: 'MyProject'
 					}
-				]
+				],
+				hints: {
+					nextSteps: ['Use get_symbol_at_position if the match is an identifier and you want a symbolKey', 'Use search_symbols for semantic discovery once you know a symbol name'],
+					scopeNote: null,
+					noMatchNote: null,
+					unreadableNote: null
+				}
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
 			error: null
 		}
 	},
@@ -1532,6 +1565,17 @@ export function validateToolParams(
 					break;
 				}
 			}
+		}
+	}
+
+	// Special-case: search_text accepts query or pattern (alias). Require at least one.
+	if (tool.id === 'search_text') {
+		const query = normalizedParams.query;
+		const pattern = normalizedParams.pattern;
+		const hasQuery = !(query === undefined || query === null || query === '');
+		const hasPattern = !(pattern === undefined || pattern === null || pattern === '');
+		if (!hasQuery && !hasPattern) {
+			errors.push('query or pattern is required');
 		}
 	}
 
