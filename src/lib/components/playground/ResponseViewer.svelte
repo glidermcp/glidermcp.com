@@ -25,8 +25,8 @@
 		const visualizableTools = [
 			'get_type_info',
 			'get_method_signature',
-			'find_usages',
-			'find_implementation',
+			'find_references',
+			'find_implementations',
 			'load',
 			'reload'
 		];

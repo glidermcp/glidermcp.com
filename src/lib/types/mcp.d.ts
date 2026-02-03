@@ -126,35 +126,37 @@ export interface ParameterInfo {
 }
 
 /**
- * Usage location from find_usages
+ * Reference location from find_references
  */
-export interface UsageLocation {
+export interface ReferenceLocation {
 	filePath: string;
 	lineNumber: number;
 	column?: number;
 	snippet?: string;
-	kind?: 'definition' | 'reference' | 'implementation';
+	referenceKind?: string;
 }
 
 /**
- * Type search result from find_types
+ * Symbol search result from search_symbols / resolve_symbol
  */
-export interface TypeSearchResult {
+export interface SymbolSearchResult {
 	name: string;
 	fullName: string;
 	kind: string;
-	filePath: string;
-	lineNumber: number;
+	symbolKey: string;
+	filePath?: string;
+	lineNumber?: number;
 }
 
 /**
- * Implementation result from find_implementation
+ * Implementation result from find_implementations
  */
 export interface ImplementationResult {
-	typeName: string;
+	name: string;
 	fullName: string;
-	filePath: string;
-	lineNumber: number;
+	symbolKey: string;
+	filePath?: string;
+	lineNumber?: number;
 }
 
 /**

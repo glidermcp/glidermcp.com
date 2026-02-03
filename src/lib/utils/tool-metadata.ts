@@ -7,10 +7,16 @@ export type ToolCategory =
 	| 'debug'
 	| 'solution'
 	| 'diagnostics'
-	| 'search'
+	| 'symbols'
+	| 'references'
 	| 'analysis'
+	| 'semantic'
+	| 'hierarchy'
+	| 'callgraph'
 	| 'refactoring'
+	| 'codefix'
 	| 'external'
+	| 'architecture'
 	| 'batch';
 
 export interface ToolParameter {
@@ -42,32 +48,56 @@ export interface ToolMetadata {
 
 export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description: string }> = {
 	debug: {
-		label: 'Debug',
+		label: 'Status',
 		description: 'Server status and health checks'
 	},
 	solution: {
-		label: 'Solution Management',
-		description: 'Load and reload .NET solutions and projects'
+		label: 'Solution & Workspace',
+		description: 'Load, sync, and reload .NET solutions and projects'
 	},
 	diagnostics: {
 		label: 'Diagnostics',
-		description: 'Compiler diagnostics and build health'
+		description: 'Compiler and analyzer diagnostics'
 	},
-	search: {
-		label: 'Search',
-		description: 'Find types, usages, and implementations'
+	symbols: {
+		label: 'Symbol Discovery',
+		description: 'Resolve and search for symbols with stable keys'
+	},
+	references: {
+		label: 'References & Relationships',
+		description: 'References, overrides, and implementations by symbol key'
 	},
 	analysis: {
-		label: 'Analysis',
-		description: 'Type information, dependencies, and complexity metrics'
+		label: 'Code Analysis',
+		description: 'Type/method info and bounded source extraction'
+	},
+	semantic: {
+		label: 'Semantic & Text Search',
+		description: 'Predicate-based symbol queries and literal/regex text search'
+	},
+	hierarchy: {
+		label: 'Type Hierarchy',
+		description: 'Base/derived relationships and member override chains'
+	},
+	callgraph: {
+		label: 'Call Graph & Impact',
+		description: 'Callers, outgoing calls, and change impact summaries'
 	},
 	refactoring: {
 		label: 'Refactoring',
 		description: 'Rename symbols and move types/members'
 	},
+	codefix: {
+		label: 'Code Fixes & Formatting',
+		description: 'Code fixes, organize usings, and format documents'
+	},
 	external: {
 		label: 'External Source',
 		description: 'View source code of NuGet/framework types'
+	},
+	architecture: {
+		label: 'Architecture & Metrics',
+		description: 'Dependency analysis and complexity metrics'
 	},
 	batch: {
 		label: 'Batching',
@@ -117,7 +147,7 @@ export const TOOLS: ToolMetadata[] = [
 			},
 			error: null
 		},
-		showInDocs: false
+		showInDocs: true
 	},
 
 	// Solution management
@@ -159,7 +189,7 @@ export const TOOLS: ToolMetadata[] = [
 		],
 		examples: [
 			{ description: 'Load a solution', params: { path: '/Users/dev/MyProject/MyProject.sln' } },
-			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject' } },
+			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
 			{ description: 'Load a standalone project', params: { path: '/Users/dev/MyProject/MyProject.csproj' } }
 		],
 		responseDescription: 'Returns projects and cache metadata for the loaded solution/project',
@@ -169,14 +199,17 @@ export const TOOLS: ToolMetadata[] = [
 				loadedPath: '/Users/dev/MyProject/MyProject.sln',
 				loadedKind: 'solution',
 				projectCount: 2,
-				watchingEnabled: true,
-				watchedDirectory: '/Users/dev/MyProject',
+				projects: [{ name: 'MyProject', filePath: '/Users/dev/MyProject/MyProject.csproj', documentCount: 42 }],
+				fileWatcher: { enabled: true, watchedDirectory: '/Users/dev/MyProject' },
 				cache: {
 					cacheStatus: 'valid',
 					revision: 1,
-					lastRefreshUtc: '2026-01-23T21:06:33.123Z'
+					lastRefreshUtc: '2026-01-23T21:06:33.123Z',
+					loadedKind: 'solution',
+					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				}
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 600000 },
 			error: null
 		}
 	},
@@ -187,15 +220,22 @@ export const TOOLS: ToolMetadata[] = [
 		description: 'Reloads the currently loaded solution/project from disk.',
 		category: 'solution',
 		parameters: [
-				{
-					name: 'timeout_ms',
-					type: 'number',
-					description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
-					required: false,
-					default: 300000
-				}
-			],
-		examples: [{ description: 'Reload after manual edits', params: {} }],
+			{
+				name: 'includeProjects',
+				type: 'boolean',
+				description: 'Include detailed project information in response. Default is false.',
+				required: false,
+				default: false
+			},
+			{
+				name: 'timeout_ms',
+				type: 'number',
+				description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
+				required: false,
+				default: 300000
+			}
+		],
+		examples: [{ description: 'Reload after manual edits', params: { includeProjects: true } }],
 		responseDescription: 'Returns the reloaded path, project list, and updated cache metadata',
 		responseExample: {
 			success: true,
@@ -211,6 +251,7 @@ export const TOOLS: ToolMetadata[] = [
 					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				}
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
 			error: null
 		}
 	},
@@ -268,15 +309,17 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_diagnostics',
 		name: 'get_diagnostics',
 		displayName: 'Get Diagnostics',
-		description: 'Gets compiler diagnostics for the loaded solution/project.',
+		description: 'Gets diagnostics (warnings, errors) for the loaded solution/project. Use includeAnalyzers=true to include analyzer/IDE diagnostics.',
 		category: 'diagnostics',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'Optional file path filter.', required: false, placeholder: '/path/to/File.cs' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'includeAnalyzers', type: 'boolean', description: 'Include analyzer/IDE diagnostics. Default is false.', required: false, default: false },
 			{ name: 'summaryOnly', type: 'boolean', description: 'When true, returns summary counts only. Default is false.', required: false, default: false },
 			{ name: 'severity', type: 'string', description: "Minimum severity: 'error', 'warning', 'info', or 'hidden'. Default is 'warning'.", required: false, default: 'warning' },
 			{ name: 'category', type: 'string', description: "Optional category filter (e.g., 'Compiler', 'Style').", required: false, placeholder: 'Compiler' },
 			{ name: 'idPrefix', type: 'string', description: "Optional diagnostic ID prefix filter (e.g., 'CS', 'CA', 'IDE').", required: false, placeholder: 'CS' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'severity', 'filePath', 'id', 'lineNumber', 'projectName'.", required: false, placeholder: 'severity' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
@@ -312,18 +355,60 @@ export const TOOLS: ToolMetadata[] = [
 					}
 				]
 			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
 			error: null
 		}
 	},
 
-	// Search
+	// Symbol discovery
+	{
+		id: 'resolve_symbol',
+		name: 'resolve_symbol',
+		displayName: 'Resolve Symbol',
+		description:
+			'Resolves an ambiguous name fragment into 0..N candidate symbols with stable symbol keys. Use this when you need exact keys for tools like find_references/find_implementations.',
+		category: 'symbols',
+		parameters: [
+			{ name: 'query', type: 'string', description: 'Name fragment or fully qualified name.', required: true, placeholder: 'SolutionManager' },
+			{ name: 'kinds', type: 'string', description: "Optional kinds filter (comma-separated): 'Type,Method,Property,Field,Event'.", required: false, placeholder: 'Type,Method' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name to limit scope.', required: false, placeholder: 'MyProject' },
+			{ name: 'maxCandidates', type: 'number', description: 'Max candidates to return. Default is 25.', required: false, default: 25 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [
+			{ description: 'Resolve an ambiguous type name', params: { query: 'SolutionManager', kinds: 'Type' } },
+			{ description: 'Resolve a method name', params: { query: 'Login', kinds: 'Method' } }
+		],
+		responseDescription: 'Returns candidate symbols with stable symbol keys',
+		responseExample: {
+			success: true,
+			data: {
+				query: 'SolutionManager',
+				candidateCount: 2,
+				candidates: [
+					{
+						symbolKey: '...',
+						fullName: 'MyApp.Services.SolutionManager',
+						kind: 'Type',
+						filePath: '/path/to/SolutionManager.cs',
+						lineNumber: 12,
+						projectName: 'MyProject'
+					}
+				],
+				hints: { nextSteps: ['Use get_symbol_info with a candidate symbolKey for details', 'Use find_references with symbolKey to locate usages'] }
+			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
+			error: null
+		}
+	},
 	{
 		id: 'search_symbols',
 		name: 'search_symbols',
 		displayName: 'Search Symbols',
 		description:
 			'Searches for symbols (types and members) by pattern and returns stable symbol keys for follow-up tool calls. By default, only searches symbols with source code in the solution (excludes external assemblies/packages).',
-		category: 'search',
+		category: 'symbols',
 		parameters: [
 			{ name: 'query', type: 'string', description: "Search pattern. Supports '*' and '?', or plain text for substring match.", required: true, placeholder: '*Service' },
 			{
@@ -392,7 +477,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'get_symbol_at_position',
 		displayName: 'Get Symbol at Position',
 		description: 'Resolves the symbol at a file position and returns a stable symbol key.',
-		category: 'search',
+		category: 'symbols',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'Absolute file path.', required: true, placeholder: '/path/to/File.cs' },
 			{ name: 'line', type: 'number', description: '1-based line number.', required: true, default: 1 },
@@ -420,7 +505,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'get_symbol_info',
 		displayName: 'Get Symbol Info',
 		description: 'Gets detailed information for a symbol by stable symbol key (from search_symbols or get_symbol_at_position).',
-		category: 'search',
+		category: 'symbols',
 		parameters: [
 			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key.', required: true, placeholder: '...' },
 			{ name: 'includeLocations', type: 'boolean', description: 'Include all definition locations. Default is true.', required: false, default: true },
@@ -455,53 +540,53 @@ export const TOOLS: ToolMetadata[] = [
 			error: null
 		}
 	},
+	// References & relationships
 	{
-		id: 'find_types',
-		name: 'find_types',
-		displayName: 'Find Types',
-		description: "Finds types by name pattern with wildcard support ('*' and '?'). By default, only searches types with source code in the solution (excludes external assemblies/packages).",
-		category: 'search',
+		id: 'find_references',
+		name: 'find_references',
+		displayName: 'Find References',
+		description: 'Finds references to an exact symbol (by symbolKey) in the loaded solution.',
+		category: 'references',
 		parameters: [
-			{ name: 'pattern', type: 'string', description: "Search pattern (supports '*' and '?').", required: true, placeholder: '*Service' },
-			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key identifying the exact symbol to search for.', required: true, placeholder: '...' },
 			{
-				name: 'sourceOnly',
-				type: 'boolean',
-				description: 'Only search types with source in solution (excludes external assemblies/packages). Default is true.',
+				name: 'scope',
+				type: 'json',
+				description: 'Optional scope. Example: { "kind": "solution" } or { "kind": "project", "projectName": "MyProject" }. Set includeExternal=true where supported.',
 				required: false,
-				default: true
+				placeholder: '{ "kind": "solution" }'
 			},
-			{ name: 'summaryOnly', type: 'boolean', description: 'When true, returns summary counts only. Default is false.', required: false, default: false },
-			{ name: 'kind', type: 'string', description: "Optional kind filter (e.g., 'Class', 'Interface').", required: false, placeholder: 'Interface' },
-			{ name: 'accessibility', type: 'string', description: "Optional accessibility filter (e.g., 'Public', 'Internal').", required: false, placeholder: 'Public' },
+			{
+				name: 'referenceKinds',
+				type: 'string',
+				description: "Optional filter (comma-separated): 'Read,Write,Invocation,TypeArgument,NameOf,Attribute'.",
+				required: false,
+				placeholder: 'Read,Write,Invocation'
+			},
+			{ name: 'includeLineText', type: 'boolean', description: 'Include lineText for each reference. Default is true.', required: false, default: true },
+			{ name: 'maxLineTextChars', type: 'number', description: 'Max characters for lineText. Use 0 for unlimited. Default is 200.', required: false, default: 200 },
+			{ name: 'groupBy', type: 'string', description: "Grouping: 'file', 'project', 'containingSymbol', or 'none' (default).", required: false, default: 'none' },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'sortBy', type: 'string', description: "Optional sort: 'name', 'kind', 'filePath', 'projectName', 'lineNumber'.", required: false, placeholder: 'name' },
-			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [
-			{ description: 'Find all service types', params: { pattern: '*Service' } },
-			{ description: 'Find public interfaces', params: { pattern: 'I*', kind: 'Interface', accessibility: 'Public' } },
-			{ description: 'Include external assemblies', params: { pattern: 'Task', sourceOnly: false } }
-		],
-		responseDescription: 'Returns matching types (with paging)',
+		examples: [{ description: 'Find references for a symbolKey', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns reference locations (with paging)',
 		responseExample: {
 			success: true,
 			data: {
-				pattern: '*Service',
-				matchCount: 2,
-				paging: { skip: 0, take: 200, returned: 2, total: 2 },
-				matches: [
+				symbolKey: '...',
+				referenceCount: 15,
+				paging: { skip: 0, take: 200, returned: 15, total: 15 },
+				references: [
 					{
-						typeName: 'UserService',
-						fullName: 'MyApp.Services.UserService',
-						kind: 'Class',
-						accessibility: 'Public',
-						filePath: '/path/to/UserService.cs',
-						lineNumber: 12,
-						projectName: 'MyApp'
+						filePath: '/path/to/Program.cs',
+						lineNumber: 9,
+						column: 35,
+						lineText: 'builder.Services.AddSingleton<ISolutionManager, SolutionManager>();',
+						projectName: 'MyProject',
+						referenceKind: 'TypeArgument'
 					}
 				]
 			},
@@ -509,39 +594,35 @@ export const TOOLS: ToolMetadata[] = [
 		}
 	},
 	{
-		id: 'find_usages',
-		name: 'find_usages',
-		displayName: 'Find Usages',
-		description: 'Finds usages (references) of a symbol in the loaded solution/project.',
-		category: 'search',
+		id: 'find_overrides',
+		name: 'find_overrides',
+		displayName: 'Find Overrides',
+		description: 'Finds overrides of a virtual/abstract member (by symbolKey).',
+		category: 'references',
 		parameters: [
-			{ name: 'symbolName', type: 'string', description: 'Symbol name (simple or fully qualified).', required: true, placeholder: 'IUserService' },
-			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'summaryOnly', type: 'boolean', description: 'When true, returns summary counts only. Default is false.', required: false, default: false },
-			{ name: 'sortBy', type: 'string', description: "Optional sort: 'filePath', 'lineNumber', 'projectName'.", required: false, placeholder: 'filePath' },
-			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the virtual/abstract member.', required: true, placeholder: '...' },
+			{ name: 'scope', type: 'json', description: 'Optional scope for overrides search.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [
-			{ description: 'Find usages of an interface', params: { symbolName: 'IUserService' } },
-			{ description: 'Summary view', params: { symbolName: 'IUserService', summaryOnly: true } }
-		],
-		responseDescription: 'Returns usage locations (with paging)',
+		examples: [{ description: 'Find overrides for a member', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns overriding members (with paging)',
 		responseExample: {
 			success: true,
 			data: {
-				symbolName: 'ISolutionManager',
-				symbolKind: 'Interface',
-				usageCount: 15,
-				paging: { skip: 0, take: 200, returned: 15, total: 15 },
-				usages: [
+				symbolKey: '...',
+				overrideCount: 2,
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
+				overrides: [
 					{
-						filePath: '/path/to/Program.cs',
-						lineNumber: 9,
-						column: 35,
-						lineText: 'builder.Services.AddSingleton<ISolutionManager, SolutionManager>();',
+						name: 'ToString',
+						fullName: 'MyApp.Models.User.ToString()',
+						kind: 'Method',
+						symbolKey: '...',
+						filePath: '/path/to/User.cs',
+						lineNumber: 42,
 						projectName: 'MyProject'
 					}
 				]
@@ -550,34 +631,318 @@ export const TOOLS: ToolMetadata[] = [
 		}
 	},
 	{
-		id: 'find_implementation',
-		name: 'find_implementation',
+		id: 'find_implementations',
+		name: 'find_implementations',
 		displayName: 'Find Implementations',
-		description: 'Finds concrete implementations of an interface or abstract class.',
-		category: 'search',
+		description: 'Finds implementations of an interface/abstract type or member (by symbolKey).',
+		category: 'references',
 		parameters: [
-			{ name: 'typeName', type: 'string', description: 'Interface/abstract class name (simple or fully qualified).', required: true, placeholder: 'IRepository' },
-			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the interface/abstract type (or member).', required: true, placeholder: '...' },
+			{ name: 'scope', type: 'json', description: 'Optional scope for implementation search.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [{ description: 'Find implementations of IRepository', params: { typeName: 'IRepository' } }],
-		responseDescription: 'Returns implementing types',
+		examples: [{ description: 'Find implementations for an interface', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns implementing symbols (with paging)',
 		responseExample: {
 			success: true,
 			data: {
-				baseTypeName: 'IRepository',
-				baseTypeKind: 'Interface',
+				symbolKey: '...',
 				implementationCount: 2,
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
 				implementations: [
 					{
-						typeName: 'SqlRepository',
+						name: 'SqlRepository',
 						fullName: 'MyApp.Data.SqlRepository',
-						kind: 'Class',
+						kind: 'Type',
+						symbolKey: '...',
 						filePath: '/path/to/SqlRepository.cs',
 						lineNumber: 10,
-						projectName: 'MyApp'
+						projectName: 'MyProject'
 					}
 				]
+			},
+			error: null
+		}
+	},
+
+	// Semantic & text search
+	{
+		id: 'semantic_query',
+		name: 'semantic_query',
+		displayName: 'Semantic Query',
+		description:
+			'Finds symbols by semantic predicates (kinds, name patterns, modifiers, parameter/return types, and attributes). Useful for queries like “async methods without CancellationToken”.',
+		category: 'semantic',
+		parameters: [
+			{ name: 'kinds', type: 'string', description: "Optional kinds (comma-separated): 'Type,Method,Property,Field,Event,Namespace'.", required: false, placeholder: 'Method' },
+			{ name: 'namePattern', type: 'string', description: "Optional name pattern (wildcards '*' and '?' supported).", required: false, placeholder: '*Async' },
+			{ name: 'modifiers', type: 'string', description: "Optional modifiers (comma-separated): 'async,static,virtual,abstract'.", required: false, placeholder: 'async' },
+			{ name: 'mustHaveParameterType', type: 'string', description: 'Optional required parameter types (comma-separated). Methods only.', required: false, placeholder: 'CancellationToken' },
+			{ name: 'mustNotHaveParameterType', type: 'string', description: 'Optional excluded parameter types (comma-separated). Methods only.', required: false, placeholder: 'CancellationToken' },
+			{ name: 'mustHaveAttribute', type: 'string', description: 'Optional required attributes (comma-separated).', required: false, placeholder: 'Authorize' },
+			{ name: 'mustNotHaveAttribute', type: 'string', description: 'Optional excluded attributes (comma-separated).', required: false, placeholder: 'Authorize' },
+			{ name: 'returnType', type: 'string', description: 'Optional return type patterns (comma-separated). Methods only.', required: false, placeholder: 'Task*' },
+			{ name: 'scope', type: 'json', description: 'Optional search scope.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [
+			{ description: 'Find async methods missing CancellationToken', params: { kinds: 'Method', modifiers: 'async', mustNotHaveParameterType: 'CancellationToken' } }
+		],
+		responseDescription: 'Returns matching symbols (with paging) including symbol keys',
+		responseExample: {
+			success: true,
+			data: {
+				matchCount: 1,
+				paging: { skip: 0, take: 200, returned: 1, total: 1 },
+				matches: [
+					{
+						name: 'SaveAsync',
+						fullName: 'MyApp.Data.UserRepository.SaveAsync(User user)',
+						kind: 'Method',
+						symbolKey: '...',
+						filePath: '/path/to/UserRepository.cs',
+						lineNumber: 88,
+						projectName: 'MyProject'
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'search_text',
+		name: 'search_text',
+		displayName: 'Search Text',
+		description: 'Searches for a literal string or regex pattern across solution documents (non-semantic).',
+		category: 'semantic',
+		parameters: [
+			{ name: 'query', type: 'string', description: 'Search query (literal string by default). Preferred argument name.', required: false, placeholder: 'TODO' },
+			{ name: 'pattern', type: 'string', description: 'Backward-compatible alias for query.', required: false, placeholder: 'TODO' },
+			{ name: 'useRegex', type: 'boolean', description: 'Treat pattern as a .NET regex. Default is false.', required: false, default: false },
+			{ name: 'caseSensitive', type: 'boolean', description: 'Case-sensitive match. Default is false.', required: false, default: false },
+			{ name: 'scope', type: 'json', description: 'Optional search scope.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'maxLineTextChars', type: 'number', description: 'Max characters for lineText. Use 0 for unlimited. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Find TODO comments', params: { query: 'TODO' } }],
+		responseDescription: 'Returns matching text occurrences (with paging)',
+		responseExample: {
+			success: true,
+			data: {
+				pattern: 'TODO',
+				useRegex: false,
+				caseSensitive: false,
+				scopeUsed: { mode: 'solution' },
+				matchCount: 2,
+				projectsSearched: 2,
+				totalProjectsInWorkspace: 2,
+				documentsMatchedScope: 120,
+				documentsSearched: 120,
+				documentsWithMatches: 1,
+				documentsUnreadable: 0,
+				totalDocumentsInWorkspace: 120,
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
+				matches: [
+					{
+						filePath: '/path/to/Program.cs',
+						lineNumber: 12,
+						column: 1,
+						lineText: '// TODO: refactor this',
+						projectName: 'MyProject'
+					}
+				],
+				hints: {
+					nextSteps: ['Use get_symbol_at_position if the match is an identifier and you want a symbolKey', 'Use search_symbols for semantic discovery once you know a symbol name'],
+					scopeNote: null,
+					noMatchNote: null,
+					unreadableNote: null
+				}
+			},
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
+			error: null
+		}
+	},
+
+	// Type hierarchy
+	{
+		id: 'get_type_hierarchy',
+		name: 'get_type_hierarchy',
+		displayName: 'Get Type Hierarchy',
+		description: 'Gets base types, interfaces, and derived types for a type (by symbolKey).',
+		category: 'hierarchy',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the type.', required: true, placeholder: '...' },
+			{ name: 'includeBaseTypes', type: 'boolean', description: 'Include base types. Default is true.', required: false, default: true },
+			{ name: 'includeInterfaces', type: 'boolean', description: 'Include interfaces. Default is true.', required: false, default: true },
+			{ name: 'includeDerivedTypes', type: 'boolean', description: 'Include derived types. Default is true.', required: false, default: true },
+			{ name: 'scope', type: 'json', description: 'Optional scope applied to derived type search.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'derivedSkip', type: 'number', description: 'Derived type paging offset. Default is 0.', required: false, default: 0 },
+			{ name: 'derivedTake', type: 'number', description: 'Derived type paging size. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Get type hierarchy for a type symbolKey', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns base types, interfaces, and derived types (derived types support paging)',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				baseTypes: [{ name: 'ControllerBase', fullName: 'Microsoft.AspNetCore.Mvc.ControllerBase', symbolKey: '...' }],
+				interfaces: [],
+				derivedPaging: { skip: 0, take: 200, returned: 1, total: 1 },
+				derivedTypes: [{ name: 'UsersController', fullName: 'MyApp.Controllers.UsersController', symbolKey: '...', filePath: '/path/to/UsersController.cs', lineNumber: 5 }]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_derived_types',
+		name: 'get_derived_types',
+		displayName: 'Get Derived Types',
+		description: 'Finds derived types for a base type (by symbolKey).',
+		category: 'hierarchy',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the base type.', required: true, placeholder: '...' },
+			{ name: 'scope', type: 'json', description: 'Optional scope for derived type search.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Get derived types', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns derived types (with paging)',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				derivedCount: 1,
+				paging: { skip: 0, take: 200, returned: 1, total: 1 },
+				derivedTypes: [{ name: 'UsersController', fullName: 'MyApp.Controllers.UsersController', symbolKey: '...', filePath: '/path/to/UsersController.cs', lineNumber: 5 }]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'find_member_in_hierarchy',
+		name: 'find_member_in_hierarchy',
+		displayName: 'Find Member in Hierarchy',
+		description: 'Walks a member’s override chain to locate the original declaration (by symbolKey).',
+		category: 'hierarchy',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for a member (method/property/event).', required: true, placeholder: '...' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Find original declaration for an override', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns the override chain and original declaration',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				chain: [
+					{ name: 'ToString', fullName: 'MyApp.Models.User.ToString()', symbolKey: '...', filePath: '/path/to/User.cs', lineNumber: 42 },
+					{ name: 'ToString', fullName: 'System.Object.ToString()', symbolKey: '...', filePath: null, lineNumber: null }
+				],
+				original: { name: 'ToString', fullName: 'System.Object.ToString()', symbolKey: '...' }
+			},
+			error: null
+		}
+	},
+
+	// Call graph & impact
+	{
+		id: 'find_callers',
+		name: 'find_callers',
+		displayName: 'Find Callers',
+		description: 'Finds semantic callers of a method (by symbolKey).',
+		category: 'callgraph',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the callee method.', required: true, placeholder: '...' },
+			{ name: 'scope', type: 'json', description: 'Optional scope for call site search.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Find callers for a method', params: { symbolKey: '...' } }],
+		responseDescription: 'Returns call sites grouped by caller (with paging)',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				callerCount: 1,
+				paging: { skip: 0, take: 200, returned: 1, total: 1 },
+				callers: [
+					{
+						caller: { name: 'Login', fullName: 'MyApp.Controllers.AuthController.Login()', symbolKey: '...' },
+						callSites: [{ filePath: '/path/to/AuthController.cs', lineNumber: 58, column: 12, lineText: 'await _service.LoginAsync(...);' }]
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_outgoing_calls',
+		name: 'get_outgoing_calls',
+		displayName: 'Get Outgoing Calls',
+		description: 'Finds methods invoked by a method (by symbolKey). Supports depth-limited expansion.',
+		category: 'callgraph',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the caller method.', required: true, placeholder: '...' },
+			{ name: 'maxDepth', type: 'number', description: 'Maximum expansion depth. Default is 1.', required: false, default: 1 },
+			{ name: 'includeExternal', type: 'boolean', description: 'Include calls to external symbols. Default is false.', required: false, default: false },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Get outgoing calls for a method', params: { symbolKey: '...', maxDepth: 1 } }],
+		responseDescription: 'Returns outgoing calls (with paging)',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				callCount: 2,
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
+				calls: [
+					{ callee: { name: 'SaveAsync', fullName: 'MyApp.Data.UserRepository.SaveAsync(User)', symbolKey: '...' }, isExternal: false, depth: 1 }
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'analyze_change_impact',
+		name: 'analyze_change_impact',
+		displayName: 'Analyze Change Impact',
+		description: 'Summarizes what will be affected if a symbol changes (by symbolKey).',
+		category: 'callgraph',
+		parameters: [
+			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the symbol you plan to change.', required: true, placeholder: '...' },
+			{ name: 'scope', type: 'json', description: 'Optional scope for impact search.', required: false, placeholder: '{ "kind": "solution" }' },
+			{ name: 'summaryOnly', type: 'boolean', description: 'Return counts/summary rather than full lists. Default is false.', required: false, default: false },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+		],
+		examples: [{ description: 'Summarize impact of changing a method/type', params: { symbolKey: '...', summaryOnly: true } }],
+		responseDescription: 'Returns an impact summary (and optionally detailed lists)',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				summary: { referenceCount: 15, callerCount: 2, implementationCount: 0, overrideCount: 0 }
 			},
 			error: null
 		}
@@ -716,7 +1081,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'get_type_dependencies',
 		displayName: 'Get Type Dependencies',
 		description: 'Analyzes type dependencies (uses / used_by).',
-		category: 'analysis',
+		category: 'architecture',
 		parameters: [
 			{ name: 'typeName', type: 'string', description: 'Type name to analyze.', required: true, placeholder: 'SolutionManager' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
@@ -762,7 +1127,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'analyze_complexity',
 		displayName: 'Analyze Complexity',
 		description: 'Analyzes code complexity metrics (cyclomatic complexity, LOC, method counts).',
-		category: 'analysis',
+		category: 'architecture',
 		parameters: [
 			{ name: 'typeName', type: 'string', description: 'Optional type name filter.', required: false, placeholder: 'SolutionManager' },
 			{ name: 'filePath', type: 'string', description: 'Optional file path filter.', required: false, placeholder: '/path/to/SolutionManager.cs' },
@@ -917,13 +1282,14 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'get_code_fixes',
 		displayName: 'Get Code Fixes',
 		description: 'Lists available code fixes for diagnostics at a specific location.',
-		category: 'refactoring',
+		category: 'codefix',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'File path containing the diagnostic.', required: true, placeholder: '/path/to/File.cs' },
 			{ name: 'lineNumber', type: 'number', description: '1-based line number.', required: true, default: 1 },
 			{ name: 'column', type: 'number', description: '1-based column number.', required: true, default: 1 },
 			{ name: 'diagnosticId', type: 'string', description: "Optional diagnostic ID filter (e.g., 'CS0246').", required: false, placeholder: 'CS0246' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'includeAnalyzers', type: 'boolean', description: 'Include analyzer/IDE diagnostics. Default is false.', required: false, default: false },
 			{ name: 'maxFixes', type: 'number', description: 'Max fixes per diagnostic. Default is 10.', required: false, default: 10 },
 			{ name: 'includePreviewDiff', type: 'boolean', description: 'Include preview diff for each fix. Default is false.', required: false, default: false },
 			{ name: 'maxPreviewDiffChars', type: 'number', description: 'Max characters for preview diffs. Default is 2000.', required: false, default: 2000 },
@@ -960,7 +1326,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'apply_code_fix',
 		displayName: 'Apply Code Fix',
 		description: 'Applies a specific code fix (or returns a preview) and returns diff output.',
-		category: 'refactoring',
+		category: 'codefix',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'File path containing the diagnostic.', required: true, placeholder: '/path/to/File.cs' },
 			{ name: 'lineNumber', type: 'number', description: '1-based line number.', required: true, default: 1 },
@@ -993,7 +1359,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'organize_usings',
 		displayName: 'Organize Usings',
 		description: 'Organizes using directives in a C# file (sort + remove unused) and returns diff output.',
-		category: 'refactoring',
+		category: 'codefix',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'File path to organize.', required: true, placeholder: '/path/to/File.cs' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
@@ -1023,7 +1389,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'format_document',
 		displayName: 'Format Document',
 		description: "Formats a C# document according to the project's formatting rules and returns diff output.",
-		category: 'refactoring',
+		category: 'codefix',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'File path to format.', required: true, placeholder: '/path/to/File.cs' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
@@ -1122,7 +1488,7 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'Run multiple operations',
 				params: {
 					operations:
-						`[\n  { "tool": "get_type_info", "arguments": { "typeName": "SolutionManager" } },\n  { "tool": "find_usages", "arguments": { "symbolName": "ISolutionManager", "summaryOnly": true } }\n]`
+						`[\n  { "tool": "get_type_info", "arguments": { "typeName": "SolutionManager" } },\n  { "tool": "search_symbols", "arguments": { "query": "*SolutionManager*", "kinds": "Type" } }\n]`
 				}
 			}
 		],
@@ -1136,7 +1502,7 @@ export const TOOLS: ToolMetadata[] = [
 				stoppedEarly: false,
 				results: [
 					{ tool: 'get_type_info', result: { success: true, data: { name: 'SolutionManager' }, error: null } },
-					{ tool: 'find_usages', result: { success: true, data: { usageCount: 15 }, error: null } }
+					{ tool: 'search_symbols', result: { success: true, data: { matchCount: 3 }, error: null } }
 				]
 			},
 			error: null
@@ -1199,6 +1565,17 @@ export function validateToolParams(
 					break;
 				}
 			}
+		}
+	}
+
+	// Special-case: search_text accepts query or pattern (alias). Require at least one.
+	if (tool.id === 'search_text') {
+		const query = normalizedParams.query;
+		const pattern = normalizedParams.pattern;
+		const hasQuery = !(query === undefined || query === null || query === '');
+		const hasPattern = !(pattern === undefined || pattern === null || pattern === '');
+		if (!hasQuery && !hasPattern) {
+			errors.push('query or pattern is required');
 		}
 	}
 

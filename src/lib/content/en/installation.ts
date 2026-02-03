@@ -31,7 +31,8 @@ export const installation: InstallationContent = {
 	title: 'Installation Guides',
 	intro: [
 		'Choose your AI client below for specific setup instructions. Glider works with any MCP-compatible client.',
-		'<strong>Recommendation:</strong> prefer <strong>project/workspace</strong> configuration when your client supports it. This avoids launching Glider for unrelated projects (and can help reduce token usage).'
+		'<strong>Recommendation:</strong> prefer <strong>project/workspace</strong> configuration when your client supports it. This avoids launching Glider for unrelated projects (and can help reduce token usage).',
+		'In stdio mode, <code>glider</code> waits for MCP input and is intentionally quiet by default. Use <code>glider --verbose</code> if you want a startup banner/logs (written to stderr).'
 	],
 	hint: 'Use Tab/Arrow keys to navigate, Enter to select.',
 	ariaLabel: 'Installation guides',
@@ -79,7 +80,7 @@ export const installationGuides: InstallationGuides = {
 			},
 			{
 				title: 'Verify',
-				description: 'Start a new Claude Code session and check for Glider tools.',
+				description: 'Start a new Claude Code session and check for Glider tools. If you need startup output/logs, re-add Glider with <code>--verbose</code> (e.g. <code>... -- glider --verbose</code>).',
 				code: 'claude\n# Then ask: "What Glider tools are available?"'
 			}
 		]
@@ -103,7 +104,7 @@ export const installationGuides: InstallationGuides = {
 			{
 				title: 'Start Glider (Streamable HTTP)',
 				description:
-					'Codex currently supports MCP servers over <strong>Streamable HTTP</strong>. Start Glider in HTTP mode (default endpoint: <code>http://localhost:5001/mcp</code>).',
+					'Codex currently supports MCP servers over <strong>Streamable HTTP</strong>. Start Glider in HTTP mode (default endpoint: <code>http://localhost:5001/mcp</code>). Add <code>--verbose</code> for logs if needed.',
 				code: 'glider --transport http',
 				language: 'bash'
 			},

@@ -10,7 +10,7 @@
 	let { content }: Props = $props();
 
 	// Assemble email from parts to obfuscate from bots
-	const emailParts = ['bogdan', 'sacrorum.com'];
+	const emailParts = ['feedback', 'glidermcp.com'];
 	let email = $state('');
 	let mailto = $state('');
 

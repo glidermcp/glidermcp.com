@@ -7,8 +7,10 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 ## What you can do with Glider
 
 - Resolve symbols the same way the compiler does (not grep).
-- Find usages, implementations, and types (supports wildcards like `*Manager`).
-- Search for symbols and get stable keys to use across tool calls.
+- Resolve ambiguous names into stable keys (`symbolKey`) and use them across tool calls.
+- Find references, overrides, and implementations by exact `symbolKey`.
+- Query symbols by semantic predicates and search solution text (literal/regex).
+- Navigate type hierarchies, call graphs, and change impact.
 - Inspect APIs with detailed type information and method signatures.
 - Surface compiler diagnostics for a loaded solution/project.
 - Refactor safely: rename symbols and move types/members with reference updates.
@@ -20,8 +22,12 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 
 - Diagnostics: `server_status`, `get_diagnostics`
 - Solution management: `load`, `reload`, `sync`
-- Symbol search & discovery: `search_symbols`, `get_symbol_at_position`, `get_symbol_info`, `find_usages`, `find_implementation`, `find_types`
+- Symbol discovery: `resolve_symbol`, `search_symbols`, `get_symbol_at_position`, `get_symbol_info`
+- References & relationships: `find_references`, `find_overrides`, `find_implementations`
 - Code analysis: `get_type_info`, `get_method_signature`, `get_type_source`, `get_method_source`
+- Semantic & text search: `semantic_query`, `search_text`
+- Type hierarchy: `get_type_hierarchy`, `get_derived_types`, `find_member_in_hierarchy`
+- Call graph & impact: `find_callers`, `get_outgoing_calls`, `analyze_change_impact`
 - Refactoring: `rename_symbol`, `move_type`, `move_member`
 - Code fixes & formatting: `get_code_fixes`, `apply_code_fix`, `organize_usings`, `format_document`
 - External source: `view_external_definition`
@@ -52,9 +58,16 @@ Glider supports two transports:
 # Stdio (default)
 glider
 
+# Show CLI help and exit
+glider --help
+glider -h
+
 # Print version and exit
 glider --version
 glider -v
+
+# Enable logs and (for stdio) a startup banner on stderr
+glider --verbose
 
 # HTTP (default port: 5001)
 glider --transport http
@@ -92,6 +105,10 @@ Find all usages of MyNamespace.MyType.MyMethod
 ```
 
 ```
+Resolve MyNamespace.MyType.MyMethod, then find_references for the selected symbolKey
+```
+
+```
 Rename the symbol OldName to NewName (preview the diff first).
 ```
 
@@ -99,7 +116,7 @@ Rename the symbol OldName to NewName (preview the diff first).
 
 ### `glider` “hangs” when I run it
 
-That’s expected for stdio mode: it’s an MCP server waiting for a client connection. Configure it in your MCP client instead of running it in a terminal by itself.
+That’s expected for stdio mode: it’s an MCP server waiting for a client connection, and it’s intentionally quiet by default. Configure it in your MCP client instead of running it in a terminal by itself (use `--verbose` if you want startup output/logs on stderr).
 
 ### `glider` not found after install
 

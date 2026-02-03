@@ -81,7 +81,7 @@ Key types:
 Some content fields accept HTML for formatting:
 ```typescript
 answer: [
-  'Use the <code>find_types</code> tool with <strong>wildcard patterns</strong>.'
+  'Use the <code>search_symbols</code> tool with <strong>wildcard patterns</strong> (set <code>kinds</code> to <code>Type</code>).'
 ]
 ```
 

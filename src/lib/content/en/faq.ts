@@ -22,9 +22,11 @@ export const faq: FaqContent = {
 			]
 		},
 		{
-			question: 'How does it differ from grep/ripgrep?',
+			question: 'Why use Glider instead of grep, LSP, or relying on the LLM alone?',
 			answer: [
-				'Glider provides <strong>semantic</strong> understanding. It knows that <code>IService</code> in one file refers to the same interface as in another. It can find implementations, usages, and perform safe renames that grep cannot.'
+				'<strong>LLM alone:</strong> Without tooling, LLMs hallucinate symbol names, miss cross-file relationships, and cannot verify that code compiles. They work from stale training data and lack visibility into your actual codebase.',
+				'<strong>Grep/ripgrep:</strong> Text search cannot distinguish between a class named <code>Foo</code> and a variable named <code>Foo</code>. Glider provides <strong>semantic</strong> understanding — it knows that <code>IService</code> in one file refers to the same interface as in another, and can find implementations, usages, and perform safe renames.',
+				'<strong>LSP:</strong> Language servers provide editor features (autocomplete, go-to-definition) but were not designed for AI workflows. Glider offers <strong>stable symbol keys</strong> for precise multi-step operations, <strong>batch operations</strong> to reduce round-trips, <strong>impact analysis</strong> and call graphs, <strong>safe refactoring</strong> with preview diffs, <strong>semantic queries</strong> (e.g., find async methods without CancellationToken), and <strong>external source viewing</strong> for NuGet packages.'
 			]
 		},
 		{
