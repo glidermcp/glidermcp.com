@@ -65,7 +65,7 @@ export const prompts: PromptsContent = {
 			description: 'Multi-step analysis workflows.',
 			prompts: [
 				'I need to understand how authentication works. Find the IAuthService interface, list its methods, and show where Login is called.',
-				'Find all classes that implement IRepository and show their public methods.',
+				'Resolve IRepository, then find_implementations with its symbolKey and show public methods.',
 				'Show me the dependency chain from UserController to the database layer.',
 				'Run a batch: search_symbols for "*UserController*" (Type), then get_type_info for the best match, then summarize.'
 			]

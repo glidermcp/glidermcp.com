@@ -366,7 +366,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'resolve_symbol',
 		displayName: 'Resolve Symbol',
 		description:
-			'Resolves an ambiguous name fragment into 0..N candidate symbols with stable symbol keys. Use this when you need exact keys for tools like find_references/find_implementations.',
+			'Quick lookup: resolves a name or pattern into candidate symbols with stable symbolKeys. Use when you already know the symbol name. Lightweight alternative to search_symbols.',
 		category: 'symbols',
 		parameters: [
 			{ name: 'query', type: 'string', description: 'Name fragment or fully qualified name.', required: true, placeholder: 'SolutionManager' },
@@ -407,7 +407,7 @@ export const TOOLS: ToolMetadata[] = [
 		name: 'search_symbols',
 		displayName: 'Search Symbols',
 		description:
-			'Searches for symbols (types and members) by pattern and returns stable symbol keys for follow-up tool calls. By default, only searches symbols with source code in the solution (excludes external assemblies/packages).',
+			'Searches symbol index by name pattern (* and ? wildcards). Full-featured: namespace/accessibility filters, sorting, paging. Use for exploration or filtered/sorted results. Returns stable symbolKeys.',
 		category: 'symbols',
 		parameters: [
 			{ name: 'query', type: 'string', description: "Search pattern. Supports '*' and '?', or plain text for substring match.", required: true, placeholder: '*Service' },
@@ -504,10 +504,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_symbol_info',
 		name: 'get_symbol_info',
 		displayName: 'Get Symbol Info',
-		description: 'Gets detailed information for a symbol by stable symbol key (from search_symbols or get_symbol_at_position).',
+		description: 'Gets detailed information about a symbol by its stable key (signature, docs, locations).',
 		category: 'symbols',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key.', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'includeLocations', type: 'boolean', description: 'Include all definition locations. Default is true.', required: false, default: true },
 			{ name: 'includeDocumentation', type: 'boolean', description: 'Include XML documentation. Default is true.', required: false, default: true },
 			{
@@ -545,10 +551,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_references',
 		name: 'find_references',
 		displayName: 'Find References',
-		description: 'Finds references to an exact symbol (by symbolKey) in the loaded solution.',
+		description: 'Finds all references to a symbol. Requires a symbolKey (use resolve_symbol or search_symbols to get one). Supports scope/filtering/grouping/paging.',
 		category: 'references',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key identifying the exact symbol to search for.', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{
 				name: 'scope',
 				type: 'json',
@@ -597,10 +609,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_overrides',
 		name: 'find_overrides',
 		displayName: 'Find Overrides',
-		description: 'Finds overrides of a virtual/abstract member (by symbolKey).',
+		description: 'Finds overrides of a virtual/abstract member. Requires a symbolKey.',
 		category: 'references',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the virtual/abstract member.', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'scope', type: 'json', description: 'Optional scope for overrides search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
@@ -634,10 +652,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_implementations',
 		name: 'find_implementations',
 		displayName: 'Find Implementations',
-		description: 'Finds implementations of an interface/abstract type or member (by symbolKey).',
+		description: 'Finds implementations of an interface/abstract type or member. Requires a symbolKey.',
 		category: 'references',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the interface/abstract type (or member).', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'scope', type: 'json', description: 'Optional scope for implementation search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
@@ -777,10 +801,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_type_hierarchy',
 		name: 'get_type_hierarchy',
 		displayName: 'Get Type Hierarchy',
-		description: 'Gets base types, interfaces, and derived types for a type (by symbolKey).',
+		description: 'Gets base types, interfaces, and derived types for a type. Requires a symbolKey.',
 		category: 'hierarchy',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the type.', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'includeBaseTypes', type: 'boolean', description: 'Include base types. Default is true.', required: false, default: true },
 			{ name: 'includeInterfaces', type: 'boolean', description: 'Include interfaces. Default is true.', required: false, default: true },
 			{ name: 'includeDerivedTypes', type: 'boolean', description: 'Include derived types. Default is true.', required: false, default: true },
@@ -808,10 +838,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_derived_types',
 		name: 'get_derived_types',
 		displayName: 'Get Derived Types',
-		description: 'Finds derived types for a base type (by symbolKey).',
+		description: 'Finds derived types of a base type. Requires a symbolKey.',
 		category: 'hierarchy',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the base type.', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'scope', type: 'json', description: 'Optional scope for derived type search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
@@ -835,10 +871,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_member_in_hierarchy',
 		name: 'find_member_in_hierarchy',
 		displayName: 'Find Member in Hierarchy',
-		description: 'Walks a member’s override chain to locate the original declaration (by symbolKey).',
+		description: "Walks a member's override chain to find the original declaration. Requires a symbolKey.",
 		category: 'hierarchy',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for a member (method/property/event).', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
@@ -863,10 +905,16 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'find_callers',
 		name: 'find_callers',
 		displayName: 'Find Callers',
-		description: 'Finds semantic callers of a method (by symbolKey).',
+		description: 'Finds methods that call a given method. Requires a symbolKey.',
 		category: 'callgraph',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the callee method.', required: true, placeholder: '...' },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
 			{ name: 'scope', type: 'json', description: 'Optional scope for call site search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
@@ -895,18 +943,24 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_outgoing_calls',
 		name: 'get_outgoing_calls',
 		displayName: 'Get Outgoing Calls',
-		description: 'Finds methods invoked by a method (by symbolKey). Supports depth-limited expansion.',
+		description: "Finds methods called by a given method's body. Requires a symbolKey. Supports depth-limited expansion and paging.",
 		category: 'callgraph',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the caller method.', required: true, placeholder: '...' },
-			{ name: 'maxDepth', type: 'number', description: 'Maximum expansion depth. Default is 1.', required: false, default: 1 },
-			{ name: 'includeExternal', type: 'boolean', description: 'Include calls to external symbols. Default is false.', required: false, default: false },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
+			{ name: 'depth', type: 'number', description: 'Depth of expansion. Default is 1 (direct calls).', required: false, default: 1 },
+			{ name: 'scope', type: 'json', description: 'Optional scope for outgoing call analysis.', required: false, placeholder: '{ "mode": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [{ description: 'Get outgoing calls for a method', params: { symbolKey: '...', maxDepth: 1 } }],
+		examples: [{ description: 'Get outgoing calls for a method', params: { symbolKey: '...', depth: 1 } }],
 		responseDescription: 'Returns outgoing calls (with paging)',
 		responseExample: {
 			success: true,
@@ -925,18 +979,28 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'analyze_change_impact',
 		name: 'analyze_change_impact',
 		displayName: 'Analyze Change Impact',
-		description: 'Summarizes what will be affected if a symbol changes (by symbolKey).',
+		description: 'Summarizes impact of changing a symbol (references, callers, implementations, overrides). Requires a symbolKey.',
 		category: 'callgraph',
 		parameters: [
-			{ name: 'symbolKey', type: 'string', description: 'Stable symbol key for the symbol you plan to change.', required: true, placeholder: '...' },
-			{ name: 'scope', type: 'json', description: 'Optional scope for impact search.', required: false, placeholder: '{ "kind": "solution" }' },
-			{ name: 'summaryOnly', type: 'boolean', description: 'Return counts/summary rather than full lists. Default is false.', required: false, default: false },
-			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
+			{ name: 'scope', type: 'json', description: 'Optional scope for impact search.', required: false, placeholder: '{ "mode": "solution" }' },
+			{ name: 'includeCallers', type: 'boolean', description: 'Include a caller summary (methods invoking the symbol). Default is true.', required: false, default: true },
+			{ name: 'includeImplementations', type: 'boolean', description: 'Include an implementation summary (for interfaces/abstract members/types). Default is true.', required: false, default: true },
+			{ name: 'includeOverrides', type: 'boolean', description: 'Include an override summary (for virtual/abstract members). Default is true.', required: false, default: true },
+			{ name: 'callersSkip', type: 'number', description: 'Pagination offset for callers summary. Default is 0.', required: false, default: 0 },
+			{ name: 'callersTake', type: 'number', description: 'Pagination size for callers summary. Default is 50.', required: false, default: 50 },
+			{ name: 'implementationsSkip', type: 'number', description: 'Pagination offset for implementations summary. Default is 0.', required: false, default: 0 },
+			{ name: 'implementationsTake', type: 'number', description: 'Pagination size for implementations summary. Default is 50.', required: false, default: 50 },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [{ description: 'Summarize impact of changing a method/type', params: { symbolKey: '...', summaryOnly: true } }],
+		examples: [{ description: 'Summarize impact of changing a method/type', params: { symbolKey: '...', includeCallers: true } }],
 		responseDescription: 'Returns an impact summary (and optionally detailed lists)',
 		responseExample: {
 			success: true,
@@ -1457,7 +1521,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'batch',
 		name: 'batch',
 		displayName: 'Batch',
-		description: 'Runs multiple tool operations in a single request.',
+		description: 'Runs multiple tool operations sequentially in one request.',
 		category: 'batch',
 		parameters: [
 			{
@@ -1488,7 +1552,7 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'Run multiple operations',
 				params: {
 					operations:
-						`[\n  { "tool": "get_type_info", "arguments": { "typeName": "SolutionManager" } },\n  { "tool": "search_symbols", "arguments": { "query": "*SolutionManager*", "kinds": "Type" } }\n]`
+						`[\n  { "tool": "resolve_symbol", "arguments": { "query": "ISolutionManager", "kinds": "Type" } },\n  { "tool": "find_references", "arguments": { "symbolKey": "...", "groupBy": "project" } }\n]`
 				}
 			}
 		],
