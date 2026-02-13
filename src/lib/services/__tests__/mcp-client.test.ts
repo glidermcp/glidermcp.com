@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 import { MCPClient } from '../mcp-client';
 
 describe('MCPClient', () => {
@@ -9,6 +9,10 @@ describe('MCPClient', () => {
 		client = new MCPClient({ baseUrl: 'http://localhost:5001' });
 		mockFetch = vi.fn();
 		globalThis.fetch = mockFetch;
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	describe('constructor', () => {
@@ -178,6 +182,52 @@ describe('MCPClient', () => {
 
 			const callBody = JSON.parse(mockFetch.mock.calls[0][1].body);
 			expect(callBody.params.arguments).toEqual({ valid: 'value' });
+		});
+
+		it('should use per-call timeout override', async () => {
+			vi.useFakeTimers();
+			mockFetch.mockImplementationOnce((_url: string, init?: RequestInit) => {
+				return new Promise((_resolve, reject) => {
+					const signal = init?.signal as AbortSignal | undefined;
+					signal?.addEventListener(
+						'abort',
+						() => {
+							const error = new Error('Aborted');
+							error.name = 'AbortError';
+							reject(error);
+						},
+						{ once: true }
+					);
+				});
+			});
+
+			const promise = client.callTool('load', {}, { requestTimeoutMs: 50 });
+			await vi.advanceTimersByTimeAsync(50);
+			const result = await promise;
+
+			expect(result.success).toBe(false);
+			expect(result.error).toContain('50ms');
+			expect(result.error).toContain('client-side timeout');
+		});
+
+		it('should disable client timeout when request timeout is null', async () => {
+			mockFetch.mockResolvedValueOnce({
+				ok: true,
+				headers: { get: () => 'application/json' },
+				json: async () => ({
+					jsonrpc: '2.0',
+					id: '123',
+					result: {
+						content: [{ type: 'text', text: '{"ok": true}' }]
+					}
+				})
+			});
+
+			const result = await client.callTool('load', {}, { requestTimeoutMs: null });
+			const callOptions = mockFetch.mock.calls[0][1] as RequestInit;
+
+			expect(result.success).toBe(true);
+			expect(callOptions.signal).toBeUndefined();
 		});
 	});
 

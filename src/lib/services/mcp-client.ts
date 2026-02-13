@@ -26,6 +26,10 @@ export interface CallToolResult<T = unknown> {
 	duration: number;
 }
 
+export interface CallToolOptions {
+	requestTimeoutMs?: number | null;
+}
+
 const DEFAULT_BASE_URL = 'http://localhost:5001';
 const DEFAULT_TIMEOUT = 120000; // 120 seconds - solution loading can take a while
 const HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
@@ -185,9 +189,11 @@ class MCPClient {
 	 */
 	async callTool<T = unknown>(
 		toolName: string,
-		params: Record<string, unknown> = {}
+		params: Record<string, unknown> = {},
+		options: CallToolOptions = {}
 	): Promise<CallToolResult<T>> {
 		const startTime = performance.now();
+		const effectiveTimeoutMs = options.requestTimeoutMs === undefined ? this.timeout : options.requestTimeoutMs;
 
 		// Clean params: remove undefined and null values
 		const cleanParams: Record<string, unknown> = {};
@@ -215,7 +221,7 @@ class MCPClient {
 					'Accept': 'application/json, text/event-stream'
 				},
 				body: JSON.stringify(request)
-			}, this.timeout);
+			}, effectiveTimeoutMs);
 
 			const duration = performance.now() - startTime;
 
@@ -310,7 +316,16 @@ class MCPClient {
 			};
 		} catch (error) {
 			const duration = performance.now() - startTime;
-			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			let errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+			if (
+				error instanceof Error &&
+				error.name === 'AbortError' &&
+				typeof effectiveTimeoutMs === 'number' &&
+				effectiveTimeoutMs > 0
+			) {
+				errorMessage = `Request timed out after ${effectiveTimeoutMs}ms (client-side timeout)`;
+			}
 
 			// Check if it's a connection error
 			if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
@@ -331,8 +346,12 @@ class MCPClient {
 	private async fetchWithTimeout(
 		url: string,
 		options: RequestInit,
-		timeout: number
+		timeout?: number | null
 	): Promise<Response> {
+		if (timeout === null || timeout === undefined || timeout <= 0) {
+			return fetch(url, options);
+		}
+
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), timeout);
 
