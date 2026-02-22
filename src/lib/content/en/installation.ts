@@ -114,7 +114,8 @@ export const installationGuides: InstallationGuides = {
 					'Edit: macOS/Linux <code>~/.codex/config.toml</code>, Windows <code>%USERPROFILE%\\.codex\\config.toml</code>. Codex does not currently support per-repo MCP config, so this is user-scoped. Codex docs: <a href="https://developers.openai.com/codex/mcp/" target="_blank" rel="noreferrer">developers.openai.com/codex/mcp</a>.',
 				code: `# ~/.codex/config.toml
 [mcp_servers.glider]
-url = "http://localhost:5001/mcp"`,
+url = "http://localhost:5001/mcp"
+tool_timeout_sec = 300`,
 				language: 'plaintext'
 			},
 			{
@@ -133,6 +134,7 @@ url = "http://localhost:5001/mcp"`,
 
 [profiles.glider.mcp_servers.glider]
 url = "http://localhost:5001/mcp"
+tool_timeout_sec = 300
 
 # Run with:
 # codex --profile glider`,
