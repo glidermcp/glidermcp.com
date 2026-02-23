@@ -143,7 +143,7 @@ Edit `src/lib/content/en/installation.ts`:
 2. Add an `InstallationGuide` to `installationGuides`
 
 ### Adding a Tool
-Tools are defined in `src/lib/data/tools.ts` (the data), not content files. Tool UI labels are in `src/lib/content/en/tools.ts`.
+Tools are defined in `src/lib/utils/tool-metadata.ts` (the data), not content files. Tool UI labels are in `src/lib/content/en/tools.ts`.
 
 ### Adding Prompt Examples
 Edit `src/lib/content/en/prompts.ts`:

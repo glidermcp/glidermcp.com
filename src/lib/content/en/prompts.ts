@@ -9,6 +9,7 @@ export const prompts: PromptsContent = {
 			description: 'Start by loading your .NET solution or project. Enable file watching for automatic sync.',
 			prompts: [
 				'Load the solution at /path/to/MySolution.sln',
+				'Load the solution at /path/to/MySolution.slnx',
 				'Load /path/to/MySolution.sln and watch /path/to/workspace for changes',
 				'Load the project at /path/to/MyProject.csproj'
 			]

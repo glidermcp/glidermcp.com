@@ -36,6 +36,7 @@ dotnet tool list -g
 			paragraphs: ['Once configured, you can ask your AI assistant:'],
 			code: {
 				code: `"Load the solution at /path/to/MySolution.sln"
+"Load the solution at /path/to/MySolution.slnx"
 "Load the solution at /path/to/MySolution.sln with file watching in /path/to/workspace"
 "Use search_symbols with query *Service and kinds Type to find all service classes"
 "What methods does IUserRepository define?"
