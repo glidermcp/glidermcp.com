@@ -155,13 +155,13 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'load',
 		name: 'load',
 		displayName: 'Load',
-		description: 'Loads a C# solution (.sln) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided.',
+		description: 'Loads a C# solution (.sln/.slnx) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided.',
 		category: 'solution',
 		parameters: [
 			{
 				name: 'path',
 				type: 'string',
-				description: 'Absolute path to .sln or .csproj file to load.',
+				description: 'Absolute path to .sln, .slnx, or .csproj file to load.',
 				required: true,
 				placeholder: '/path/to/Solution.sln'
 			},

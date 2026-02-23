@@ -127,4 +127,4 @@ Make sure the .NET tools directory is on your `PATH`:
 
 ### Solution/project won’t load
 
-Use an absolute path to the `.sln` / `.csproj` file.
+Use an absolute path to the `.sln` / `.slnx` / `.csproj` file.
