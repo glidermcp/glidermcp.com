@@ -57,8 +57,6 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-move-type', label: 'move_type', href: '/tools/move-type' },
 			{ id: 'tool-move-member', label: 'move_member', href: '/tools/move-member' },
 
-			{ id: 'tool-get-code-fixes', label: 'get_code_fixes', href: '/tools/get-code-fixes' },
-			{ id: 'tool-apply-code-fix', label: 'apply_code_fix', href: '/tools/apply-code-fix' },
 			{ id: 'tool-organize-usings', label: 'organize_usings', href: '/tools/organize-usings' },
 			{ id: 'tool-format-document', label: 'format_document', href: '/tools/format-document' },
 
