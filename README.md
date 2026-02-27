@@ -14,7 +14,7 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 - Inspect APIs with detailed type information and method signatures.
 - Surface compiler diagnostics for a loaded solution/project.
 - Refactor safely: rename symbols and move types/members with reference updates.
-- Apply code fixes and deterministic formatting with preview diffs.
+- Apply deterministic formatting with preview diffs.
 - Analyze architecture via dependency and complexity metrics.
 - Batch multiple tool calls into a single request.
 
@@ -29,7 +29,7 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 - Type hierarchy: `get_type_hierarchy`, `get_derived_types`, `find_member_in_hierarchy`
 - Call graph & impact: `find_callers`, `get_outgoing_calls`, `analyze_change_impact`
 - Refactoring: `rename_symbol`, `move_type`, `move_member`
-- Code fixes & formatting: `get_code_fixes`, `apply_code_fix`, `organize_usings`, `format_document`
+- Formatting: `organize_usings`, `format_document`
 - External source: `view_external_definition`
 - Architecture & metrics: `get_type_dependencies`, `analyze_complexity`
 - Batching: `batch`
