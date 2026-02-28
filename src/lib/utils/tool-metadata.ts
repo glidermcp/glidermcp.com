@@ -159,7 +159,7 @@ export const TOOLS: ToolMetadata[] = [
 		category: 'solution',
 		parameters: [
 			{
-				name: 'path',
+				name: 'filePath',
 				type: 'string',
 				description: 'Absolute path to .sln, .slnx, or .csproj file to load.',
 				required: true,
@@ -188,9 +188,9 @@ export const TOOLS: ToolMetadata[] = [
 			}
 		],
 		examples: [
-			{ description: 'Load a solution', params: { path: '/Users/dev/MyProject/MyProject.sln' } },
-			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
-			{ description: 'Load a standalone project', params: { path: '/Users/dev/MyProject/MyProject.csproj' } }
+			{ description: 'Load a solution', params: { filePath: '/Users/dev/MyProject/MyProject.sln' } },
+			{ description: 'Load with file watching', params: { filePath: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
+			{ description: 'Load a standalone project', params: { filePath: '/Users/dev/MyProject/MyProject.csproj' } }
 		],
 		responseDescription: 'Returns projects and cache metadata for the loaded solution/project',
 		responseExample: {
