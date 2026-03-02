@@ -13,7 +13,7 @@ describe('tool-metadata', () => {
 		expect(tool).toBeDefined();
 		const validation = validateToolParams(tool!, {});
 		expect(validation.valid).toBe(false);
-		expect(validation.errors.join('\n')).toMatch(/path is required/);
+		expect(validation.errors.join('\n')).toMatch(/filePath is required/);
 	});
 
 	it('parses json parameters during validation', () => {

@@ -159,7 +159,7 @@ export const TOOLS: ToolMetadata[] = [
 		category: 'solution',
 		parameters: [
 			{
-				name: 'path',
+				name: 'filePath',
 				type: 'string',
 				description: 'Absolute path to .sln, .slnx, or .csproj file to load.',
 				required: true,
@@ -188,9 +188,9 @@ export const TOOLS: ToolMetadata[] = [
 			}
 		],
 		examples: [
-			{ description: 'Load a solution', params: { path: '/Users/dev/MyProject/MyProject.sln' } },
-			{ description: 'Load with file watching', params: { path: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
-			{ description: 'Load a standalone project', params: { path: '/Users/dev/MyProject/MyProject.csproj' } }
+			{ description: 'Load a solution', params: { filePath: '/Users/dev/MyProject/MyProject.sln' } },
+			{ description: 'Load with file watching', params: { filePath: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
+			{ description: 'Load a standalone project', params: { filePath: '/Users/dev/MyProject/MyProject.csproj' } }
 		],
 		responseDescription: 'Returns projects and cache metadata for the loaded solution/project',
 		responseExample: {
@@ -259,15 +259,24 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'sync',
 		name: 'sync',
 		displayName: 'Sync',
-		description: 'Synchronizes one or more documents from disk into the in-memory workspace (faster than reload for .cs edits).',
+		description:
+			'Synchronizes one or more documents from disk into the in-memory workspace (faster than reload for .cs edits). If no paths are provided, sync runs only when pending watcher changes exist unless forceSync is true.',
 		category: 'solution',
 		parameters: [
 			{
 				name: 'filePaths',
 				type: 'json',
-				description: 'Optional file paths to sync. JSON array of strings. If omitted/empty, syncs all documents in the loaded solution/project.',
+				description:
+					'Optional file paths to sync. JSON array of strings. If omitted/empty, sync runs only when pending watcher changes exist unless forceSync is true.',
 				required: false,
 				placeholder: '["/path/to/File.cs"]'
+			},
+			{
+				name: 'forceSync',
+				type: 'boolean',
+				description: 'When true, forces sync of all documents even if no pending changes are detected. Default is false.',
+				required: false,
+				default: false
 			},
 			{
 				name: 'pathStyle',
@@ -285,7 +294,8 @@ export const TOOLS: ToolMetadata[] = [
 			}
 		],
 		examples: [
-			{ description: 'Sync all documents', params: {} },
+			{ description: 'Sync when watcher has pending changes', params: {} },
+			{ description: 'Force sync all documents', params: { forceSync: true } },
 			{ description: 'Sync a specific file', params: { filePaths: '["/Users/dev/MyProject/Program.cs"]' } }
 		],
 		responseDescription: 'Returns updated and skipped files plus revision info',
@@ -1085,15 +1095,25 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_method_signature',
 		name: 'get_method_signature',
 		displayName: 'Get Method Signature',
-		description: 'Gets detailed information about a method signature (parameters, return type, docs, and location).',
+		description:
+			'Gets detailed information about a method signature (parameters, return type, docs, and location). Supports fully qualified method names when containingTypeName is omitted.',
 		category: 'analysis',
 		parameters: [
-			{ name: 'methodName', type: 'string', description: 'Method name to analyze.', required: true, placeholder: 'GetUserById' },
+			{
+				name: 'methodName',
+				type: 'string',
+				description: "Method name to analyze. If containingTypeName is omitted, you can pass a fully qualified name like 'Namespace.Type.Method'.",
+				required: true,
+				placeholder: 'GetUserById'
+			},
 			{ name: 'containingTypeName', type: 'string', description: 'Optional containing type name filter.', required: false, placeholder: 'UserService' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
 			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
 		],
-		examples: [{ description: 'Get method signature', params: { methodName: 'GetUserById' } }],
+		examples: [
+			{ description: 'Get method signature', params: { methodName: 'GetUserById' } },
+			{ description: 'Get signature with fully qualified name', params: { methodName: 'MyApp.Services.UserService.GetUserById' } }
+		],
 		responseDescription: 'Returns method signature with parameters',
 		responseExample: {
 			success: true,
