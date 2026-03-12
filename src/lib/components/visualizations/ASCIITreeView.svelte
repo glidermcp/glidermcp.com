@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import type { TreeNode } from '$lib/types/visualizations';
 
@@ -206,16 +205,10 @@
 	}
 
 	// Register keyboard handler
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
+	$effect(() => {
 		if (interactive) {
-			unsubscribe = keyboardManager.addHandler(handleKeyboard);
+			return keyboardManager.addHandler(handleKeyboard);
 		}
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
 	});
 </script>
 
@@ -227,9 +220,13 @@
 		{#each flatNodes as flat, index}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<div
-				class="tree-node"
-				class:selected={interactive && index === selectedIndex}
-				class:has-children={flat.hasChildren}
+				class={[
+					'tree-node',
+					{
+						selected: interactive && index === selectedIndex,
+						'has-children': flat.hasChildren
+					}
+				]}
 				role="treeitem"
 				aria-selected={interactive && index === selectedIndex}
 				aria-expanded={flat.hasChildren ? flat.isExpanded : undefined}
@@ -237,7 +234,7 @@
 				onclick={() => interactive && handleNodeClick(index)}
 			>
 				<span class="prefix">{getPrefix(flat)}</span>
-				<span class="expand-icon" class:visible={flat.hasChildren}>{getExpandIcon(flat)}</span>
+				<span class={['expand-icon', { visible: flat.hasChildren }]}>{getExpandIcon(flat)}</span>
 				<span class="type-icon" data-type={flat.node.type}>[{getTypeIcon(flat.node.type)}]</span>
 				<span class="node-name">{flat.node.name}</span>
 				{#if flat.node.meta}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import CodeBlock from './CodeBlock.svelte';
 	import CodeTabs from './CodeTabs.svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
@@ -153,14 +152,8 @@
 		});
 	}
 
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleKeyboard);
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
+	$effect(() => {
+		return keyboardManager.addHandler(handleKeyboard);
 	});
 </script>
 
@@ -174,7 +167,7 @@
 
 	<div class="steps">
 		{#each steps as step, i}
-			<div class="step" class:selected={i === selectedIndex} class:active={isActive}>
+			<div class={['step', { selected: i === selectedIndex, active: isActive }]}>
 				<div class="step-header">
 					<button type="button" class="step-select" onclick={() => selectStep(i)}>
 						<span class="step-number">{i + 1}.</span>

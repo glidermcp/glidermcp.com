@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import InstallGuide from '$components/docs/InstallGuide.svelte';
 	import type { InstallationGuide } from '$lib/content/types';
 	import { setStatusBarKeys } from '$stores/statusbar';
@@ -21,12 +20,11 @@
 		{ key: '^G', label: 'Game', action: 'game' }
 	];
 
-	onMount(() => {
+	$effect(() => {
 		setStatusBarKeys(installKeys);
-	});
-
-	onDestroy(() => {
-		setStatusBarKeys(null);
+		return () => {
+			setStatusBarKeys(null);
+		};
 	});
 </script>
 

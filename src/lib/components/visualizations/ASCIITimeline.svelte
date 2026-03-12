@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import type { TimelineEntry } from '$lib/types/visualizations';
 
@@ -112,16 +111,10 @@
 	}
 
 	// Register keyboard handler
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
+	$effect(() => {
 		if (interactive) {
-			unsubscribe = keyboardManager.addHandler(handleKeyboard);
+			return keyboardManager.addHandler(handleKeyboard);
 		}
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
 	});
 </script>
 
@@ -137,10 +130,14 @@
 			{#each displayEntries as entry, index}
 				<button
 					type="button"
-					class="timeline-entry"
-					class:selected={interactive && index === selectedIndex}
-					class:success={entry.success}
-					class:error={!entry.success}
+					class={[
+						'timeline-entry',
+						{
+							selected: interactive && index === selectedIndex,
+							success: entry.success,
+							error: !entry.success
+						}
+					]}
 					aria-pressed={interactive && index === selectedIndex}
 					tabindex={interactive && index === selectedIndex ? 0 : -1}
 					onclick={() => handleEntryClick(index)}

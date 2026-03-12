@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { TOOLS, TOOL_CATEGORIES, type ToolCategory } from '$lib/utils/tool-metadata';
 	import { selectedToolId, selectTool } from '$stores/playground';
@@ -114,18 +113,12 @@
 		});
 	}
 
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleKeyboard);
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
+	$effect(() => {
+		return keyboardManager.addHandler(handleKeyboard);
 	});
 </script>
 
-<div class="tool-selector" class:active={isActive}>
+<div class={['tool-selector', { active: isActive }]}>
 	{#each Object.entries(TOOL_CATEGORIES) as [category, meta]}
 		{@const tools = toolsByCategory[category as ToolCategory]}
 		{#if tools.length > 0}
@@ -135,8 +128,7 @@
 					{#each tools as tool}
 						<button
 							type="button"
-							class="tool-item"
-							class:selected={tool.id === currentToolId}
+							class={['tool-item', { selected: tool.id === currentToolId }]}
 							onclick={() => handleSelect(tool.id)}
 						>
 							<span class="tool-name">{tool.name}</span>

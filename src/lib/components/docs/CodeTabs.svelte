@@ -25,13 +25,12 @@
 	}
 </script>
 
-<div class="code-tabs" class:active>
+<div class={['code-tabs', { active }]}>
 	<div class="tab-bar" role="tablist" aria-label="OS tabs">
 		{#each variants as variant, i}
 			<button
 				type="button"
-				class="tab"
-				class:selected={i === activeIndex}
+				class={['tab', { selected: i === activeIndex }]}
 				role="tab"
 				aria-selected={i === activeIndex}
 				tabindex={i === activeIndex ? 0 : -1}

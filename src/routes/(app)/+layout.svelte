@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import type { Component, Snippet } from 'svelte';
 	import TUILayout from '$components/tui/TUILayout.svelte';
@@ -69,14 +68,8 @@
 		}
 	}
 
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleContentKeyboard);
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
+	$effect(() => {
+		return keyboardManager.addHandler(handleContentKeyboard);
 	});
 </script>
 
@@ -93,7 +86,7 @@
 	{/snippet}
 
 	{#snippet rightPanel()}
-		<div class="content-area" class:focused={currentFocusedPanel === 'right'}>
+		<div class={['content-area', { focused: currentFocusedPanel === 'right' }]}>
 			{@render children()}
 		</div>
 	{/snippet}

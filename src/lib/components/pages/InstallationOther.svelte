@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { CodeBlock } from '$components/docs';
 	import CodeTabs from '$components/docs/CodeTabs.svelte';
 	import { setStatusBarKeys } from '$stores/statusbar';
@@ -30,12 +29,11 @@
 		{ key: '^G', label: 'Game', action: 'game' }
 	];
 
-	onMount(() => {
+	$effect(() => {
 		setStatusBarKeys(installKeys);
-	});
-
-	onDestroy(() => {
-		setStatusBarKeys(null);
+		return () => {
+			setStatusBarKeys(null);
+		};
 	});
 </script>
 

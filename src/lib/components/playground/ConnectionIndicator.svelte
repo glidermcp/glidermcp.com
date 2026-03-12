@@ -25,8 +25,17 @@
 	}
 </script>
 
-<div class="connection-indicator" class:connected={connected && online} class:error={status === 'error'} class:offline={!online}>
-	<span class="status-dot" class:pulse={status === 'connecting'}></span>
+<div
+	class={[
+		'connection-indicator',
+		{
+			connected: connected && online,
+			error: status === 'error',
+			offline: !online
+		}
+	]}
+>
+	<span class={['status-dot', { pulse: status === 'connecting' }]}></span>
 	<span class="status-text">{getStatusLabel(status, online)}</span>
 </div>
 

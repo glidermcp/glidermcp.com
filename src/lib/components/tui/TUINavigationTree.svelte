@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy, tick, untrack } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import {
@@ -250,14 +250,8 @@
 	}
 
 	// Register keyboard handler
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleKeyboard);
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
+	$effect(() => {
+		return keyboardManager.addHandler(handleKeyboard);
 	});
 
 	function getPrefix(flat: FlatItem): string {
@@ -269,24 +263,28 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
-<nav class="nav-tree" class:active={isActive} role="tree" aria-label="Navigation">
+<nav class={['nav-tree', { active: isActive }]} role="tree" aria-label="Navigation">
 	{#each flatItems as flat, index}
 		<a
 			href={flat.item.href}
-			class="nav-item"
-			class:playground={flat.item.href === '/playground'}
-			class:selected={index === selectedIndex}
-			class:current={isCurrentPath(flat.item.href)}
-			class:disabled={flat.item.disabled}
-			class:has-children={flat.hasChildren}
-			class:expanded={flat.isExpanded}
+			class={[
+				'nav-item',
+				{
+					playground: flat.item.href === '/playground',
+					selected: index === selectedIndex,
+					current: isCurrentPath(flat.item.href),
+					disabled: flat.item.disabled,
+					'has-children': flat.hasChildren,
+					expanded: flat.isExpanded
+				}
+			]}
 			role="treeitem"
 			aria-selected={index === selectedIndex}
 			aria-expanded={flat.hasChildren ? flat.isExpanded : undefined}
 			aria-disabled={flat.item.disabled}
 			aria-current={isCurrentPath(flat.item.href) ? 'page' : undefined}
 			tabindex={index === selectedIndex ? 0 : -1}
-			style:padding-left={"calc(" + flat.depth + " * var(--nav-indent-step) + var(--nav-indent-base))"}
+			style={`padding-left: calc(${flat.depth} * var(--nav-indent-step) + var(--nav-indent-base));`}
 			onclick={(e) => handleItemClick(e, index)}
 			onkeydown={(e) => {
 				// Prevent Space from triggering anchor click - we handle it in keyboard manager
@@ -298,8 +296,7 @@
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<span
-				class="prefix"
-				class:clickable={flat.hasChildren}
+				class={['prefix', { clickable: flat.hasChildren }]}
 				onclick={(e) => flat.hasChildren && handleToggleClick(e, index)}
 			>{getPrefix(flat)}</span>
 			<span class="label">{flat.item.label}</span>

@@ -24,7 +24,7 @@
 	const hLine = $derived(chars.h.repeat(200));
 </script>
 
-<div class="box-border-wrapper" class:focused class:double={variant === 'double'}>
+<div class={['box-border-wrapper', { focused, double: variant === 'double' }]}>
 	<!-- Top border -->
 	<div class="box-row box-top">
 		<span class="corner">{chars.tl}</span>

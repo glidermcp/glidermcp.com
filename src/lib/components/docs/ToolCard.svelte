@@ -22,7 +22,7 @@
 	}
 </script>
 
-<div class="tool-card" class:expanded>
+<div class={['tool-card', { expanded }]}>
 	<button class="tool-header" onclick={onToggle}>
 		<span class="expand-icon">{expanded ? '▼' : '▶'}</span>
 		<span class="tool-name">{tool.name}</span>

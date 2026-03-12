@@ -14,7 +14,7 @@
 	}: Props = $props();
 </script>
 
-<div class="tui-panel-wrapper" class:focused>
+<div class={['tui-panel-wrapper', { focused }]}>
 	<!-- Top border with optional title -->
 	<div class="panel-top">
 		<span class="corner">┌</span>
