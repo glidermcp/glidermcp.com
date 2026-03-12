@@ -20,10 +20,7 @@ export const pricing: PricingContent = {
 		code: 'dotnet tool update --global glider',
 		language: 'bash'
 	},
-	authorTitle: 'Author',
-	authorLabel: 'Built by',
-	authorName: 'Bogdan Novosad',
-	authorUrl: 'https://sacrorum.com',
+	contactTitle: 'Contact information',
 	licenseTitle: 'License',
 	licenseText: 'All Rights Reserved'
 };

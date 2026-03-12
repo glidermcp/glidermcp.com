@@ -38,8 +38,7 @@
 {/each}
 <CodeBlock code={content.updateCode.code} language={content.updateCode.language} />
 
-<h3>{content.authorTitle}</h3>
-<p>{content.authorLabel} <a href={content.authorUrl} class="link">{content.authorName}</a></p>
+<h3>{content.contactTitle}</h3>
 {#if email}
 	<p class="muted"><a href={mailto} class="link">{email}</a></p>
 {/if}

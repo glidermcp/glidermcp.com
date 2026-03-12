@@ -148,10 +148,7 @@ export interface PricingContent {
 	versionPolicyTitle: string;
 	versionPolicy: string[];
 	updateCode: CodeSample;
-	authorTitle: string;
-	authorLabel: string;
-	authorName: string;
-	authorUrl: string;
+	contactTitle: string;
 	licenseTitle: string;
 	licenseText: string;
 }
