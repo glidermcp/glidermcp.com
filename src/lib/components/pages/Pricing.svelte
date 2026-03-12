@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { CodeBlock } from '$components/docs';
 	import type { PricingContent } from '$lib/content/types';
 
@@ -10,8 +11,13 @@
 
 	// Assemble email from parts to obfuscate from bots
 	const emailParts = ['feedback', 'glidermcp.com'];
-	const email = emailParts.join('@');
-	const mailto = `mailto:${email}`;
+	let email = $state('');
+	let mailto = $state('');
+
+	onMount(() => {
+		email = emailParts.join('@');
+		mailto = `mailto:${email}`;
+	});
 </script>
 
 <h2>{content.title}</h2>
