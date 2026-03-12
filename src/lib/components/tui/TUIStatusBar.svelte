@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { toggleTheme } from '$stores/theme';
 	import { focusedPanel, togglePanel } from '$stores/keyboard';
@@ -70,14 +69,8 @@
 		}
 	}
 
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleKeyboard);
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
+	$effect(() => {
+		return keyboardManager.addHandler(handleKeyboard);
 	});
 </script>
 

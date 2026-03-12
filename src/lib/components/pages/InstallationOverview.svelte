@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { InstallationContent } from '$lib/content/types';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
@@ -80,14 +79,8 @@
 	}
 
 	// Register keyboard handler
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleKeyboard);
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
+	$effect(() => {
+		return keyboardManager.addHandler(handleKeyboard);
 	});
 </script>
 
@@ -98,16 +91,14 @@
 <p class="hint">{content.hint}</p>
 
 <div
-	class="client-grid"
-	class:active={isActive}
+	class={['client-grid', { active: isActive }]}
 	role="grid"
 	aria-label={content.ariaLabel}
 >
 	{#each content.clients as client, index}
 		<a
 			href={client.href}
-			class="client-card"
-			class:selected={index === selectedIndex}
+			class={['client-card', { selected: index === selectedIndex }]}
 			role="gridcell"
 			aria-selected={index === selectedIndex}
 			tabindex={index === selectedIndex ? 0 : -1}

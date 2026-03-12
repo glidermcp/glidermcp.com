@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import GameCanvas from './GameCanvas.svelte';
 	import {
 		gameVisible,
@@ -20,8 +19,6 @@
 	const currentScore = $derived($score);
 	const best = $derived($highScore);
 	const muted = $derived($gameMuted);
-
-	let unsubscribe: (() => void) | null = null;
 
 	function handleKeyboard(action: KeyboardAction, event: KeyboardEvent): boolean {
 		if (!$gameVisible) return false;
@@ -78,18 +75,17 @@
 		}
 	}
 
-	onMount(() => {
-		unsubscribe = keyboardManager.addHandler(handleKeyboard);
+	$effect(() => {
+		const unsubscribe = keyboardManager.addHandler(handleKeyboard);
 		if (typeof window !== 'undefined') {
 			window.addEventListener('keydown', handleSpace);
 		}
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
-		if (typeof window !== 'undefined') {
-			window.removeEventListener('keydown', handleSpace);
-		}
+		return () => {
+			unsubscribe();
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('keydown', handleSpace);
+			}
+		};
 	});
 
 	$effect(() => {

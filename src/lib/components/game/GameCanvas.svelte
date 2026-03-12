@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import {
 		gameState,
 		glider,
@@ -204,7 +203,7 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
 		if (!canvas) return;
 
 		ctx = canvas.getContext('2d');
@@ -216,13 +215,13 @@
 		if (typeof window !== 'undefined') {
 			window.addEventListener('resize', resizeCanvas);
 		}
-	});
-
-	onDestroy(() => {
-		stopLoop();
-		if (typeof window !== 'undefined') {
-			window.removeEventListener('resize', resizeCanvas);
-		}
+		return () => {
+			stopLoop();
+			ctx = null;
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('resize', resizeCanvas);
+			}
+		};
 	});
 
 	// Restart loop when game becomes visible

@@ -70,8 +70,7 @@
 				{#if supportsVisualization && response.success}
 					<button
 						type="button"
-						class="action-btn"
-						class:active={viewMode === 'visual'}
+						class={['action-btn', { active: viewMode === 'visual' }]}
 						onclick={toggleViewMode}
 						title="Toggle visualization"
 						disabled={executionStateValue === 'executing'}

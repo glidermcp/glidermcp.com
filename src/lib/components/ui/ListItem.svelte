@@ -31,16 +31,14 @@
 </script>
 
 <div
-	class="list-item"
-	class:selected
-	class:disabled
+	class={['list-item', { selected, disabled }]}
 	role="option"
 	aria-selected={selected}
 	aria-disabled={disabled}
 	tabindex={disabled ? -1 : 0}
 	onclick={() => !disabled && onclick?.()}
 	onkeydown={handleKeydown}
-	style:padding-left="{indent * 16 + 8}px"
+	style={`padding-left: ${indent * 16 + 8}px;`}
 >
 	{#if prefix}
 		<span class="prefix">{prefix}</span>

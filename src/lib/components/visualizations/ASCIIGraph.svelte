@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import type { ReferenceNode, SymbolWithReferences } from '$lib/types/visualizations';
 
@@ -128,16 +127,10 @@
 	}
 
 	// Register keyboard handler
-	let unsubscribe: (() => void) | null = null;
-
-	onMount(() => {
+	$effect(() => {
 		if (interactive) {
-			unsubscribe = keyboardManager.addHandler(handleKeyboard);
+			return keyboardManager.addHandler(handleKeyboard);
 		}
-	});
-
-	onDestroy(() => {
-		unsubscribe?.();
 	});
 </script>
 
@@ -160,8 +153,7 @@
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 					<div
-						class="ref-node"
-						class:selected={interactive && index === selectedIndex}
+						class={['ref-node', { selected: interactive && index === selectedIndex }]}
 						role="option"
 						aria-selected={interactive && index === selectedIndex}
 						tabindex={interactive && index === selectedIndex ? 0 : -1}

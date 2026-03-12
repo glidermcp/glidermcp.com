@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { onMount, onDestroy } from 'svelte';
 	import TUIMenuBar from './TUIMenuBar.svelte';
 	import TUIStatusBar from './TUIStatusBar.svelte';
 	import { keyboardManager } from '$lib/services/keyboard-manager';
@@ -31,25 +30,21 @@
 	const focusedPanel = $derived($focusedPanelStore);
 	const mobileNavOpen = $derived($mobileNavOpenStore);
 
-	// Initialize keyboard manager on mount
-	onMount(() => {
+	$effect(() => {
 		keyboardManager.init();
-	});
-
-	onDestroy(() => {
-		keyboardManager.destroy();
+		return () => {
+			keyboardManager.destroy();
+		};
 	});
 </script>
 
 <div class="tui-layout">
 	<TUIMenuBar {title} />
 
-	<div class="tui-main" class:mobile-nav-open={mobileNavOpen}>
+	<div class={['tui-main', { 'mobile-nav-open': mobileNavOpen }]}>
 		<div
-			class="tui-panel tui-panel-left"
-			class:tui-panel-focused={focusedPanel === 'left'}
-			style:width={leftPanelWidth}
-			style:min-width={leftPanelWidth}
+			class={['tui-panel tui-panel-left', { 'tui-panel-focused': focusedPanel === 'left' }]}
+			style={`width: ${leftPanelWidth}; min-width: ${leftPanelWidth};`}
 		>
 			<div class="tui-panel-border tui-panel-border-top">
 				<span class="box-tl">┌</span>
@@ -69,8 +64,7 @@
 		</div>
 
 		<button
-			class="tui-panel-overlay"
-			class:visible={mobileNavOpen}
+			class={['tui-panel-overlay', { visible: mobileNavOpen }]}
 			aria-label="Close navigation"
 			onclick={() => setMobileNavOpen(false)}
 		></button>
@@ -80,8 +74,7 @@
 		</div>
 
 		<div
-			class="tui-panel tui-panel-right"
-			class:tui-panel-focused={focusedPanel === 'right'}
+			class={['tui-panel tui-panel-right', { 'tui-panel-focused': focusedPanel === 'right' }]}
 		>
 			<div class="tui-panel-border tui-panel-border-top">
 				<span class="box-tl">┌</span>

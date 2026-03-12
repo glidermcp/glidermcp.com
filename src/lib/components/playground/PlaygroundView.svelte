@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
@@ -211,22 +211,20 @@
 		}
 	}
 
-	let unsubscribeKeyboard: (() => void) | null = null;
-	let unsubscribeStatus: (() => void) | null = null;
+	$effect(() => {
+		serverUrlInput = untrack(() => currentServerUrl);
 
-	onMount(() => {
-		// Initialize server URL input from store
-		serverUrlInput = currentServerUrl;
-
-		unsubscribeKeyboard = keyboardManager.addHandler(handleKeyboard);
-
-		// Subscribe to MCP client status changes
-		unsubscribeStatus = mcpClient.onStatusChange((status) => {
+		const unsubscribeKeyboard = keyboardManager.addHandler(handleKeyboard);
+		const unsubscribeStatus = mcpClient.onStatusChange((status) => {
 			setConnectionStatus(status);
 		});
 
-		// Try to connect on mount
 		connect();
+
+		return () => {
+			unsubscribeKeyboard();
+			unsubscribeStatus?.();
+		};
 	});
 
 	$effect(() => {
@@ -270,10 +268,6 @@
 		});
 	});
 
-	onDestroy(() => {
-		unsubscribeKeyboard?.();
-		unsubscribeStatus?.();
-	});
 </script>
 
 <div class="playground-view">
