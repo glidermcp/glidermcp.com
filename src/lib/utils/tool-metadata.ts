@@ -178,13 +178,6 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'Include detailed project information in response. Default is false.',
 				required: false,
 				default: false
-			},
-			{
-				name: 'timeout_ms',
-				type: 'number',
-				description: 'Timeout in milliseconds (10 minutes). Use 0 to disable. Default is 600000.',
-				required: false,
-				default: 600000
 			}
 		],
 		examples: [
@@ -209,7 +202,7 @@ export const TOOLS: ToolMetadata[] = [
 					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				}
 			},
-			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 600000 },
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
 			error: null
 		}
 	},
@@ -226,13 +219,6 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'Include detailed project information in response. Default is false.',
 				required: false,
 				default: false
-			},
-			{
-				name: 'timeout_ms',
-				type: 'number',
-				description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
-				required: false,
-				default: 300000
 			}
 		],
 		examples: [{ description: 'Reload after manual edits', params: { includeProjects: true } }],
@@ -251,7 +237,7 @@ export const TOOLS: ToolMetadata[] = [
 					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				}
 			},
-			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
 			error: null
 		}
 	},
@@ -284,13 +270,6 @@ export const TOOLS: ToolMetadata[] = [
 				description: "Path style: 'absolute' (default) or 'relative' (to solution root).",
 				required: false,
 				default: 'absolute'
-			},
-			{
-				name: 'timeout_ms',
-				type: 'number',
-				description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.',
-				required: false,
-				default: 300000
 			}
 		],
 		examples: [
@@ -333,8 +312,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'severity', 'filePath', 'id', 'lineNumber', 'projectName'.", required: false, placeholder: 'severity' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
 		],
 		examples: [
 			{ description: 'Get warnings and errors (default)', params: {} },
@@ -365,7 +343,7 @@ export const TOOLS: ToolMetadata[] = [
 					}
 				]
 			},
-			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
 			error: null
 		}
 	},
@@ -383,8 +361,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'kinds', type: 'string', description: "Optional kinds filter (comma-separated): 'Type,Method,Property,Field,Event'.", required: false, placeholder: 'Type,Method' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit scope.', required: false, placeholder: 'MyProject' },
 			{ name: 'maxCandidates', type: 'number', description: 'Max candidates to return. Default is 25.', required: false, default: 25 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [
 			{ description: 'Resolve an ambiguous type name', params: { query: 'SolutionManager', kinds: 'Type' } },
@@ -408,7 +385,7 @@ export const TOOLS: ToolMetadata[] = [
 				],
 				hints: { nextSteps: ['Use get_symbol_info with a candidate symbolKey for details', 'Use find_references with symbolKey to locate usages'] }
 			},
-			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
 			error: null
 		}
 	},
@@ -448,8 +425,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'name', 'kind', 'filePath', 'projectName', 'namespace'.", required: false, placeholder: 'name' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
 		],
 		examples: [
 			{ description: 'Search for service types', params: { query: '*Service', kinds: 'Type' } },
@@ -492,8 +468,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'filePath', type: 'string', description: 'Absolute file path.', required: true, placeholder: '/path/to/File.cs' },
 			{ name: 'line', type: 'number', description: '1-based line number.', required: true, default: 1 },
 			{ name: 'column', type: 'number', description: '1-based column number.', required: true, default: 1 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get symbol key under cursor', params: { filePath: '/Users/dev/MyProject/Program.cs', line: 10, column: 15 } }],
 		responseDescription: 'Returns a symbol key and basic symbol details',
@@ -533,8 +508,7 @@ export const TOOLS: ToolMetadata[] = [
 				required: false,
 				default: 2000
 			},
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get symbol info from a symbol key', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns rich symbol information including signature and locations',
@@ -590,8 +564,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'groupBy', type: 'string', description: "Grouping: 'file', 'project', 'containingSymbol', or 'none' (default).", required: false, default: 'none' },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
 		],
 		examples: [{ description: 'Find references for a symbolKey', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns reference locations (with paging)',
@@ -632,8 +605,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional scope for overrides search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
 		],
 		examples: [{ description: 'Find overrides for a member', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns overriding members (with paging)',
@@ -675,8 +647,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional scope for implementation search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
 		],
 		examples: [{ description: 'Find implementations for an interface', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns implementing symbols (with paging)',
@@ -722,8 +693,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional search scope.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [
 			{ description: 'Find async methods missing CancellationToken', params: { kinds: 'Method', modifiers: 'async', mustNotHaveParameterType: 'CancellationToken' } }
@@ -764,8 +734,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
 			{ name: 'maxLineTextChars', type: 'number', description: 'Max characters for lineText. Use 0 for unlimited. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Find TODO comments', params: { query: 'TODO' } }],
 		responseDescription: 'Returns matching text occurrences (with paging)',
@@ -801,7 +770,7 @@ export const TOOLS: ToolMetadata[] = [
 					unreadableNote: null
 				}
 			},
-			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 300000 },
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
 			error: null
 		}
 	},
@@ -827,8 +796,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional scope applied to derived type search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'derivedSkip', type: 'number', description: 'Derived type paging offset. Default is 0.', required: false, default: 0 },
 			{ name: 'derivedTake', type: 'number', description: 'Derived type paging size. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get type hierarchy for a type symbolKey', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns base types, interfaces, and derived types (derived types support paging)',
@@ -861,8 +829,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional scope for derived type search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get derived types', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns derived types (with paging)',
@@ -891,8 +858,7 @@ export const TOOLS: ToolMetadata[] = [
 				required: true,
 				placeholder: '...'
 			},
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Find original declaration for an override', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns the override chain and original declaration',
@@ -928,8 +894,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional scope for call site search.', required: false, placeholder: '{ "kind": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Find callers for a method', params: { symbolKey: '...' } }],
 		responseDescription: 'Returns call sites grouped by caller (with paging)',
@@ -967,8 +932,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'scope', type: 'json', description: 'Optional scope for outgoing call analysis.', required: false, placeholder: '{ "mode": "solution" }' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
 			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get outgoing calls for a method', params: { symbolKey: '...', depth: 1 } }],
 		responseDescription: 'Returns outgoing calls (with paging)',
@@ -1007,8 +971,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'callersTake', type: 'number', description: 'Pagination size for callers summary. Default is 50.', required: false, default: 50 },
 			{ name: 'implementationsSkip', type: 'number', description: 'Pagination offset for implementations summary. Default is 0.', required: false, default: 0 },
 			{ name: 'implementationsTake', type: 'number', description: 'Pagination size for implementations summary. Default is 50.', required: false, default: 50 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Summarize impact of changing a method/type', params: { symbolKey: '...', includeCallers: true } }],
 		responseDescription: 'Returns an impact summary (and optionally detailed lists)',
@@ -1031,8 +994,7 @@ export const TOOLS: ToolMetadata[] = [
 		category: 'analysis',
 		parameters: [
 			{ name: 'typeName', type: 'string', description: 'Type name (simple or fully qualified).', required: true, placeholder: 'UserService' },
-			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' }
 		],
 		examples: [{ description: 'Get type info', params: { typeName: 'UserService' } }],
 		responseDescription: 'Returns type details including members',
@@ -1070,8 +1032,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'typeName', type: 'string', description: 'Type name (simple or fully qualified).', required: true, placeholder: 'UserService' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
 			{ name: 'maxLines', type: 'number', description: 'Max lines to return. Use 0 for unlimited. Default is 200.', required: false, default: 200 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get type source', params: { typeName: 'UserService' } }],
 		responseDescription: 'Returns type source (possibly truncated)',
@@ -1107,8 +1068,7 @@ export const TOOLS: ToolMetadata[] = [
 				placeholder: 'GetUserById'
 			},
 			{ name: 'containingTypeName', type: 'string', description: 'Optional containing type name filter.', required: false, placeholder: 'UserService' },
-			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' }
 		],
 		examples: [
 			{ description: 'Get method signature', params: { methodName: 'GetUserById' } },
@@ -1140,8 +1100,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
 			{ name: 'maxLines', type: 'number', description: 'Max lines to return. Use 0 for unlimited. Default is 120.', required: false, default: 120 },
 			{ name: 'bodyOnly', type: 'boolean', description: 'If true, return only the method body (no signature). Default is false.', required: false, default: false },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Get method source', params: { methodName: 'LoadSolutionAsync', containingTypeName: 'SolutionManager' } }],
 		responseDescription: 'Returns method source (possibly truncated)',
@@ -1169,8 +1128,7 @@ export const TOOLS: ToolMetadata[] = [
 		parameters: [
 			{ name: 'typeName', type: 'string', description: 'Type name to analyze.', required: true, placeholder: 'SolutionManager' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
-			{ name: 'direction', type: 'string', description: "Direction: 'uses', 'used_by', or 'both' (default).", required: false, default: 'both' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'direction', type: 'string', description: "Direction: 'uses', 'used_by', or 'both' (default).", required: false, default: 'both' }
 		],
 		examples: [{ description: 'Analyze dependencies', params: { typeName: 'SolutionManager' } }],
 		responseDescription: 'Returns types used by the target and types that reference it',
@@ -1220,8 +1178,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'sortBy', type: 'string', description: "Optional sort: 'complexity', 'averageComplexity', 'linesOfCode', 'methodCount', 'name'.", required: false, placeholder: 'complexity' },
 			{ name: 'sortOrder', type: 'string', description: "Sort order: 'asc' (default) or 'desc'.", required: false, default: 'asc' },
 			{ name: 'skip', type: 'number', description: 'Pagination offset over returned types. Default is 0.', required: false, default: 0 },
-			{ name: 'take', type: 'number', description: 'Pagination size over returned types. Default is 50.', required: false, default: 50 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'take', type: 'number', description: 'Pagination size over returned types. Default is 50.', required: false, default: 50 }
 		],
 		examples: [
 			{ description: 'Analyze overall complexity', params: {} },
@@ -1276,8 +1233,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'symbolName', type: 'string', description: 'Symbol name to rename (simple or fully qualified).', required: true, placeholder: 'OldClassName' },
 			{ name: 'newName', type: 'string', description: 'New name for the symbol.', required: true, placeholder: 'NewClassName' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit symbol search.', required: false, placeholder: 'MyProject' },
-			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true }
 		],
 		examples: [
 			{ description: 'Rename a class', params: { symbolName: 'OldClassName', newName: 'NewClassName' } },
@@ -1309,8 +1265,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'targetFilePath', type: 'string', description: 'Optional target file path.', required: false, placeholder: '/path/to/NewFile.cs' },
 			{ name: 'targetNamespace', type: 'string', description: 'Optional target namespace.', required: false, placeholder: 'MyApp.Utils' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit symbol search.', required: false, placeholder: 'MyProject' },
-			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true }
 		],
 		examples: [{ description: 'Move a type to a new namespace', params: { typeName: 'MyClass', targetNamespace: 'MyApp.Utils' } }],
 		responseDescription: 'Returns a unified diff of the change set',
@@ -1341,8 +1296,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'targetTypeName', type: 'string', description: 'Target type name.', required: true, placeholder: 'TargetClass' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit search.', required: false, placeholder: 'MyProject' },
 			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns a preview diff.', required: false, default: true },
-			{ name: 'maxReferenceUpdates', type: 'number', description: 'Maximum reference updates when rewriting call sites. Use 0 to disable. Default is 2000.', required: false, default: 2000 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'maxReferenceUpdates', type: 'number', description: 'Maximum reference updates when rewriting call sites. Use 0 to disable. Default is 2000.', required: false, default: 2000 }
 		],
 		examples: [{ description: 'Move a method to another class', params: { memberName: 'ProcessData', sourceTypeName: 'OldClass', targetTypeName: 'NewClass' } }],
 		responseDescription: 'Returns a unified diff of the change set',
@@ -1373,8 +1327,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns preview only.', required: false, default: true },
 			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
 			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Preview organize usings', params: { filePath: '/Users/dev/MyProject/Program.cs', applyChanges: false } }],
 		responseDescription: 'Returns diff output for the formatting operation',
@@ -1403,8 +1356,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'applyChanges', type: 'boolean', description: 'If true (default), applies changes to disk. If false, returns preview only.', required: false, default: true },
 			{ name: 'includeDiff', type: 'boolean', description: 'Include unified diff in response. Default is true.', required: false, default: true },
 			{ name: 'maxDiffChars', type: 'number', description: 'Max diff characters. Use 0 for unlimited. Default is 50000.', required: false, default: 50000 },
-			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
 		],
 		examples: [{ description: 'Preview formatting a file', params: { filePath: '/Users/dev/MyProject/Program.cs', applyChanges: false } }],
 		responseDescription: 'Returns diff output for the formatting operation',
@@ -1433,8 +1385,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ name: 'symbolName', type: 'string', description: 'Symbol name to look up (simple or fully qualified).', required: true, placeholder: 'JsonSerializer' },
 			{ name: 'assemblyHint', type: 'string', description: 'Optional assembly name hint to narrow matches.', required: false, placeholder: 'System.Text.Json' },
 			{ name: 'projectName', type: 'string', description: 'Optional project name to limit referenced assemblies.', required: false, placeholder: 'MyProject' },
-			{ name: 'maxLines', type: 'number', description: 'Maximum number of source lines to return. Use 0 for no limit. Default is 400.', required: false, default: 400 },
-			{ name: 'timeout_ms', type: 'number', description: 'Timeout in milliseconds (5 minutes). Use 0 to disable. Default is 300000.', required: false, default: 300000 }
+			{ name: 'maxLines', type: 'number', description: 'Maximum number of source lines to return. Use 0 for no limit. Default is 400.', required: false, default: 400 }
 		],
 		examples: [
 			{ description: 'View JsonSerializer source', params: { symbolName: 'System.Text.Json.JsonSerializer', assemblyHint: 'System.Text.Json' } }
@@ -1481,13 +1432,6 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'When true, stops after the first failure. Default is false.',
 				required: false,
 				default: false
-			},
-			{
-				name: 'timeout_ms',
-				type: 'number',
-				description: 'Overall batch timeout in milliseconds (10 minutes). Use 0 to disable. Default is 600000.',
-				required: false,
-				default: 600000
 			}
 		],
 		examples: [

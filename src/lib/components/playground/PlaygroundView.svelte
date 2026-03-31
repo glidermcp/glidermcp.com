@@ -46,24 +46,6 @@
 		return toolId.replace(/_/g, '-');
 	}
 
-	function resolveRequestTimeoutMs(params: Record<string, unknown>): number | null | undefined {
-		const timeout = params.timeout_ms;
-		if (typeof timeout !== 'number') {
-			return undefined;
-		}
-
-		if (timeout === 0) {
-			return null;
-		}
-
-		if (timeout > 0) {
-			// Keep client timeout slightly above tool timeout so server-side timeout decides first.
-			return Math.max(120000, timeout + 10000);
-		}
-
-		return undefined;
-	}
-
 	async function connect(): Promise<void> {
 		connectionAttempted = true;
 		setConnectionStatus('connecting');
@@ -113,10 +95,7 @@
 		setExecutionState('executing');
 
 		try {
-			const requestTimeoutMs = resolveRequestTimeoutMs(validation.normalizedParams);
-			const result = await mcpClient.callTool(executingTool.name, validation.normalizedParams, {
-				requestTimeoutMs
-			});
+			const result = await mcpClient.callTool(executingTool.name, validation.normalizedParams);
 
 			if (!result.success) {
 				setResponse({

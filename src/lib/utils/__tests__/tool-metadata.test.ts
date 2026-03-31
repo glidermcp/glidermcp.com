@@ -1,11 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { getToolById, validateToolParams } from '../tool-metadata';
+import { TOOLS, getToolById, validateToolParams } from '../tool-metadata';
 
 describe('tool-metadata', () => {
 	it('exposes the batch tool', () => {
 		const tool = getToolById('batch');
 		expect(tool).toBeDefined();
 		expect(tool?.parameters.some((p) => p.name === 'operations' && p.type === 'json')).toBe(true);
+	});
+
+	it('does not expose timeout_ms as a public tool parameter', () => {
+		expect(TOOLS.some((tool) => tool.parameters.some((param) => param.name === 'timeout_ms'))).toBe(false);
 	});
 
 	it('validates required parameters', () => {
@@ -40,4 +44,3 @@ describe('tool-metadata', () => {
 		expect(bad.errors.join('\n')).toMatch(/operations must be valid JSON/);
 	});
 });
-

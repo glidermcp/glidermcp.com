@@ -38,7 +38,8 @@ export const faq: FaqContent = {
 		{
 			question: 'Can I use HTTP transport?',
 			answer: [
-				'Yes. Run <code>glider --transport http</code> to start a Streamable HTTP MCP server (default: <code>http://localhost:5001/mcp</code>). This is useful for clients like Codex that connect over HTTP.'
+				'Yes. Run <code>glider --transport http</code> to start a Streamable HTTP MCP server (default: <code>http://localhost:5001/mcp</code>). This is useful for clients like Codex that connect over HTTP.',
+				'Async tools use a 20 minute server-side default timeout. Increase it with <code>glider --default-timeout 30m</code>, or use <code>0</code> to disable it entirely. Supported units: <code>ms</code>, <code>s</code>, and <code>m</code>.'
 			]
 		},
 		{
