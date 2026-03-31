@@ -1,5 +1,5 @@
 // Auto-generated. Do not edit.
 export const gliderVersion = {
-	version: '5.3.0',
-	fetchedAt: '2026-02-23T11:37:10.480Z'
+	version: '6.1.0',
+	fetchedAt: '2026-03-31T13:01:57.027Z'
 };

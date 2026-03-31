@@ -31,7 +31,8 @@ export interface CallToolOptions {
 }
 
 const DEFAULT_BASE_URL = 'http://localhost:5001';
-const DEFAULT_TIMEOUT = 120000; // 120 seconds - solution loading can take a while
+// Keep the browser client above Glider's default 20 minute server timeout so the server decides first.
+const DEFAULT_TIMEOUT = 21 * 60 * 1000;
 const HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
 
 class MCPClient {

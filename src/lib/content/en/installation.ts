@@ -32,7 +32,8 @@ export const installation: InstallationContent = {
 	intro: [
 		'Choose your AI client below for specific setup instructions. Glider works with any MCP-compatible client.',
 		'<strong>Recommendation:</strong> prefer <strong>project/workspace</strong> configuration when your client supports it. This avoids launching Glider for unrelated projects (and can help reduce token usage).',
-		'In stdio mode, <code>glider</code> waits for MCP input and is intentionally quiet by default. Use <code>glider --verbose</code> if you want a startup banner/logs (written to stderr).'
+		'In stdio mode, <code>glider</code> waits for MCP input and is intentionally quiet by default. Use <code>glider --verbose</code> if you want a startup banner/logs (written to stderr).',
+		'Async tools use a 20 minute server-side default timeout. Increase it with <code>glider --default-timeout 30m</code>, or use <code>0</code> to disable it. Supported units: <code>ms</code>, <code>s</code>, and <code>m</code>.'
 	],
 	hint: 'Use Tab/Arrow keys to navigate, Enter to select.',
 	ariaLabel: 'Installation guides',
@@ -79,6 +80,12 @@ export const installationGuides: InstallationGuides = {
 				code: 'claude mcp add --transport stdio glider --scope user -- glider'
 			},
 			{
+				title: 'Optional: increase the default async-tool timeout',
+				description:
+					'For larger solutions, pass <code>--default-timeout</code> through to Glider. Use duration values like <code>45s</code>, <code>30m</code>, or <code>0</code> to disable the server-side timeout.',
+				code: 'claude mcp add --transport stdio glider --scope project -- glider --default-timeout 30m'
+			},
+			{
 				title: 'Verify',
 				description: 'Start a new Claude Code session and check for Glider tools. If you need startup output/logs, re-add Glider with <code>--verbose</code> (e.g. <code>... -- glider --verbose</code>).',
 				code: 'claude\n# Then ask: "What Glider tools are available?"'
@@ -104,8 +111,8 @@ export const installationGuides: InstallationGuides = {
 			{
 				title: 'Start Glider (Streamable HTTP)',
 				description:
-					'Codex currently supports MCP servers over <strong>Streamable HTTP</strong>. Start Glider in HTTP mode (default endpoint: <code>http://localhost:5001/mcp</code>). Add <code>--verbose</code> for logs if needed.',
-				code: 'glider --transport http',
+					'Codex currently supports MCP servers over <strong>Streamable HTTP</strong>. Start Glider in HTTP mode (default endpoint: <code>http://localhost:5001/mcp</code>). Add <code>--verbose</code> for logs if needed. Use <code>--default-timeout</code> to raise the 20 minute server-side timeout for larger solutions.',
+				code: 'glider --transport http --default-timeout 30m',
 				language: 'bash'
 			},
 			{
@@ -115,7 +122,7 @@ export const installationGuides: InstallationGuides = {
 				code: `# ~/.codex/config.toml
 [mcp_servers.glider]
 url = "http://localhost:5001/mcp"
-tool_timeout_sec = 300`,
+tool_timeout_sec = 1200`,
 				language: 'plaintext'
 			},
 			{
@@ -134,7 +141,7 @@ tool_timeout_sec = 300`,
 
 [profiles.glider.mcp_servers.glider]
 url = "http://localhost:5001/mcp"
-tool_timeout_sec = 300
+tool_timeout_sec = 1200
 
 # Run with:
 # codex --profile glider`,
@@ -161,7 +168,7 @@ tool_timeout_sec = 300
 			{
 				title: 'Project scope (recommended)',
 				description:
-					'Create <code>.gemini/settings.json</code> in your project. Gemini CLI docs: <a href="https://geminicli.com/docs/tools/mcp-server" target="_blank" rel="noreferrer">geminicli.com/docs/tools/mcp-server</a>.',
+					'Create <code>.gemini/settings.json</code> in your project. Gemini CLI docs: <a href="https://geminicli.com/docs/tools/mcp-server" target="_blank" rel="noreferrer">geminicli.com/docs/tools/mcp-server</a>. For larger solutions, set <code>args</code> to <code>["--default-timeout", "30m"]</code>.',
 				code: `{
   "mcpServers": {
     "glider": {
@@ -175,7 +182,7 @@ tool_timeout_sec = 300
 			{
 				title: 'Global scope (user settings)',
 				description:
-					'Create/modify your user settings file: macOS/Linux <code>~/.gemini/settings.json</code>, Windows <code>%USERPROFILE%\\.gemini\\settings.json</code>.',
+					'Create/modify your user settings file: macOS/Linux <code>~/.gemini/settings.json</code>, Windows <code>%USERPROFILE%\\.gemini\\settings.json</code>. You can also pass <code>["--default-timeout", "30m"]</code> in <code>args</code> if you want a longer server-side timeout everywhere.',
 				code: `{
   "mcpServers": {
     "glider": {
@@ -207,7 +214,7 @@ tool_timeout_sec = 300
 			{
 				title: 'Project scope (recommended)',
 				description:
-					'Create <code>.cursor/mcp.json</code> in your repo (recommended to avoid starting Glider for unrelated projects). Cursor MCP docs: <a href="https://cursor.com/docs/context/mcp#using-mcpjson" target="_blank" rel="noreferrer">https://cursor.com/docs/context/mcp#using-mcpjson</a>.',
+					'Create <code>.cursor/mcp.json</code> in your repo (recommended to avoid starting Glider for unrelated projects). Cursor MCP docs: <a href="https://cursor.com/docs/context/mcp#using-mcpjson" target="_blank" rel="noreferrer">https://cursor.com/docs/context/mcp#using-mcpjson</a>. For larger solutions, set <code>args</code> to <code>["--default-timeout", "30m"]</code>.',
 				code: `{
   "mcpServers": {
     "glider": {
@@ -221,7 +228,7 @@ tool_timeout_sec = 300
 			{
 				title: 'Global scope (user settings)',
 				description:
-					'Create/modify: macOS/Linux <code>~/.cursor/mcp.json</code>, Windows <code>%USERPROFILE%\\.cursor\\mcp.json</code>.',
+					'Create/modify: macOS/Linux <code>~/.cursor/mcp.json</code>, Windows <code>%USERPROFILE%\\.cursor\\mcp.json</code>. Add <code>["--default-timeout", "30m"]</code> under <code>args</code> if you want Glider to use a longer server-side timeout.',
 				code: `{
   "mcpServers": {
     "glider": {
@@ -253,7 +260,7 @@ tool_timeout_sec = 300
 			{
 				title: 'Project scope (recommended)',
 				description:
-					'Create <code>.vscode/mcp.json</code> in your repo. GitHub Copilot MCP docs: <a href="https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-chat-with-mcp" target="_blank" rel="noreferrer">docs.github.com/.../extending-copilot-chat-with-mcp</a>.',
+					'Create <code>.vscode/mcp.json</code> in your repo. GitHub Copilot MCP docs: <a href="https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-chat-with-mcp" target="_blank" rel="noreferrer">docs.github.com/.../extending-copilot-chat-with-mcp</a>. For larger solutions, set <code>args</code> to <code>["--default-timeout", "30m"]</code>.',
 				code: `{
   "servers": {
     "glider": {
@@ -293,7 +300,7 @@ export const installationOther: OtherInstallContent = {
 		{
 			title: 'Stdio Transport (common: mcpServers JSON)',
 			description:
-				'Many clients (Cursor, Gemini CLI, etc.) use this format. Replace the file location with your client’s recommended <strong>project/workspace</strong> config file.',
+				'Many clients (Cursor, Gemini CLI, etc.) use this format. Replace the file location with your client’s recommended <strong>project/workspace</strong> config file. For larger solutions, set <code>args</code> to <code>["--default-timeout", "30m"]</code>.',
 			code: {
 				code: `{
   "mcpServers": {
@@ -309,7 +316,7 @@ export const installationOther: OtherInstallContent = {
 		{
 			title: 'VS Code / Copilot (mcp.json)',
 			description:
-				'VS Code uses a different config format (see VS Code docs: <a href="https://code.visualstudio.com/docs/copilot/chat/mcp-servers" target="_blank" rel="noreferrer">code.visualstudio.com/docs/copilot/chat/mcp-servers</a>).',
+				'VS Code uses a different config format (see VS Code docs: <a href="https://code.visualstudio.com/docs/copilot/chat/mcp-servers" target="_blank" rel="noreferrer">code.visualstudio.com/docs/copilot/chat/mcp-servers</a>). For larger solutions, set <code>args</code> to <code>["--default-timeout", "30m"]</code>.',
 			code: {
 				code: `{
   "servers": {
@@ -326,10 +333,10 @@ export const installationOther: OtherInstallContent = {
 		{
 			title: 'HTTP Transport',
 			description:
-				'If your client requires HTTP, start Glider in HTTP mode and point the client at the URL:',
+				'If your client requires HTTP, start Glider in HTTP mode and point the client at the URL. Async tools use a 20 minute server-side default timeout; change it with <code>--default-timeout</code> using values like <code>45s</code>, <code>30m</code>, or <code>0</code>:',
 			code: {
 				code: `# Start Glider in HTTP mode
-glider --transport http
+glider --transport http --default-timeout 30m
 
 # Then configure your client to connect to:
 # http://localhost:5001/mcp`,
@@ -339,7 +346,7 @@ glider --transport http
 		{
 			title: 'Environment Variables',
 			code: {
-				code: '# Custom port for HTTP transport\nglider --transport http --port 8080',
+				code: '# Custom port and timeout for HTTP transport\nglider --transport http --port 8080 --default-timeout 30m',
 				language: 'bash'
 			}
 		}

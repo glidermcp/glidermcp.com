@@ -52,9 +52,6 @@
     <loc>https://glidermcp.com/tools/analyze-complexity</loc>
   </url>
   <url>
-    <loc>https://glidermcp.com/tools/apply-code-fix</loc>
-  </url>
-  <url>
     <loc>https://glidermcp.com/tools/batch</loc>
   </url>
   <url>
@@ -74,9 +71,6 @@
   </url>
   <url>
     <loc>https://glidermcp.com/tools/format-document</loc>
-  </url>
-  <url>
-    <loc>https://glidermcp.com/tools/get-code-fixes</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-derived-types</loc>
