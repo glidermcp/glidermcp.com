@@ -77,6 +77,23 @@ test.describe('Keyboard Navigation', () => {
 		await expect(page.locator('body')).toBeVisible();
 	});
 
+	test('should show Esc Back in the status bar when the right panel is focused', async ({ page }) => {
+		await page.goto('/');
+
+		const statusbar = page.locator('.tui-statusbar');
+
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'Tab' })).toBeVisible();
+
+		await page.keyboard.press('Tab');
+
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'Esc' })).toBeVisible();
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'Tab' })).toHaveCount(0);
+
+		await page.keyboard.press('Escape');
+
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'Tab' })).toBeVisible();
+	});
+
 	test('should keep sections collapsed by default on page load', async ({ page }) => {
 		await page.goto('/');
 
@@ -193,6 +210,49 @@ test.describe('Keyboard Navigation', () => {
 		// Item should still be selected, page should be functional
 		await expect(quickStartItem).toHaveClass(/selected/);
 		await expect(page.locator('body')).toBeVisible();
+	});
+
+	test('should show the updated installation overview hint text', async ({ page }) => {
+		await page.goto('/installation');
+
+		await expect(page.locator('.hint')).toHaveText(
+			'With the content panel focused, use Arrow keys to navigate and Enter to select.'
+		);
+	});
+
+	test('should only show install-guide OS hints when the selected step has variants', async ({ page }) => {
+		await page.goto('/installation/claude-code');
+
+		const statusbar = page.locator('.tui-statusbar');
+
+		await page.keyboard.press('Tab');
+
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'Step' })).toBeVisible();
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'OS' })).toHaveCount(0);
+
+		await page.keyboard.press('ArrowDown');
+
+		await expect(page.locator('.code-tabs .tab.selected')).toHaveText('macOS');
+		await expect(statusbar.locator('.status-key').filter({ hasText: 'OS' })).toHaveCount(2);
+
+		await page.keyboard.press('ArrowRight');
+
+		await expect(page.locator('.code-tabs .tab.selected')).toHaveText('Linux');
+	});
+
+	test('should switch Other Clients OS tabs with keyboard shortcuts', async ({ page }) => {
+		await page.goto('/installation/other');
+
+		await expect(page.locator('.code-tabs .tab.selected')).toHaveText('macOS');
+
+		await page.keyboard.press('Tab');
+		await page.keyboard.press('ArrowRight');
+
+		await expect(page.locator('.code-tabs .tab.selected')).toHaveText('Linux');
+
+		await page.keyboard.press('Tab');
+
+		await expect(page.locator('.code-tabs .tab.selected')).toHaveText('Windows');
 	});
 });
 

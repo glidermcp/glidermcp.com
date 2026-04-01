@@ -2,8 +2,10 @@
 	import CodeBlock from './CodeBlock.svelte';
 	import CodeTabs from './CodeTabs.svelte';
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
-	import { focusedPanel } from '$stores/keyboard';
+	import { focusedPanel, setFocusedPanel } from '$stores/keyboard';
+	import { setStatusBarKeys } from '$stores/statusbar';
 	import type { InstallStep } from '$lib/content/types';
+	import type { StatusKey } from '$types/statusbar';
 
 	interface Props {
 		client: string;
@@ -16,6 +18,45 @@
 	const isActive = $derived($focusedPanel === 'right');
 	let selectedIndex = $state(0);
 	let variantIndexByStep = $state<number[]>([]);
+	const selectedStepHasVariants = $derived.by(() => {
+		const variants = steps[selectedIndex]?.codeVariants;
+		return (variants?.length ?? 0) > 1;
+	});
+	const selectedStepHasCode = $derived.by(() => {
+		const step = steps[selectedIndex];
+		return !!(step?.code || step?.codeVariants?.length);
+	});
+	const statusKeys = $derived.by((): StatusKey[] | null => {
+		if (!isActive) return null;
+
+		const keys: StatusKey[] = [
+			{ key: keyboardManager.getKeyDisplay('theme'), label: 'Theme', action: 'theme' },
+			{ key: '↑/↓', label: 'Step', action: 'up' }
+		];
+
+		if (selectedStepHasVariants) {
+			keys.push(
+				{ key: keyboardManager.getKeyDisplay('tab'), label: 'OS', action: 'tab', handler: () => { cycleVariants(1); } },
+				{ key: '←/→', label: 'OS', action: 'left', handler: () => { cycleVariants(1); } }
+			);
+		}
+
+		if (selectedStepHasCode) {
+			keys.push({
+				key: keyboardManager.getKeyDisplay('copy'),
+				label: 'Copy',
+				action: 'copy',
+				handler: () => { copySelected(); }
+			});
+		}
+
+		keys.push(
+			{ key: keyboardManager.getKeyDisplay('back'), label: 'Back', action: 'back', handler: () => { setFocusedPanel('left'); } },
+			{ key: keyboardManager.getKeyDisplay('game'), label: 'Game', action: 'game' }
+		);
+
+		return keys;
+	});
 
 	$effect(() => {
 		const len = steps.length;
@@ -35,6 +76,16 @@
 	function setVariantIndex(stepIndex: number, nextIndex: number): void {
 		variantIndexByStep[stepIndex] = nextIndex;
 		variantIndexByStep = variantIndexByStep;
+	}
+
+	function cycleVariants(delta: number): boolean {
+		const variants = steps[selectedIndex]?.codeVariants;
+		if (!variants || variants.length < 2) return false;
+
+		const currentIndex = variantIndexByStep[selectedIndex] ?? 0;
+		const nextIndex = (currentIndex + delta + variants.length) % variants.length;
+		setVariantIndex(selectedIndex, nextIndex);
+		return true;
 	}
 
 	function selectStep(stepIndex: number): void {
@@ -104,31 +155,15 @@
 				return true;
 
 			case 'left': {
-				const variants = steps[selectedIndex]?.codeVariants;
-				if (!variants?.length) return false;
-				const cur = variantIndexByStep[selectedIndex] ?? 0;
-				const next = (cur - 1 + variants.length) % variants.length;
-				setVariantIndex(selectedIndex, next);
-				return true;
+					return cycleVariants(-1);
 			}
 
 			case 'right': {
-				const variants = steps[selectedIndex]?.codeVariants;
-				if (!variants?.length) return false;
-				const cur = variantIndexByStep[selectedIndex] ?? 0;
-				const next = (cur + 1) % variants.length;
-				setVariantIndex(selectedIndex, next);
-				return true;
+					return cycleVariants(1);
 			}
 
 			case 'tab': {
-				const variants = steps[selectedIndex]?.codeVariants;
-				if (!variants?.length) return false;
-				const cur = variantIndexByStep[selectedIndex] ?? 0;
-				const delta = event.shiftKey ? -1 : 1;
-				const next = (cur + delta + variants.length) % variants.length;
-				setVariantIndex(selectedIndex, next);
-				return true;
+					return cycleVariants(event.shiftKey ? -1 : 1);
 			}
 
 			case 'select':
@@ -154,6 +189,13 @@
 
 	$effect(() => {
 		return keyboardManager.addHandler(handleKeyboard);
+	});
+
+	$effect(() => {
+		setStatusBarKeys(statusKeys);
+		return () => {
+			setStatusBarKeys(null);
+		};
 	});
 </script>
 

@@ -51,6 +51,23 @@ const KEY_BINDINGS: KeyBinding[] = [
 	{ key: 'End', action: 'end' },
 ];
 
+const KEY_DISPLAY: Record<KeyboardAction, string> = {
+	execute: 'F5',
+	theme: 'F9',
+	game: '^G',
+	copy: '^C',
+	up: '↑',
+	down: '↓',
+	left: '←',
+	right: '→',
+	select: 'Enter',
+	toggle: 'Space',
+	back: 'Esc',
+	tab: 'Tab',
+	home: 'Home',
+	end: 'End'
+};
+
 class KeyboardManager {
 	private handlers: Set<KeyboardHandler> = new Set();
 	private enabled: boolean = true;
@@ -151,17 +168,7 @@ class KeyboardManager {
 	 * Get display string for an action (for UI hints)
 	 */
 	getKeyDisplay(action: KeyboardAction): string {
-		const binding = KEY_BINDINGS.find(b => b.action === action);
-		if (!binding) return '';
-
-		const parts: string[] = [];
-		if (binding.ctrl) parts.push('Ctrl');
-		if (binding.meta) parts.push('Cmd');
-		if (binding.alt) parts.push('Alt');
-		if (binding.shift) parts.push('Shift');
-		parts.push(binding.key);
-
-		return parts.join('+');
+		return KEY_DISPLAY[action] ?? '';
 	}
 }
 
