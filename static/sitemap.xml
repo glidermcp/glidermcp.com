@@ -79,6 +79,9 @@
     <loc>https://glidermcp.com/tools/get-diagnostics</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/get-file-contents</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/get-method-signature</loc>
   </url>
   <url>
@@ -143,5 +146,8 @@
   </url>
   <url>
     <loc>https://glidermcp.com/tools/view-external-definition</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/write-file</loc>
   </url>
 </urlset>

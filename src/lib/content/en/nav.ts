@@ -27,6 +27,8 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-load', label: 'load', href: '/tools/load' },
 			{ id: 'tool-sync', label: 'sync', href: '/tools/sync' },
 			{ id: 'tool-reload', label: 'reload', href: '/tools/reload' },
+			{ id: 'tool-get-file-contents', label: 'get_file_contents', href: '/tools/get-file-contents' },
+			{ id: 'tool-write-file', label: 'write_file', href: '/tools/write-file' },
 
 			{ id: 'tool-resolve-symbol', label: 'resolve_symbol', href: '/tools/resolve-symbol' },
 			{ id: 'tool-search-symbols', label: 'search_symbols', href: '/tools/search-symbols' },

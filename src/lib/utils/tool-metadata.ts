@@ -53,7 +53,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	solution: {
 		label: 'Solution & Workspace',
-		description: 'Load, sync, and reload .NET solutions and projects'
+		description: 'Load, sync, reload, and access root-scoped workspace files'
 	},
 	diagnostics: {
 		label: 'Diagnostics',
@@ -289,6 +289,172 @@ export const TOOLS: ToolMetadata[] = [
 				fallbackToReload: false,
 				fallbackReason: null
 			},
+			error: null
+		}
+	},
+	{
+		id: 'get_file_contents',
+		name: 'get_file_contents',
+		displayName: 'Get File Contents',
+		description:
+			'Gets text content for a file under the loaded root, with optional line-window limits. Supports files outside the Roslyn workspace when they are still inside the loaded root.',
+		category: 'solution',
+		parameters: [
+			{
+				name: 'filePath',
+				type: 'string',
+				description: 'File path to read. Can be absolute or relative to the loaded root.',
+				required: true,
+				placeholder: '/Users/dev/MyProject/Program.cs'
+			},
+			{
+				name: 'startLine',
+				type: 'number',
+				description: 'Optional 1-based start line. Defaults to 1.',
+				required: false,
+				placeholder: '1'
+			},
+			{
+				name: 'endLine',
+				type: 'number',
+				description: 'Optional 1-based inclusive end line. Defaults to the end of the file.',
+				required: false,
+				placeholder: '120'
+			},
+			{
+				name: 'maxLines',
+				type: 'number',
+				description: 'Maximum number of lines to return. Use 0 for unlimited. Default is 400.',
+				required: false,
+				default: 400
+			},
+			{
+				name: 'maxChars',
+				type: 'number',
+				description: 'Maximum characters to return. Use 0 for unlimited. Default is 100000.',
+				required: false,
+				default: 100000
+			},
+			{
+				name: 'pathStyle',
+				type: 'string',
+				description: "Path style: 'absolute' (default) or 'relative' (to solution root).",
+				required: false,
+				default: 'absolute'
+			}
+		],
+		examples: [
+			{ description: 'Read an entire file', params: { filePath: '/Users/dev/MyProject/Program.cs' } },
+			{ description: 'Read a bounded line range', params: { filePath: '/Users/dev/MyProject/Program.cs', startLine: 40, endLine: 90 } },
+			{ description: 'Read using relative paths with limits', params: { filePath: 'src/Program.cs', maxLines: 80, maxChars: 12000, pathStyle: 'relative' } }
+		],
+		responseDescription: 'Returns bounded text content plus file metadata and workspace inclusion state',
+		responseExample: {
+			success: true,
+			data: {
+				filePath: '/Users/dev/MyProject/Program.cs',
+				totalLines: 180,
+				startLine: 40,
+				endLine: 90,
+				lineCount: 51,
+				truncated: false,
+				inWorkspace: true,
+				fileExtension: '.cs',
+				content: 'using System;\n\nnamespace MyProject;\n...'
+			},
+			meta: { durationMs: 89, cancelled: false, timedOut: false, timeoutMs: 1200000 },
+			error: null
+		}
+	},
+	{
+		id: 'write_file',
+		name: 'write_file',
+		displayName: 'Write File',
+		description:
+			'Writes a .cs file under the loaded root. Uses preview-first behavior by default and explicitly updates or reloads the workspace after applyChanges=true.',
+		category: 'solution',
+		parameters: [
+			{
+				name: 'filePath',
+				type: 'string',
+				description: 'File path to write. Can be absolute or relative to the loaded root.',
+				required: true,
+				placeholder: '/Users/dev/MyProject/Program.cs'
+			},
+			{
+				name: 'content',
+				type: 'string',
+				description: 'Full file contents to write.',
+				required: true,
+				placeholder: 'namespace MyProject;\n\npublic class Program { }'
+			},
+			{
+				name: 'applyChanges',
+				type: 'boolean',
+				description: 'If true, writes the file to disk. If false, returns a preview only. Default is false.',
+				required: false,
+				default: false
+			},
+			{
+				name: 'createIfMissing',
+				type: 'boolean',
+				description: 'If true, creates a new file when it does not already exist. Default is false.',
+				required: false,
+				default: false
+			},
+			{
+				name: 'includeDiff',
+				type: 'boolean',
+				description: 'Include unified diff output in the response. Default is true.',
+				required: false,
+				default: true
+			},
+			{
+				name: 'maxDiffChars',
+				type: 'number',
+				description: 'Maximum diff characters to return. Use 0 for unlimited. Default is 50000.',
+				required: false,
+				default: 50000
+			},
+			{
+				name: 'pathStyle',
+				type: 'string',
+				description: "Path style: 'absolute' (default) or 'relative' (to solution root).",
+				required: false,
+				default: 'absolute'
+			}
+		],
+		examples: [
+			{ description: 'Preview a file edit without writing', params: { filePath: '/Users/dev/MyProject/Program.cs', content: 'namespace MyProject;\n\npublic class Program { }' } },
+			{ description: 'Apply a file edit', params: { filePath: '/Users/dev/MyProject/Program.cs', content: 'namespace MyProject;\n\npublic class Program { }', applyChanges: true } },
+			{ description: 'Create a new file and apply the change', params: { filePath: 'src/NewType.cs', content: 'namespace MyProject;\n\npublic class NewType { }', applyChanges: true, createIfMissing: true, pathStyle: 'relative' } }
+		],
+		responseDescription: 'Returns diff output plus workspace update status after preview or apply',
+		responseExample: {
+			success: true,
+			data: {
+				filePath: '/Users/dev/MyProject/Program.cs',
+				changed: true,
+				applied: false,
+				created: false,
+				filesChanged: 1,
+				unifiedDiff: '--- /Users/dev/MyProject/Program.cs\n+++ /Users/dev/MyProject/Program.cs\n@@ ...',
+				changedFiles: [
+					{
+						filePath: '/Users/dev/MyProject/Program.cs',
+						changeCount: 1,
+						diff: '--- /Users/dev/MyProject/Program.cs\n+++ /Users/dev/MyProject/Program.cs\n@@ ...'
+					}
+				],
+				workspaceUpdate: {
+					kind: 'preview',
+					updated: false,
+					inWorkspaceBefore: true,
+					inWorkspaceAfter: true,
+					message: null
+				}
+			},
+			meta: { durationMs: 112, cancelled: false, timedOut: false, timeoutMs: 1200000 },
 			error: null
 		}
 	},
