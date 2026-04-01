@@ -2,6 +2,7 @@
 	import { keyboardManager, type KeyboardAction } from '$lib/services/keyboard-manager';
 	import { toggleTheme } from '$stores/theme';
 	import { focusedPanel, togglePanel } from '$stores/keyboard';
+	import { setFocusedPanel } from '$stores/keyboard';
 	import { showGame } from '$stores/game';
 	import { statusBarKeys } from '$stores/statusbar';
 	import type { StatusKey } from '$types/statusbar';
@@ -11,16 +12,25 @@
 		onAction?: (action: KeyboardAction) => void;
 	}
 
-	const defaultKeys: StatusKey[] = [
-		{ key: 'F9', label: 'Theme', action: 'theme' },
-		{ key: 'Tab', label: 'Panel', action: 'tab' },
-		{ key: '^G', label: 'Game', action: 'game' }
-	];
-
 	let { keys: keysProp, onAction }: Props = $props();
 
-	const effectiveKeys = $derived(keysProp ?? $statusBarKeys ?? defaultKeys);
 	const isLeftPanelFocused = $derived($focusedPanel === 'left');
+	const defaultKeys = $derived.by((): StatusKey[] => {
+		if (isLeftPanelFocused) {
+			return [
+				{ key: keyboardManager.getKeyDisplay('theme'), label: 'Theme', action: 'theme' },
+				{ key: keyboardManager.getKeyDisplay('tab'), label: 'Panel', action: 'tab' },
+				{ key: keyboardManager.getKeyDisplay('game'), label: 'Game', action: 'game' }
+			];
+		}
+
+		return [
+			{ key: keyboardManager.getKeyDisplay('theme'), label: 'Theme', action: 'theme' },
+			{ key: keyboardManager.getKeyDisplay('back'), label: 'Back', action: 'back' },
+			{ key: keyboardManager.getKeyDisplay('game'), label: 'Game', action: 'game' }
+		];
+	});
+	const effectiveKeys = $derived(keysProp ?? $statusBarKeys ?? defaultKeys);
 
 	// Built-in handlers for common actions
 	function handleAction(action: KeyboardAction): boolean {
@@ -28,6 +38,12 @@
 			case 'theme':
 				toggleTheme();
 				return true;
+				case 'back':
+					if (!isLeftPanelFocused) {
+						setFocusedPanel('left');
+						return true;
+					}
+					return false;
 			case 'tab':
 				// Tab is used as an in-panel key on some pages (e.g. OS tabs in install guides).
 				// Keep panel switching on Tab when left panel is focused.

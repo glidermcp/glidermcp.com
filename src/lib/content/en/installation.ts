@@ -35,7 +35,7 @@ export const installation: InstallationContent = {
 		'In stdio mode, <code>glider</code> waits for MCP input and is intentionally quiet by default. Use <code>glider --verbose</code> if you want a startup banner/logs (written to stderr).',
 		'Async tools use a 20 minute server-side default timeout. Increase it with <code>glider --default-timeout 30m</code>, or use <code>0</code> to disable it. Supported units: <code>ms</code>, <code>s</code>, and <code>m</code>.'
 	],
-	hint: 'Use Tab/Arrow keys to navigate, Enter to select.',
+	hint: 'With the content panel focused, use Arrow keys to navigate and Enter to select.',
 	ariaLabel: 'Installation guides',
 	notFoundText: 'Installation guide not found.',
 	clients: [
