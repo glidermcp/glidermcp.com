@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.glidermcp/glider",
   "description": "Roslyn-powered C# code analysis server for LLMs. Supports stdio and HTTP transports.",
-  "version": "6.0.0",
+  "version": "6.3.1",
   "homepage": "https://glidermcp.com",
   "license": "Proprietary",
   "capabilities": {
@@ -23,7 +23,7 @@
     {
       "registryType": "nuget",
       "identifier": "glider",
-      "version": "6.0.0",
+      "version": "6.3.1",
       "transport": {
         "type": "stdio"
       },

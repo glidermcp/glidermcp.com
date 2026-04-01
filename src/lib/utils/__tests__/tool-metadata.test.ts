@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { navItems } from '../../content/en/nav';
 import { TOOLS, getToolById, validateToolParams } from '../tool-metadata';
 
 describe('tool-metadata', () => {
@@ -42,5 +43,24 @@ describe('tool-metadata', () => {
 
 		expect(bad.valid).toBe(false);
 		expect(bad.errors.join('\n')).toMatch(/operations must be valid JSON/);
+	});
+
+	it('documents workspace file tools in metadata and navigation', () => {
+		const getFileContents = getToolById('get_file_contents');
+		const writeFile = getToolById('write_file');
+		const toolLinks = navItems.find((item) => item.id === 'tools')?.children ?? [];
+
+		expect(getFileContents).toBeDefined();
+		expect(getFileContents?.category).toBe('solution');
+		expect(getFileContents?.parameters.some((param) => param.name === 'filePath' && param.required)).toBe(true);
+		expect(getFileContents?.parameters.some((param) => param.name === 'maxChars')).toBe(true);
+
+		expect(writeFile).toBeDefined();
+		expect(writeFile?.category).toBe('solution');
+		expect(writeFile?.parameters.some((param) => param.name === 'content' && param.required)).toBe(true);
+		expect(writeFile?.parameters.some((param) => param.name === 'applyChanges' && param.default === false)).toBe(true);
+
+		expect(toolLinks.some((item) => item.href === '/tools/get-file-contents')).toBe(true);
+		expect(toolLinks.some((item) => item.href === '/tools/write-file')).toBe(true);
 	});
 });
