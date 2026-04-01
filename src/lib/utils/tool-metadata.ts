@@ -155,7 +155,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'load',
 		name: 'load',
 		displayName: 'Load',
-		description: 'Loads a C# solution (.sln/.slnx) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided.',
+		description: 'Loads a C# solution (.sln/.slnx) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided. The response includes workspace MSBuild load diagnostics captured during load.',
 		category: 'solution',
 		parameters: [
 			{
@@ -185,7 +185,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ description: 'Load with file watching', params: { filePath: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
 			{ description: 'Load a standalone project', params: { filePath: '/Users/dev/MyProject/MyProject.csproj' } }
 		],
-		responseDescription: 'Returns projects and cache metadata for the loaded solution/project',
+		responseDescription: 'Returns projects, cache metadata, and workspace load diagnostics for the loaded solution/project',
 		responseExample: {
 			success: true,
 			data: {
@@ -200,6 +200,10 @@ export const TOOLS: ToolMetadata[] = [
 					lastRefreshUtc: '2026-01-23T21:06:33.123Z',
 					loadedKind: 'solution',
 					loadedPath: '/Users/dev/MyProject/MyProject.sln'
+				},
+				workspaceDiagnostics: {
+					count: 0,
+					messages: []
 				}
 			},
 			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
@@ -210,7 +214,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'reload',
 		name: 'reload',
 		displayName: 'Reload',
-		description: 'Reloads the currently loaded solution/project from disk.',
+		description: 'Reloads the currently loaded solution/project from disk. Workspace MSBuild load diagnostics are returned only when includeWorkspaceDiagnostics is true.',
 		category: 'solution',
 		parameters: [
 			{
@@ -219,10 +223,20 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'Include detailed project information in response. Default is false.',
 				required: false,
 				default: false
+			},
+			{
+				name: 'includeWorkspaceDiagnostics',
+				type: 'boolean',
+				description: 'When true, includes workspace MSBuild load diagnostics captured during reload. Default is false.',
+				required: false,
+				default: false
 			}
 		],
-		examples: [{ description: 'Reload after manual edits', params: { includeProjects: true } }],
-		responseDescription: 'Returns the reloaded path, project list, and updated cache metadata',
+		examples: [
+			{ description: 'Reload after manual edits', params: { includeProjects: true } },
+			{ description: 'Reload and include workspace load diagnostics', params: { includeWorkspaceDiagnostics: true } }
+		],
+		responseDescription: 'Returns the reloaded path, project list, and updated cache metadata. Workspace load diagnostics are included only when requested.',
 		responseExample: {
 			success: true,
 			data: {
@@ -277,7 +291,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ description: 'Force sync all documents', params: { forceSync: true } },
 			{ description: 'Sync a specific file', params: { filePaths: '["/Users/dev/MyProject/Program.cs"]' } }
 		],
-		responseDescription: 'Returns updated and skipped files plus revision info',
+		responseDescription: 'Returns updated and skipped files plus revision info. Workspace load diagnostics are not returned by sync.',
 		responseExample: {
 			success: true,
 			data: {
@@ -464,7 +478,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_diagnostics',
 		name: 'get_diagnostics',
 		displayName: 'Get Diagnostics',
-		description: 'Gets diagnostics (warnings, errors) for the loaded solution/project. Use includeAnalyzers=true to include analyzer/IDE diagnostics.',
+		description: 'Gets diagnostics (warnings, errors) for the loaded solution/project. Use includeAnalyzers=true to include analyzer/IDE diagnostics. Workspace load diagnostics are surfaced by load, reload, and server_status instead of this tool.',
 		category: 'diagnostics',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'Optional file path filter.', required: false, placeholder: '/path/to/File.cs' },
@@ -485,7 +499,7 @@ export const TOOLS: ToolMetadata[] = [
 			{ description: 'Get error diagnostics only', params: { severity: 'error' } },
 			{ description: 'Summary view by project and severity', params: { summaryOnly: true, severity: 'warning' } }
 		],
-		responseDescription: 'Returns diagnostics, optionally with paging and filtering',
+		responseDescription: 'Returns compiler and analyzer diagnostics, optionally with paging and filtering. Workspace load diagnostics are not included.',
 		responseExample: {
 			success: true,
 			data: {
