@@ -6,7 +6,11 @@ export const quickStart: QuickStartContent = {
 	sections: [
 		{
 			title: 'Prerequisites',
-			list: ['.NET 10.0 SDK or later', 'An MCP-compatible AI client (Claude Code, Cursor, etc.)']
+			list: ['.NET 10 SDK', 'An MCP-compatible AI client (Claude Code, Cursor, etc.)'],
+			paragraphs: [
+				'Run <code>dotnet --version</code> before installing Glider. If <code>dotnet</code> is missing or the installed SDK is below 10, install the <strong>.NET 10 SDK</strong> first.',
+				'Windows: <code>winget install -e --id Microsoft.DotNet.SDK.10</code>. macOS/Linux: use the official <a href="https://dotnet.microsoft.com/download/dotnet/10.0" target="_blank" rel="noreferrer">Microsoft .NET 10 installation guide</a>.'
+			]
 		},
 		{
 			title: '1. Install Glider',

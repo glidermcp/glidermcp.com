@@ -37,9 +37,13 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 ## Installation
 
 ### Prerequisites
-- .NET 10.0 SDK or later
+- .NET 10 SDK
 
 ### Install / update / uninstall
+
+Prerequisite: Glider currently requires .NET 10 SDK to be installed.
+
+Run `dotnet --version` before installing. If `dotnet` is missing or the installed SDK is below 10, install the .NET 10 SDK first. On Windows you can use `winget install -e --id Microsoft.DotNet.SDK.10`; on macOS/Linux use the official Microsoft .NET 10 installation guide: https://dotnet.microsoft.com/download/dotnet/10.0
 
 ```bash
 dotnet tool install --global glider
@@ -114,14 +118,19 @@ Rename the symbol OldName to NewName (preview the diff first).
 
 ## Troubleshooting
 
+### `dotnet tool install --global glider` fails
+
+Run `dotnet --version` first. If `dotnet` is missing or the installed SDK is below 10, install the .NET 10 SDK before retrying. On Windows you can use `winget install -e --id Microsoft.DotNet.SDK.10`; on macOS/Linux use the official Microsoft .NET 10 installation guide: https://dotnet.microsoft.com/download/dotnet/10.0
+
 ### `glider` “hangs” when I run it
 
 That’s expected for stdio mode: it’s an MCP server waiting for a client connection, and it’s intentionally quiet by default. Configure it in your MCP client instead of running it in a terminal by itself (use `--verbose` if you want startup output/logs on stderr).
 
 ### `glider` not found after install
 
-Make sure the .NET tools directory is on your `PATH`:
+First confirm that `.NET 10 SDK` is installed, then make sure the .NET tools directory is on your `PATH`:
 
+Make sure the .NET tools directory is on your `PATH`:
 - macOS/Linux: `export PATH="$PATH:$HOME/.dotnet/tools"`
 - Windows (PowerShell): `$env:PATH += ";$env:USERPROFILE\\.dotnet\\tools"`
 

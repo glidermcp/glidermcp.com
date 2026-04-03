@@ -10,6 +10,14 @@ export const faq: FaqContent = {
 			]
 		},
 		{
+			question: 'What do I need to install Glider?',
+			answer: [
+				'You need the <strong>.NET 10 SDK</strong> installed locally.',
+				'Run <code>dotnet --version</code> before installing Glider. If <code>dotnet</code> is missing or the installed SDK is below 10, install the .NET 10 SDK before running <code>dotnet tool install --global glider</code>. On Windows you can use <code>winget install -e --id Microsoft.DotNet.SDK.10</code>; on macOS/Linux use the official <a href="https://dotnet.microsoft.com/download/dotnet/10.0" target="_blank" rel="noreferrer">Microsoft .NET 10 installation guide</a>.',
+				'If <code>dotnet tool install</code> succeeds but <code>glider</code> is not found, confirm that your .NET tools directory is on <code>PATH</code>.'
+			]
+		},
+		{
 			question: 'Which AI assistants work with Glider?',
 			answer: [
 				'Any MCP-compatible client: Claude Code, Cursor, GitHub Copilot, Codex CLI, Gemini CLI, and more. If your AI tool supports MCP, it can use Glider.'

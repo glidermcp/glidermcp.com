@@ -30,6 +30,7 @@ Get-Command glider`,
 export const installation: InstallationContent = {
 	title: 'Installation Guides',
 	intro: [
+		'Before installing Glider, install the <strong>.NET 10 SDK</strong>. Glider is distributed as a .NET tool and currently targets .NET 10.',
 		'Choose your AI client below for specific setup instructions. Glider works with any MCP-compatible client.',
 		'<strong>Recommendation:</strong> prefer <strong>project/workspace</strong> configuration when your client supports it. This avoids launching Glider for unrelated projects (and can help reduce token usage).',
 		'In stdio mode, <code>glider</code> waits for MCP input and is intentionally quiet by default. Use <code>glider --verbose</code> if you want a startup banner/logs (written to stderr).',
@@ -58,7 +59,7 @@ export const installationGuides: InstallationGuides = {
 			{
 				title: 'Install Glider',
 				description:
-					'Glider is a .NET global tool. If you do not have .NET installed yet, install the .NET SDK first.',
+					'Prerequisite: .NET 10 SDK must be installed before running <code>dotnet tool install --global glider</code>.',
 				code: 'dotnet tool install --global glider'
 			},
 			{
@@ -100,6 +101,8 @@ export const installationGuides: InstallationGuides = {
 		steps: [
 			{
 				title: 'Install Glider',
+				description:
+					'Prerequisite: .NET 10 SDK must be installed before running <code>dotnet tool install --global glider</code>.',
 				code: 'dotnet tool install --global glider'
 			},
 			{
@@ -157,6 +160,8 @@ tool_timeout_sec = 1200
 		steps: [
 			{
 				title: 'Install Glider',
+				description:
+					'Prerequisite: .NET 10 SDK must be installed before running <code>dotnet tool install --global glider</code>.',
 				code: 'dotnet tool install --global glider'
 			},
 			{
@@ -203,6 +208,8 @@ tool_timeout_sec = 1200
 		steps: [
 			{
 				title: 'Install Glider',
+				description:
+					'Prerequisite: .NET 10 SDK must be installed before running <code>dotnet tool install --global glider</code>.',
 				code: 'dotnet tool install --global glider'
 			},
 			{
@@ -249,6 +256,8 @@ tool_timeout_sec = 1200
 		steps: [
 			{
 				title: 'Install Glider',
+				description:
+					'Prerequisite: .NET 10 SDK must be installed before running <code>dotnet tool install --global glider</code>.',
 				code: 'dotnet tool install --global glider'
 			},
 			{
@@ -286,6 +295,11 @@ export const installationOther: OtherInstallContent = {
 	title: 'Generic MCP Configuration',
 	subtitle: 'Configure Glider with any MCP-compatible client.',
 	sections: [
+		{
+			title: 'Prerequisite',
+			description:
+				'Prerequisite: .NET 10 SDK must be installed before running <code>dotnet tool install --global glider</code>.'
+		},
 		{
 			title: 'Recommendation: Project/Workspace Scope',
 			description:
