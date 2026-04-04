@@ -28,6 +28,9 @@
 	</ul>
 
 	<h3>{content.quickInstallTitle}</h3>
+	{#if content.quickInstallPrerequisite}
+		<p class="prerequisite">{content.quickInstallPrerequisite}</p>
+	{/if}
 	<CodeBlock code={content.quickInstall.code} language={content.quickInstall.language} />
 
 	<p class="hint">{@html content.hint}</p>
@@ -42,5 +45,11 @@
 		color: var(--accent);
 		font-size: var(--font-size-base);
 		margin-bottom: var(--spacing-lg);
+	}
+
+	.prerequisite {
+		margin-bottom: var(--spacing-sm);
+		color: var(--text-primary);
+		font-weight: 600;
 	}
 </style>

@@ -25,6 +25,7 @@ export const intro: IntroContent = {
 		'Works with any MCP-compatible AI client'
 	],
 	quickInstallTitle: 'Quick Install',
+	quickInstallPrerequisite: 'Prerequisite: Glider currently requires .NET 10 SDK to be installed.',
 	quickInstall: {
 		code: 'dotnet tool install --global glider',
 		language: 'bash'

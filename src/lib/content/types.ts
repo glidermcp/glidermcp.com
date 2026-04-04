@@ -26,6 +26,7 @@ export interface IntroContent {
 	featuresTitle: string;
 	features: string[];
 	quickInstallTitle: string;
+	quickInstallPrerequisite?: string;
 	quickInstall: CodeSample;
 	hint: string;
 }
