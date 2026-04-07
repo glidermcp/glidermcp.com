@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
-    "@sveltejs/adapter-cloudflare": "^4.0.0",
+    "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/kit": "^2.15.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tailwindcss/vite": "^4.0.0",
@@ -28,7 +28,7 @@
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^2.0.0",
     "workbox-window": "^7.4.0",
-    "wrangler": "^3.28.4"
+    "wrangler": "^4.80.0"
   },
   "dependencies": {
     "@nanostores/persistent": "^0.10.0",
