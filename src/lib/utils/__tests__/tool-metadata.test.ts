@@ -63,4 +63,23 @@ describe('tool-metadata', () => {
 		expect(toolLinks.some((item) => item.href === '/tools/get-file-contents')).toBe(true);
 		expect(toolLinks.some((item) => item.href === '/tools/write-file')).toBe(true);
 	});
+
+	it('documents the 6.5.0 analysis and cleanup tools in metadata and navigation', () => {
+		const newToolIds = [
+			'diagnostic_hotspots',
+			'find_unused_symbols',
+			'find_unused_parameters',
+			'get_cascade_impact',
+			'get_project_graph',
+			'find_unused_project_references',
+			'find_external_dependency_usages',
+			'find_package_usages'
+		];
+		const toolLinks = navItems.find((item) => item.id === 'tools')?.children ?? [];
+
+		for (const toolId of newToolIds) {
+			expect(getToolById(toolId)).toBeDefined();
+			expect(toolLinks.some((item) => item.href === `/tools/${toolId.replace(/_/g, '-')}`)).toBe(true);
+		}
+	});
 });

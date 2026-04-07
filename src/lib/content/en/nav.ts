@@ -23,6 +23,7 @@ export const navItems: NavItem[] = [
 		children: [
 			{ id: 'tool-server-status', label: 'server_status', href: '/tools/server-status' },
 			{ id: 'tool-get-diagnostics', label: 'get_diagnostics', href: '/tools/get-diagnostics' },
+			{ id: 'tool-diagnostic-hotspots', label: 'diagnostic_hotspots', href: '/tools/diagnostic-hotspots' },
 
 			{ id: 'tool-load', label: 'load', href: '/tools/load' },
 			{ id: 'tool-sync', label: 'sync', href: '/tools/sync' },
@@ -35,6 +36,8 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-get-symbol-at-position', label: 'get_symbol_at_position', href: '/tools/get-symbol-at-position' },
 			{ id: 'tool-get-symbol-info', label: 'get_symbol_info', href: '/tools/get-symbol-info' },
 
+			{ id: 'tool-find-unused-symbols', label: 'find_unused_symbols', href: '/tools/find-unused-symbols' },
+			{ id: 'tool-find-unused-parameters', label: 'find_unused_parameters', href: '/tools/find-unused-parameters' },
 			{ id: 'tool-find-references', label: 'find_references', href: '/tools/find-references' },
 			{ id: 'tool-find-overrides', label: 'find_overrides', href: '/tools/find-overrides' },
 			{ id: 'tool-find-implementations', label: 'find_implementations', href: '/tools/find-implementations' },
@@ -54,6 +57,7 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-find-callers', label: 'find_callers', href: '/tools/find-callers' },
 			{ id: 'tool-get-outgoing-calls', label: 'get_outgoing_calls', href: '/tools/get-outgoing-calls' },
 			{ id: 'tool-analyze-change-impact', label: 'analyze_change_impact', href: '/tools/analyze-change-impact' },
+			{ id: 'tool-get-cascade-impact', label: 'get_cascade_impact', href: '/tools/get-cascade-impact' },
 
 			{ id: 'tool-rename-symbol', label: 'rename_symbol', href: '/tools/rename-symbol' },
 			{ id: 'tool-move-type', label: 'move_type', href: '/tools/move-type' },
@@ -63,8 +67,12 @@ export const navItems: NavItem[] = [
 			{ id: 'tool-format-document', label: 'format_document', href: '/tools/format-document' },
 
 			{ id: 'tool-view-external-definition', label: 'view_external_definition', href: '/tools/view-external-definition' },
+			{ id: 'tool-find-external-dependency-usages', label: 'find_external_dependency_usages', href: '/tools/find-external-dependency-usages' },
+			{ id: 'tool-find-package-usages', label: 'find_package_usages', href: '/tools/find-package-usages' },
 
 			{ id: 'tool-get-type-dependencies', label: 'get_type_dependencies', href: '/tools/get-type-dependencies' },
+			{ id: 'tool-get-project-graph', label: 'get_project_graph', href: '/tools/get-project-graph' },
+			{ id: 'tool-find-unused-project-references', label: 'find_unused_project_references', href: '/tools/find-unused-project-references' },
 			{ id: 'tool-analyze-complexity', label: 'analyze_complexity', href: '/tools/analyze-complexity' },
 
 			{ id: 'tool-batch', label: 'batch', href: '/tools/batch' }

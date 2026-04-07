@@ -55,7 +55,13 @@
     <loc>https://glidermcp.com/tools/batch</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/diagnostic-hotspots</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/find-callers</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/find-external-dependency-usages</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/find-implementations</loc>
@@ -67,10 +73,25 @@
     <loc>https://glidermcp.com/tools/find-overrides</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/find-package-usages</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/find-references</loc>
   </url>
   <url>
+    <loc>https://glidermcp.com/tools/find-unused-parameters</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/find-unused-project-references</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/find-unused-symbols</loc>
+  </url>
+  <url>
     <loc>https://glidermcp.com/tools/format-document</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-cascade-impact</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-derived-types</loc>
@@ -89,6 +110,9 @@
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-outgoing-calls</loc>
+  </url>
+  <url>
+    <loc>https://glidermcp.com/tools/get-project-graph</loc>
   </url>
   <url>
     <loc>https://glidermcp.com/tools/get-symbol-at-position</loc>

@@ -62,11 +62,22 @@ export const prompts: PromptsContent = {
 			]
 		},
 		{
+			title: 'Diagnostics & Cleanup',
+			description: 'Group problems, find dead code, and plan dependency cleanup before editing.',
+			prompts: [
+				'Load /path/to/MySolution.sln, run diagnostic_hotspots, and show the worst compiler hotspot grouped by file',
+				'Find likely-unused private symbols and unused parameters in this project, then summarize the safest cleanup candidates',
+				'Show me the project graph and flag direct project references that can likely be removed',
+				'Find package usages for System.Text.Json and summarize the impacted files and symbols'
+			]
+		},
+		{
 			title: 'Complex Analysis',
 			description: 'Multi-step analysis workflows.',
 			prompts: [
 				'I need to understand how authentication works. Find the IAuthService interface, list its methods, and show where Login is called.',
 				'Resolve IRepository, then find_implementations with its symbolKey and show public methods.',
+				'Before renaming IRepository, analyze_change_impact and then get_cascade_impact for the selected symbol.',
 				'Show me the dependency chain from UserController to the database layer.',
 				'Run a batch: search_symbols for "*UserController*" (Type), then get_type_info for the best match, then summarize.'
 			]
