@@ -5,22 +5,22 @@ export const intro: IntroContent = {
 	tagline: 'Roslyn-powered C# code analysis for AI assistants',
 	paragraphs: [
 		'Tired of watching your coding agent fumble through C# code? Grepping file after file, missing obvious connections, bloating context with irrelevant code, and unable to peek inside third-party libraries to understand how to use them?',
-		'Glider is an MCP (Model Context Protocol) server that gives AI assistants deep semantic understanding of C# codebases. Built on Roslyn, it provides 35 tools for code navigation, analysis, refactoring, and diagnostics.'
+		'Glider is an MCP (Model Context Protocol) server that gives AI assistants deep semantic understanding of C# codebases. Built on Roslyn, it now provides 43 tools for code navigation, diagnostics, dependency cleanup, refactoring, and architecture analysis.'
 	],
 	featuresTitle: 'Key Features',
 	features: [
 		'Load and analyze .NET solutions and projects with optional automatic file watching',
-		'Get compiler and analyzer diagnostics',
+		'Get compiler and analyzer diagnostics, plus grouped hotspot summaries',
 		'Resolve and search symbols and get stable keys for precise follow-up tool calls',
-		'Find references, overrides, and implementations by exact symbol key',
+		'Find references, overrides, implementations, unused symbols, and unused parameters',
 		'Semantic symbol queries plus literal/regex text search',
-		'Navigate type hierarchies and call graphs, and analyze change impact',
+		'Navigate type hierarchies, call graphs, direct impact, and cascade impact',
 		'Get detailed type and method information',
-		'Semantic rename across entire solutions',
-		'Move types and members between files',
-		'Apply code fixes and deterministic formatting with preview diffs',
-		'Get bounded source for types and methods',
-		'View source of NuGet/framework types',
+		'Inspect external assemblies and NuGet package usage before cleanup work',
+		'Review project graphs and identify likely-unused direct project references',
+		'Apply semantic rename and move refactorings with preview diffs',
+		'Use deterministic formatting and preview-first file writes',
+		'Get bounded source for types, methods, and external definitions',
 		'Batch multiple tool calls for faster workflows',
 		'Works with any MCP-compatible AI client'
 	],

@@ -57,7 +57,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	diagnostics: {
 		label: 'Diagnostics',
-		description: 'Compiler and analyzer diagnostics'
+		description: 'Compiler and analyzer diagnostics, plus grouped hotspot planning'
 	},
 	symbols: {
 		label: 'Symbol Discovery',
@@ -65,7 +65,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	references: {
 		label: 'References & Relationships',
-		description: 'References, overrides, and implementations by symbol key'
+		description: 'References, overrides, implementations, and unused-code discovery'
 	},
 	analysis: {
 		label: 'Code Analysis',
@@ -81,7 +81,7 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	callgraph: {
 		label: 'Call Graph & Impact',
-		description: 'Callers, outgoing calls, and change impact summaries'
+		description: 'Callers, outgoing calls, and direct/transitive impact summaries'
 	},
 	refactoring: {
 		label: 'Refactoring',
@@ -93,11 +93,11 @@ export const TOOL_CATEGORIES: Record<ToolCategory, { label: string; description:
 	},
 	external: {
 		label: 'External Source',
-		description: 'View source code of NuGet/framework types'
+		description: 'View external source and analyze assembly/package usage'
 	},
 	architecture: {
 		label: 'Architecture & Metrics',
-		description: 'Dependency analysis and complexity metrics'
+		description: 'Project graphs, dependency analysis, cleanup planning, and complexity metrics'
 	},
 	batch: {
 		label: 'Batching',
@@ -527,6 +527,55 @@ export const TOOLS: ToolMetadata[] = [
 			error: null
 		}
 	},
+	{
+		id: 'diagnostic_hotspots',
+		name: 'diagnostic_hotspots',
+		displayName: 'Diagnostic Hotspots',
+		description: 'Groups diagnostics into hotspots by file, project, category, or ID so you can plan cleanup before drilling into raw diagnostics.',
+		category: 'diagnostics',
+		parameters: [
+			{ name: 'filePath', type: 'string', description: 'Optional file path filter.', required: false, placeholder: '/path/to/File.cs' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'diagnosticSource', type: 'string', description: "Diagnostic source: 'compiler' (default), 'all', or 'analyzer'.", required: false, default: 'compiler' },
+			{ name: 'severity', type: 'string', description: "Minimum severity: 'error', 'warning', 'info', or 'hidden'. Default is 'warning'.", required: false, default: 'warning' },
+			{ name: 'category', type: 'string', description: "Optional category filter (e.g., 'Compiler', 'Style').", required: false, placeholder: 'Compiler' },
+			{ name: 'idPrefix', type: 'string', description: "Optional diagnostic ID prefix filter (e.g., 'CS', 'CA', 'IDE').", required: false, placeholder: 'CS' },
+			{ name: 'groupBy', type: 'string', description: "Primary grouping: 'file' (default), 'project', 'category', or 'id'.", required: false, default: 'file' },
+			{ name: 'includeExamples', type: 'boolean', description: 'Include example diagnostics inside each hotspot group. Default is false.', required: false, default: false },
+			{ name: 'maxExamplesPerGroup', type: 'number', description: 'Maximum example diagnostics to include per group when includeExamples=true. Default is 3. Use 0 for none.', required: false, default: 3 },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'sortBy', type: 'string', description: "Optional sort: 'count' (default), 'errorCount', 'warningCount', 'infoCount', or 'key'.", required: false, placeholder: 'count' },
+			{ name: 'sortOrder', type: 'string', description: "Sort order: 'desc' (default) or 'asc'.", required: false, default: 'desc' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 50.', required: false, default: 50 }
+		],
+		examples: [
+			{ description: 'Group compiler diagnostics by file', params: { groupBy: 'file' } },
+			{ description: 'Show analyzer hotspots with examples', params: { diagnosticSource: 'analyzer', groupBy: 'category', includeExamples: true } }
+		],
+		responseDescription: 'Returns grouped diagnostic hotspots with severity totals and optional example diagnostics',
+		responseExample: {
+			success: true,
+			data: {
+				groupBy: 'file',
+				groupCount: 1,
+				paging: { skip: 0, take: 50, returned: 1, total: 1 },
+				groups: [
+					{
+						key: '/path/to/UserService.cs',
+						totalCount: 4,
+						errorCount: 1,
+						warningCount: 3,
+						infoCount: 0,
+						examples: [
+							{ id: 'CS8602', severity: 'Warning', lineNumber: 42, message: 'Dereference of a possibly null reference.' }
+						]
+					}
+				]
+			},
+			error: null
+		}
+	},
 
 	// Symbol discovery
 	{
@@ -711,6 +760,95 @@ export const TOOLS: ToolMetadata[] = [
 		}
 	},
 	// References & relationships
+	{
+		id: 'find_unused_symbols',
+		name: 'find_unused_symbols',
+		displayName: 'Find Unused Symbols',
+		description: 'Finds likely-unused source symbols with zero non-self references. Skips generated code, overrides/interface implementations, and reflection-sensitive symbols by default.',
+		category: 'references',
+		parameters: [
+			{ name: 'kinds', type: 'string', description: "Optional kinds filter (comma-separated): 'Type,Method,Property,Field,Event'.", required: false, placeholder: 'Method,Property' },
+			{ name: 'scope', type: 'json', description: 'Optional scope used to select symbol definitions to analyze.', required: false, placeholder: '{ "mode": "solution" }' },
+			{ name: 'accessibility', type: 'string', description: "Accessibility filter. Default is 'Private,Internal'.", required: false, default: 'Private,Internal' },
+			{ name: 'excludeReflectionSensitive', type: 'boolean', description: 'Skip reflection- or activation-sensitive symbols. Default is true.', required: false, default: true },
+			{ name: 'summaryOnly', type: 'boolean', description: 'Return grouped summaries without the paged symbol list. Default is false.', required: false, default: false },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
+		],
+		examples: [
+			{ description: 'Find likely-unused private members', params: { accessibility: 'Private,Internal' } },
+			{ description: 'Summarize unused methods in one project', params: { kinds: 'Method', scope: { mode: 'project', projectName: 'MyProject' }, summaryOnly: true } }
+		],
+		responseDescription: 'Returns likely-unused source symbols, optionally summarized by kind and project',
+		responseExample: {
+			success: true,
+			data: {
+				totalCount: 2,
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
+				items: [
+					{
+						name: 'BuildCache',
+						kind: 'Field',
+						containingType: 'SolutionManager',
+						symbolKey: '...',
+						filePath: '/path/to/SolutionManager.cs',
+						lineNumber: 18,
+						accessibility: 'Private'
+					}
+				],
+				summary: {
+					byKind: [
+						{ key: 'Field', count: 1 },
+						{ key: 'Method', count: 1 }
+					]
+				}
+			},
+			error: null
+		}
+	},
+	{
+		id: 'find_unused_parameters',
+		name: 'find_unused_parameters',
+		displayName: 'Find Unused Parameters',
+		description: 'Finds likely-unused parameters with zero references inside their declaring method or constructor. Skips generated code and reflection-sensitive members by default.',
+		category: 'references',
+		parameters: [
+			{ name: 'scope', type: 'json', description: 'Optional scope used to select methods and constructors to analyze.', required: false, placeholder: '{ "mode": "solution" }' },
+			{ name: 'accessibility', type: 'string', description: "Accessibility filter for the containing member. Default is 'Private,Internal'.", required: false, default: 'Private,Internal' },
+			{ name: 'excludeReflectionSensitive', type: 'boolean', description: 'Skip parameters on reflection- or activation-sensitive members. Default is true.', required: false, default: true },
+			{ name: 'summaryOnly', type: 'boolean', description: 'Return grouped summaries without the paged parameter list. Default is false.', required: false, default: false },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 }
+		],
+		examples: [
+			{ description: 'Find likely-unused private method parameters', params: { accessibility: 'Private,Internal' } },
+			{ description: 'Summarize unused parameters in one project', params: { scope: { mode: 'project', projectName: 'MyProject' }, summaryOnly: true } }
+		],
+		responseDescription: 'Returns likely-unused parameters, optionally summarized by containing project and member kind',
+		responseExample: {
+			success: true,
+			data: {
+				totalCount: 1,
+				paging: { skip: 0, take: 200, returned: 1, total: 1 },
+				items: [
+					{
+						parameterName: 'cancellationToken',
+						containingSymbol: 'RefreshCacheAsync',
+						containingType: 'CacheService',
+						filePath: '/path/to/CacheService.cs',
+						lineNumber: 54,
+						projectName: 'MyProject'
+					}
+				],
+				summary: {
+					byProject: [{ key: 'MyProject', count: 1 }]
+				}
+			},
+			error: null
+		}
+	},
 	{
 		id: 'find_references',
 		name: 'find_references',
@@ -1164,6 +1302,60 @@ export const TOOLS: ToolMetadata[] = [
 			error: null
 		}
 	},
+	{
+		id: 'get_cascade_impact',
+		name: 'get_cascade_impact',
+		displayName: 'Get Cascade Impact',
+		description: 'Expands analyze_change_impact transitively to show callers, implementations, and overrides up to a requested depth. Use it for bounded refactor planning before changing a symbol.',
+		category: 'callgraph',
+		parameters: [
+			{
+				name: 'symbolKey',
+				type: 'string',
+				description: 'Opaque symbolKey from search_symbols, resolve_symbol, get_symbol_at_position, or any tool that returns symbolKey. Not a name.',
+				required: true,
+				placeholder: '...'
+			},
+			{ name: 'depth', type: 'number', description: 'Depth of transitive expansion. Depth 1 returns only direct impact items. Default is 2.', required: false, default: 2 },
+			{ name: 'scope', type: 'json', description: 'Optional scope for transitive impact analysis.', required: false, placeholder: '{ "mode": "solution" }' },
+			{ name: 'includeCallers', type: 'boolean', description: 'Include callers while building the cascade. Default is true.', required: false, default: true },
+			{ name: 'includeImplementations', type: 'boolean', description: 'Include implementations while building the cascade. Default is true.', required: false, default: true },
+			{ name: 'includeOverrides', type: 'boolean', description: 'Include overrides while building the cascade. Default is true.', required: false, default: true },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'skip', type: 'number', description: 'Pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'take', type: 'number', description: 'Pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'maxExpansionSymbols', type: 'number', description: 'Maximum impacted symbols to expand before returning partial results. Default is 250.', required: false, default: 250 }
+		],
+		examples: [
+			{ description: 'Expand direct and transitive impact', params: { symbolKey: '...', depth: 2 } },
+			{ description: 'Focus on callers only', params: { symbolKey: '...', depth: 3, includeImplementations: false, includeOverrides: false } }
+		],
+		responseDescription: 'Returns depth-based impact summaries plus a paged impacted-symbol list',
+		responseExample: {
+			success: true,
+			data: {
+				symbolKey: '...',
+				depth: 2,
+				summaryByDepth: [
+					{ depth: 1, impactedSymbols: 5 },
+					{ depth: 2, impactedSymbols: 11 }
+				],
+				paging: { skip: 0, take: 200, returned: 2, total: 2 },
+				impactedSymbols: [
+					{
+						name: 'Login',
+						kind: 'Method',
+						fullName: 'MyApp.Controllers.AuthController.Login()',
+						symbolKey: '...',
+						depth: 1,
+						projectName: 'MyApp'
+					}
+				],
+				partial: false
+			},
+			error: null
+		}
+	},
 
 	// Analysis
 	{
@@ -1585,6 +1777,163 @@ export const TOOLS: ToolMetadata[] = [
 				sourceCodeReturnedLines: 400,
 				sourceCodeTruncated: true,
 				language: 'C#'
+			},
+			error: null
+		}
+	},
+	{
+		id: 'find_external_dependency_usages',
+		name: 'find_external_dependency_usages',
+		displayName: 'Find External Dependency Usages',
+		description: 'Finds source usages of symbols that come from a referenced external assembly, keyed by assembly name or full metadata reference identity.',
+		category: 'external',
+		parameters: [
+			{ name: 'assemblyName', type: 'string', description: 'Optional simple assembly name to analyze. Provide this or referenceIdentity.', required: false, placeholder: 'System.Text.Json' },
+			{ name: 'referenceIdentity', type: 'string', description: 'Optional full metadata reference identity. Provide this or assemblyName.', required: false, placeholder: 'System.Text.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'symbolsSkip', type: 'number', description: 'Symbol-summary pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'symbolsTake', type: 'number', description: 'Symbol-summary pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'filesSkip', type: 'number', description: 'File-summary pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'filesTake', type: 'number', description: 'File-summary pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'maxExampleLocations', type: 'number', description: 'Maximum sample locations or symbols to include per summary item. Default is 5. Use 0 to omit examples.', required: false, default: 5 }
+		],
+		examples: [
+			{ description: 'Analyze usages by assembly name', params: { assemblyName: 'System.Text.Json' } },
+			{ description: 'Analyze usages by full metadata identity', params: { referenceIdentity: 'System.Text.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' } }
+		],
+		responseDescription: 'Returns project, file, and symbol summaries for a referenced external assembly',
+		responseExample: {
+			success: true,
+			data: {
+				assemblyName: 'System.Text.Json',
+				projectSummaryCount: 1,
+				fileSummaryCount: 2,
+				symbolSummaryCount: 3,
+				projects: [{ projectName: 'MyApp', usageCount: 6 }],
+				files: [{ filePath: '/path/to/JsonService.cs', usageCount: 4 }],
+				symbols: [
+					{
+						symbolName: 'JsonSerializer.Serialize',
+						usageCount: 3,
+						exampleLocations: [{ filePath: '/path/to/JsonService.cs', lineNumber: 27 }]
+					}
+				]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'find_package_usages',
+		name: 'find_package_usages',
+		displayName: 'Find Package Usages',
+		description: 'Maps a NuGet package to compile assemblies and metadata reference identities, then summarizes semantic source usages of that package.',
+		category: 'external',
+		parameters: [
+			{ name: 'packageId', type: 'string', description: 'NuGet package ID to analyze.', required: true, placeholder: 'System.Text.Json' },
+			{ name: 'packageVersion', type: 'string', description: 'Optional package version. Useful when multiple versions are restored.', required: false, placeholder: '9.0.0' },
+			{ name: 'projectName', type: 'string', description: 'Optional project name filter.', required: false, placeholder: 'MyProject' },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' },
+			{ name: 'symbolsSkip', type: 'number', description: 'Symbol-summary pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'symbolsTake', type: 'number', description: 'Symbol-summary pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'filesSkip', type: 'number', description: 'File-summary pagination offset. Default is 0.', required: false, default: 0 },
+			{ name: 'filesTake', type: 'number', description: 'File-summary pagination size. Default is 200.', required: false, default: 200 },
+			{ name: 'maxExampleLocations', type: 'number', description: 'Maximum sample locations or symbols to include per summary item. Default is 5. Use 0 to omit examples.', required: false, default: 5 }
+		],
+		examples: [
+			{ description: 'Analyze usages for one package', params: { packageId: 'System.Text.Json' } },
+			{ description: 'Disambiguate between restored versions', params: { packageId: 'Newtonsoft.Json', packageVersion: '13.0.3' } }
+		],
+		responseDescription: 'Returns package-to-assembly mapping plus project, file, and symbol usage summaries',
+		responseExample: {
+			success: true,
+			data: {
+				packageId: 'System.Text.Json',
+				packageVersion: '9.0.0',
+				mappedAssemblies: [
+					{
+						assemblyName: 'System.Text.Json',
+						referenceIdentity: 'System.Text.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'
+					}
+				],
+				projectSummaryCount: 1,
+				fileSummaryCount: 2,
+				symbolSummaryCount: 3,
+				files: [{ filePath: '/path/to/JsonService.cs', usageCount: 4 }],
+				symbols: [{ symbolName: 'JsonSerializer.Serialize', usageCount: 3 }]
+			},
+			error: null
+		}
+	},
+	{
+		id: 'get_project_graph',
+		name: 'get_project_graph',
+		displayName: 'Get Project Graph',
+		description: 'Analyzes the loaded workspace at the project-reference level. Returns direct edges, roots/leaves, transitive reachability, and cycle groups for architecture review.',
+		category: 'architecture',
+		parameters: [
+			{ name: 'projectName', type: 'string', description: 'Optional project name to focus reachability details.', required: false, placeholder: 'MyProject.Web' },
+			{ name: 'includeTransitive', type: 'boolean', description: 'Include transitive dependency/dependent counts and focused reachability lists. Default is true.', required: false, default: true },
+			{ name: 'includeCycles', type: 'boolean', description: 'Include detected cycle groups. Default is true.', required: false, default: true },
+			{ name: 'includeEdges', type: 'boolean', description: 'Include the explicit direct edge list. Default is true.', required: false, default: true },
+			{ name: 'pathStyle', type: 'string', description: "Path style: 'absolute' (default) or 'relative' (to solution root).", required: false, default: 'absolute' }
+		],
+		examples: [
+			{ description: 'Inspect the full project graph', params: {} },
+			{ description: 'Focus on one project', params: { projectName: 'MyProject.Web' } }
+		],
+		responseDescription: 'Returns project nodes, direct edges, roots/leaves, cycles, and optional focused reachability data',
+		responseExample: {
+			success: true,
+			data: {
+				projectCount: 3,
+				edgeCount: 2,
+				roots: ['MyProject.Web'],
+				leaves: ['MyProject.Data'],
+				edges: [
+					{ fromProject: 'MyProject.Web', toProject: 'MyProject.Core' },
+					{ fromProject: 'MyProject.Core', toProject: 'MyProject.Data' }
+				],
+				cycleGroups: [],
+				focus: {
+					projectName: 'MyProject.Web',
+					transitiveDependencies: ['MyProject.Core', 'MyProject.Data'],
+					transitiveDependents: []
+				}
+			},
+			error: null
+		}
+	},
+	{
+		id: 'find_unused_project_references',
+		name: 'find_unused_project_references',
+		displayName: 'Find Unused Project References',
+		description: 'Tests each direct ProjectReference by removing it in memory and checking whether new compiler errors appear in the referencing project. Use it for compile-backed project cleanup planning.',
+		category: 'architecture',
+		parameters: [
+			{ name: 'projectName', type: 'string', description: 'Optional project name to limit analysis to one referencing project.', required: false, placeholder: 'MyProject.Web' },
+			{ name: 'maxEvidenceDiagnostics', type: 'number', description: 'Maximum compiler diagnostics to include as evidence for a used reference. Default is 5. Use 0 to omit samples.', required: false, default: 5 }
+		],
+		examples: [
+			{ description: 'Analyze all direct project references', params: {} },
+			{ description: 'Analyze one project with no evidence samples', params: { projectName: 'MyProject.Web', maxEvidenceDiagnostics: 0 } }
+		],
+		responseDescription: 'Returns direct project references that appear removable, plus evidence when a reference is still required',
+		responseExample: {
+			success: true,
+			data: {
+				projectCountAnalyzed: 1,
+				totalReferencesAnalyzed: 3,
+				unusedReferenceCount: 1,
+				items: [
+					{
+						projectName: 'MyProject.Web',
+						referenceProjectName: 'MyProject.Legacy',
+						referencePath: '../MyProject.Legacy/MyProject.Legacy.csproj',
+						canRemove: true,
+						evidenceDiagnostics: []
+					}
+				]
 			},
 			error: null
 		}

@@ -2,7 +2,7 @@ import type { ToolDetailContent, ToolsListContent } from '../types';
 
 export const toolsList: ToolsListContent = {
 	title: 'Available Tools',
-	intro: 'Glider provides 35 MCP tools for C# code analysis and refactoring.'
+	intro: 'Glider provides 43 MCP tools for semantic C# analysis, cleanup, and refactoring.'
 };
 
 export const toolDetail: ToolDetailContent = {

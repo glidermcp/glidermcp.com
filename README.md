@@ -8,11 +8,13 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 
 - Resolve symbols the same way the compiler does (not grep).
 - Resolve ambiguous names into stable keys (`symbolKey`) and use them across tool calls.
-- Find references, overrides, and implementations by exact `symbolKey`.
+- Find references, overrides, implementations, unused symbols, and unused parameters.
 - Query symbols by semantic predicates and search solution text (literal/regex).
-- Navigate type hierarchies, call graphs, and change impact.
+- Navigate type hierarchies, call graphs, direct impact, and cascade impact.
 - Inspect APIs with detailed type information and method signatures.
-- Surface compiler diagnostics for a loaded solution/project.
+- Surface compiler diagnostics and grouped hotspots for a loaded solution/project.
+- Investigate NuGet packages and external assembly usage before cleanup work.
+- Review project graphs and identify likely-unused direct project references.
 - Refactor safely: rename symbols and move types/members with reference updates.
 - Apply deterministic formatting with preview diffs.
 - Analyze architecture via dependency and complexity metrics.
@@ -20,18 +22,18 @@ For full documentation and setup guides, see [glidermcp.com](https://glidermcp.c
 
 ## Tool overview
 
-- Diagnostics: `server_status`, `get_diagnostics`
-- Solution management: `load`, `reload`, `sync`
+- Diagnostics: `server_status`, `get_diagnostics`, `diagnostic_hotspots`
+- Solution management: `load`, `reload`, `sync`, `get_file_contents`, `write_file`
 - Symbol discovery: `resolve_symbol`, `search_symbols`, `get_symbol_at_position`, `get_symbol_info`
-- References & relationships: `find_references`, `find_overrides`, `find_implementations`
+- References & relationships: `find_unused_symbols`, `find_unused_parameters`, `find_references`, `find_overrides`, `find_implementations`
 - Code analysis: `get_type_info`, `get_method_signature`, `get_type_source`, `get_method_source`
 - Semantic & text search: `semantic_query`, `search_text`
 - Type hierarchy: `get_type_hierarchy`, `get_derived_types`, `find_member_in_hierarchy`
-- Call graph & impact: `find_callers`, `get_outgoing_calls`, `analyze_change_impact`
+- Call graph & impact: `find_callers`, `get_outgoing_calls`, `analyze_change_impact`, `get_cascade_impact`
 - Refactoring: `rename_symbol`, `move_type`, `move_member`
 - Formatting: `organize_usings`, `format_document`
-- External source: `view_external_definition`
-- Architecture & metrics: `get_type_dependencies`, `analyze_complexity`
+- External source & dependency usage: `view_external_definition`, `find_external_dependency_usages`, `find_package_usages`
+- Architecture & metrics: `get_type_dependencies`, `get_project_graph`, `find_unused_project_references`, `analyze_complexity`
 - Batching: `batch`
 
 ## Installation
@@ -73,25 +75,34 @@ glider -v
 # Enable logs and (for stdio) a startup banner on stderr
 glider --verbose
 
+# Change the default async-tool timeout
+glider --default-timeout 30m
+
 # HTTP (default port: 5001)
 glider --transport http
 # Listens on http://localhost:5001/mcp
 
 glider --transport http --port 8080
 # Listens on http://localhost:8080/mcp
+
+glider --transport http --port 8080 --default-timeout 30m
+# Listens on http://localhost:8080/mcp with a longer server-side timeout
 ```
 
 ## Using with Claude Code (stdio)
 
 ```bash
 # Project-scoped config (recommended)
-claude mcp add --transport stdio glider --scope project -- ~/.dotnet/tools/glider
+claude mcp add --transport stdio glider --scope project -- glider
+
+# For larger solutions
+claude mcp add --transport stdio glider --scope project -- glider --default-timeout 30m
 ```
 
-If you prefer not to call the shim directly:
+If you prefer not to rely on PATH:
 
 ```bash
-claude mcp add --transport stdio glider --scope project -- dotnet tool run --global glider
+claude mcp add --transport stdio glider --scope project -- ~/.dotnet/tools/glider
 ```
 
 ## Example prompts
@@ -105,6 +116,10 @@ I changed some files on disk. Reload the current solution and then re-run diagno
 ```
 
 ```
+Load /path/to/MyApp.sln, run diagnostic_hotspots, and show the worst compiler hotspot.
+```
+
+```
 Find all usages of MyNamespace.MyType.MyMethod
 ```
 
@@ -114,6 +129,10 @@ Resolve MyNamespace.MyType.MyMethod, then find_references for the selected symbo
 
 ```
 Rename the symbol OldName to NewName (preview the diff first).
+```
+
+```
+Get the project graph and identify direct project references that can likely be removed.
 ```
 
 ## Troubleshooting

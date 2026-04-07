@@ -5,7 +5,7 @@ export const pricing: PricingContent = {
 	planName: 'Free',
 	price: '$0',
 	features: [
-		'All 35 tools included',
+		'All 43 tools included',
 		'Unlimited solutions',
 		'Both stdio and HTTP transport',
 		'Works with any MCP client',

@@ -42,7 +42,11 @@ dotnet tool list -g
 				code: `"Load the solution at /path/to/MySolution.sln"
 "Load the solution at /path/to/MySolution.slnx"
 "Load the solution at /path/to/MySolution.sln with file watching in /path/to/workspace"
+"Load /path/to/MySolution.sln, run diagnostic_hotspots, and show the biggest compiler hotspot"
 "Use search_symbols with query *Service and kinds Type to find all service classes"
+"Find likely-unused private symbols and summarize the top cleanup candidates"
+"Get the project graph and identify direct project references that may be removable"
+"Find package usages for System.Text.Json and summarize the impacted files"
 "What methods does IUserRepository define?"
 "Resolve the Login method and then find_references for the selected symbolKey"
 "I changed some files on disk. Sync the documents to see the latest changes."`,
