@@ -21,6 +21,22 @@ describe('tool-metadata', () => {
 		expect(validation.errors.join('\n')).toMatch(/filePath is required/);
 	});
 
+	it('documents load diagnostics as opt-in and server_status as the retrieval path', () => {
+		const load = getToolById('load');
+		const serverStatus = getToolById('server_status');
+
+		expect(load).toBeDefined();
+		expect(load?.parameters.some((param) => param.name === 'includeWorkspaceDiagnostics' && param.default === false)).toBe(true);
+		expect((load?.responseExample?.data as { workspaceDiagnostics?: unknown }).workspaceDiagnostics).toBeUndefined();
+
+		const nextSteps = (load?.responseExample?.data as { hints?: { nextSteps?: string[] } }).hints?.nextSteps ?? [];
+		expect(nextSteps.some((step) => step.includes('server_status'))).toBe(true);
+		expect(nextSteps.some((step) => step.includes('MSBuild load errors'))).toBe(true);
+
+		expect(serverStatus).toBeDefined();
+		expect((serverStatus?.responseExample?.data as { workspaceDiagnostics?: unknown }).workspaceDiagnostics).toBeDefined();
+	});
+
 	it('parses json parameters during validation', () => {
 		const tool = getToolById('batch');
 		expect(tool).toBeDefined();

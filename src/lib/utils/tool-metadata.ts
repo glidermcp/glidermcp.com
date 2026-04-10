@@ -111,7 +111,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'server_status',
 		name: 'server_status',
 		displayName: 'Server Status',
-		description: 'Returns server running status and whether a solution/project is loaded.',
+		description: 'Returns server running status, loaded-workspace state, cache metadata, file-watcher stats, and cached workspace load diagnostics.',
 		category: 'debug',
 		parameters: [
 			{
@@ -123,13 +123,17 @@ export const TOOLS: ToolMetadata[] = [
 			}
 		],
 		examples: [{ description: 'Check if the server is running', params: {} }],
-		responseDescription: 'Returns server/solution status and cache metadata',
+		responseDescription: 'Returns server/workspace status, cache metadata, watcher stats, and cached workspace load diagnostics.',
 		responseExample: {
 			success: true,
 			data: {
 				serverRunning: true,
 				solutionLoaded: true,
 				solutionPath: '/path/to/solution.sln',
+				workspaceDiagnostics: {
+					count: 0,
+					messages: []
+				},
 				cache: {
 					cacheStatus: 'valid',
 					revision: 3,
@@ -155,7 +159,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'load',
 		name: 'load',
 		displayName: 'Load',
-		description: 'Loads a C# solution (.sln/.slnx) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided. The response includes workspace MSBuild load diagnostics captured during load.',
+		description: 'Loads a C# solution (.sln/.slnx) or project (.csproj) for analysis. Optionally enables automatic file watching when workingDirectory is provided. Workspace MSBuild load diagnostics are hidden by default; inspect them with server_status or set includeWorkspaceDiagnostics=true to include them inline.',
 		category: 'solution',
 		parameters: [
 			{
@@ -178,14 +182,22 @@ export const TOOLS: ToolMetadata[] = [
 				description: 'Include detailed project information in response. Default is false.',
 				required: false,
 				default: false
+			},
+			{
+				name: 'includeWorkspaceDiagnostics',
+				type: 'boolean',
+				description: 'When true, includes cached workspace MSBuild load diagnostics in the response. Default is false.',
+				required: false,
+				default: false
 			}
 		],
 		examples: [
 			{ description: 'Load a solution', params: { filePath: '/Users/dev/MyProject/MyProject.sln' } },
 			{ description: 'Load with file watching', params: { filePath: '/Users/dev/MyProject/MyProject.sln', workingDirectory: '/Users/dev/MyProject', includeProjects: true } },
+			{ description: 'Load and include workspace diagnostics', params: { filePath: '/Users/dev/MyProject/MyProject.sln', includeWorkspaceDiagnostics: true } },
 			{ description: 'Load a standalone project', params: { filePath: '/Users/dev/MyProject/MyProject.csproj' } }
 		],
-		responseDescription: 'Returns projects, cache metadata, and workspace load diagnostics for the loaded solution/project',
+		responseDescription: 'Returns the loaded path, project list, watcher state, and cache metadata. Inline workspace load diagnostics are included only when requested; otherwise load may return next-step hints when diagnostics were suppressed.',
 		responseExample: {
 			success: true,
 			data: {
@@ -201,12 +213,14 @@ export const TOOLS: ToolMetadata[] = [
 					loadedKind: 'solution',
 					loadedPath: '/Users/dev/MyProject/MyProject.sln'
 				},
-				workspaceDiagnostics: {
-					count: 0,
-					messages: []
+				hints: {
+					nextSteps: [
+						'Workspace load diagnostics were suppressed. Use server_status to inspect the cached diagnostics.',
+						'The presence of diagnostic messages does not indicate limited functionality of the glider. If you are experiencing issues with missing files or incomplete analysis results, please inspect the workspace diagnostics to determine if there are MSBuild load errors that need to be resolved.'
+					]
 				}
 			},
-			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000 },
+			meta: { durationMs: 123, cancelled: false, timedOut: false, timeoutMs: 1200000, workspaceDiagnosticsSuppressed: true },
 			error: null
 		}
 	},
@@ -214,7 +228,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'reload',
 		name: 'reload',
 		displayName: 'Reload',
-		description: 'Reloads the currently loaded solution/project from disk. Workspace MSBuild load diagnostics are returned only when includeWorkspaceDiagnostics is true.',
+		description: 'Reloads the currently loaded solution/project from disk. Cached workspace MSBuild load diagnostics are returned only when includeWorkspaceDiagnostics is true.',
 		category: 'solution',
 		parameters: [
 			{
@@ -478,7 +492,7 @@ export const TOOLS: ToolMetadata[] = [
 		id: 'get_diagnostics',
 		name: 'get_diagnostics',
 		displayName: 'Get Diagnostics',
-		description: 'Gets diagnostics (warnings, errors) for the loaded solution/project. Use includeAnalyzers=true to include analyzer/IDE diagnostics. Workspace load diagnostics are surfaced by load, reload, and server_status instead of this tool.',
+		description: 'Gets diagnostics (warnings, errors) for the loaded solution/project. Use includeAnalyzers=true to include analyzer/IDE diagnostics. Workspace load diagnostics are available via server_status, or inline from load/reload when includeWorkspaceDiagnostics is true.',
 		category: 'diagnostics',
 		parameters: [
 			{ name: 'filePath', type: 'string', description: 'Optional file path filter.', required: false, placeholder: '/path/to/File.cs' },
