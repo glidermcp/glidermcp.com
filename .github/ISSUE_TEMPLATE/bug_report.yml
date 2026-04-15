@@ -1,0 +1,68 @@
+name: Bug report
+description: Report a product or docs bug
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      description: Which product is affected?
+      options:
+        - glider
+        - glidermcp-web
+        - tsglider
+        - glider-memory
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Product version, commit, or deployment date
+      placeholder: e.g. glider 6.7.0
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, runtime, client, and transport details
+      placeholder: e.g. macOS 14.6, Claude Code, stdio
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Minimal, ordered steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / output / screenshots
+      description: Paste relevant logs or attach screenshots
+    validations:
+      required: false

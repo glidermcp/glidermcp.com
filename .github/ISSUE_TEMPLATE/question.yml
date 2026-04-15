@@ -1,0 +1,39 @@
+name: Question / support
+description: Ask a setup, usage, or troubleshooting question
+labels: ["question"]
+body:
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      options:
+        - glider
+        - glidermcp-web
+        - tsglider
+        - glider-memory
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Describe what you are trying to do
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempt
+    attributes:
+      label: What you already tried
+      description: Commands, prompts, config, or docs followed
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / output
+      description: Paste any relevant output
+    validations:
+      required: false
