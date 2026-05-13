@@ -1,0 +1,14 @@
+{
+  "name": "glidermcp",
+  "description": "GliderMCP plugins for coding agents.",
+  "plugins": [
+    {
+      "name": "glidermcp",
+      "description": "C# semantic navigation, diagnostics, references, call graphs, impact analysis, and safe refactoring for Codex.",
+      "source": {
+        "source": "local",
+        "path": "./plugins/glidermcp"
+      }
+    }
+  ]
+}

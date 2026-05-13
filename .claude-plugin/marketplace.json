@@ -1,0 +1,15 @@
+{
+  "name": "glidermcp",
+  "owner": {
+    "name": "GliderMCP",
+    "email": "feedback@glidermcp.com",
+    "url": "https://glidermcp.com"
+  },
+  "plugins": [
+    {
+      "name": "glidermcp",
+      "source": "./plugins/glidermcp",
+      "description": "C# semantic navigation, diagnostics, references, call graphs, impact analysis, and safe refactoring for Claude Code."
+    }
+  ]
+}
