@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "glider": {
+      "command": "glider",
+      "args": [
+        "--default-timeout",
+        "30m"
+      ]
+    }
+  }
+}

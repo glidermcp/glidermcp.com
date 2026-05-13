@@ -1,0 +1,38 @@
+{
+  "name": "glidermcp",
+  "version": "0.1.0",
+  "description": "Connect coding agents to the local GliderMCP C# semantic analysis server.",
+  "author": {
+    "name": "GliderMCP",
+    "email": "feedback@glidermcp.com",
+    "url": "https://glidermcp.com"
+  },
+  "homepage": "https://glidermcp.com",
+  "repository": "https://github.com/glidermcp/glidermcp.com",
+  "license": "MIT",
+  "keywords": [
+    "csharp",
+    "dotnet",
+    "mcp",
+    "semantic-code-navigation",
+    "roslyn"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.codex-mcp.json",
+  "interface": {
+    "displayName": "GliderMCP",
+    "shortDescription": "C# semantic navigation for coding agents",
+    "longDescription": "Use GliderMCP to give Codex semantic C# navigation, references, implementations, diagnostics, call graphs, impact analysis, and previewable refactoring through a local MCP server.",
+    "developerName": "GliderMCP",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://glidermcp.com",
+    "defaultPrompt": [
+      "Use GliderMCP to load this C# solution, inspect diagnostics, and navigate symbols semantically before editing."
+    ],
+    "screenshots": []
+  }
+}

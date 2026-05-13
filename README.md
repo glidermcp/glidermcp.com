@@ -30,6 +30,31 @@ Please open issues in this repository and select the relevant product in the iss
 - Product site: https://glidermcp.com
 - NuGet package: https://www.nuget.org/packages/glider
 
+## Plugin and config assets
+
+This repository ships root-level marketplace and config assets for agent clients:
+
+- `plugins/glidermcp/` - shared plugin bundle with `.mcp.json` plus a C# workflow skill.
+- `.claude-plugin/marketplace.json` - Claude Code marketplace entry.
+- `.agents/plugins/marketplace.json` - Codex marketplace entry.
+- `install/claude-code/.mcp.json` - direct Claude Code project config template.
+- `install/codex/config.toml` - direct Codex global config snippet for HTTP transport.
+
+Claude Code plugin install:
+
+```bash
+claude plugin marketplace add glidermcp/glidermcp.com
+claude plugin install glidermcp@glidermcp
+```
+
+Codex plugin install:
+
+```bash
+codex plugin marketplace add glidermcp/glidermcp.com
+codex
+# Open /plugins and install glidermcp.
+```
+
 ## Notes
 
 - Pull requests with runtime/product code are not accepted in this repository.

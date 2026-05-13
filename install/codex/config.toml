@@ -1,0 +1,8 @@
+[mcp_servers.glider]
+url = "http://localhost:5001/mcp"
+http_headers = { Accept = "application/json, text/event-stream" }
+startup_timeout_sec = 30
+tool_timeout_sec = 1200
+
+# Start separately:
+# glider --transport http --default-timeout 30m
