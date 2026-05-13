@@ -1,6 +1,9 @@
 {
   "name": "glidermcp",
   "description": "GliderMCP plugins for coding agents.",
+  "interface": {
+    "displayName": "GliderMCP"
+  },
   "plugins": [
     {
       "name": "glidermcp",
@@ -8,7 +11,12 @@
       "source": {
         "source": "local",
         "path": "./plugins/glidermcp"
-      }
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Coding"
     }
   ]
 }
