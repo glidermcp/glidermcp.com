@@ -18,7 +18,7 @@
     "roslyn"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
+  "mcpServers": "./.codex-mcp.json",
   "interface": {
     "displayName": "GliderMCP",
     "shortDescription": "C# semantic navigation for coding agents",
