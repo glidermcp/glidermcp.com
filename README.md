@@ -10,25 +10,21 @@ This repository is the public support and issue-intake front door for the Glider
 
 This repository is intentionally minimal.
 
-## Active development location
-
-Active implementation for products and website code is maintained in a private monorepo:
-
-- `rexsacrorum/glider` (private)
-
 ## Where to file issues
 
 Please open issues in this repository and select the relevant product in the issue template:
 
 - `glider` (C# MCP)
+- `glider-trace` (runtime evidence MCP server)
+- `tglider` (TypeScript MCP)
 - `glidermcp-web` (website/docs UX)
-- `tsglider` (TypeScript MCP)
-- `glider-memory` (planned)
 
 ## Quick links
 
 - Product site: https://glidermcp.com
-- NuGet package: https://www.nuget.org/packages/glider
+- Glider NuGet package: https://www.nuget.org/packages/glider
+- GliderTrace Nuget Package: https://www.nuget.org/packages/glider-trace
+- TGlider NPM package: https://www.npmjs.com/package/tglider
 
 ## Plugin and config assets
 
