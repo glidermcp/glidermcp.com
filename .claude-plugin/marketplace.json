@@ -10,6 +10,16 @@
       "name": "glidermcp",
       "source": "./plugins/glidermcp",
       "description": "C# semantic navigation, diagnostics, references, call graphs, impact analysis, and safe refactoring for Claude Code."
+    },
+    {
+      "name": "glider-trace",
+      "source": "./plugins/glider-trace",
+      "description": "Runtime evidence, command and test runs, exception summaries, counters, traces, dumps, and artifact indexing for Claude Code."
+    },
+    {
+      "name": "tglider",
+      "source": "./plugins/tglider",
+      "description": "TypeScript and JavaScript semantic navigation, diagnostics, references, dependency topology, and refactoring for Claude Code."
     }
   ]
 }

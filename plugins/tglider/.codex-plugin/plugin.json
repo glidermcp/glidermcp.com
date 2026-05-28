@@ -1,0 +1,38 @@
+{
+  "name": "tglider",
+  "version": "0.1.0",
+  "description": "Connect coding agents to the local TGlider TypeScript and JavaScript semantic MCP server.",
+  "author": {
+    "name": "GliderMCP",
+    "email": "feedback@glidermcp.com",
+    "url": "https://glidermcp.com"
+  },
+  "homepage": "https://glidermcp.com",
+  "repository": "https://github.com/glidermcp/glidermcp.com",
+  "license": "MIT",
+  "keywords": [
+    "typescript",
+    "javascript",
+    "mcp",
+    "semantic-code-navigation",
+    "refactoring"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.codex-mcp.json",
+  "interface": {
+    "displayName": "TGlider",
+    "shortDescription": "TypeScript and JavaScript semantic navigation for coding agents",
+    "longDescription": "Use TGlider to give Codex semantic TypeScript and JavaScript navigation, references, implementations, diagnostics, dependency topology, impact analysis, and previewable refactoring through a local MCP server.",
+    "developerName": "GliderMCP",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://glidermcp.com",
+    "defaultPrompt": [
+      "Use TGlider to load this TypeScript or JavaScript workspace and navigate symbols semantically before editing."
+    ],
+    "screenshots": []
+  }
+}

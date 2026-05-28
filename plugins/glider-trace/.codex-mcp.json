@@ -1,0 +1,11 @@
+{
+  "mcp_servers": {
+    "glider-trace": {
+      "command": "glider-trace",
+      "args": [
+        "--default-timeout",
+        "30m"
+      ]
+    }
+  }
+}
