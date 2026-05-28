@@ -6,6 +6,22 @@
         "--default-timeout",
         "30m"
       ]
+    },
+    "glider-trace": {
+      "command": "glider-trace",
+      "args": [
+        "--default-timeout",
+        "30m"
+      ]
+    },
+    "tglider": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tglider",
+        "--default-timeout",
+        "30m"
+      ]
     }
   }
 }

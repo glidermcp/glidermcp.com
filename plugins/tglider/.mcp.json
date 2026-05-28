@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "tglider": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tglider",
+        "--default-timeout",
+        "30m"
+      ]
+    }
+  }
+}

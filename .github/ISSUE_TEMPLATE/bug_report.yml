@@ -9,9 +9,9 @@ body:
       description: Which product is affected?
       options:
         - glider
+        - glider-trace
+        - tglider
         - glidermcp-web
-        - tsglider
-        - glider-memory
     validations:
       required: true
 

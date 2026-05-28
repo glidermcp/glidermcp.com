@@ -1,8 +1,17 @@
 [mcp_servers.glider]
-url = "http://localhost:5001/mcp"
-http_headers = { Accept = "application/json, text/event-stream" }
+command = "glider"
+args = ["--default-timeout", "30m"]
 startup_timeout_sec = 30
 tool_timeout_sec = 1200
 
-# Start separately:
-# glider --transport http --default-timeout 30m
+[mcp_servers."glider-trace"]
+command = "glider-trace"
+args = ["--default-timeout", "30m"]
+startup_timeout_sec = 30
+tool_timeout_sec = 1200
+
+[mcp_servers.tglider]
+command = "npx"
+args = ["-y", "tglider", "--default-timeout", "30m"]
+startup_timeout_sec = 30
+tool_timeout_sec = 1200

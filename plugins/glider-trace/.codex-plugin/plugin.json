@@ -1,0 +1,38 @@
+{
+  "name": "glider-trace",
+  "version": "0.1.0",
+  "description": "Connect coding agents to the local GliderTrace runtime evidence MCP server.",
+  "author": {
+    "name": "GliderMCP",
+    "email": "feedback@glidermcp.com",
+    "url": "https://glidermcp.com"
+  },
+  "homepage": "https://glidermcp.com",
+  "repository": "https://github.com/glidermcp/glidermcp.com",
+  "license": "MIT",
+  "keywords": [
+    "csharp",
+    "dotnet",
+    "mcp",
+    "runtime-evidence",
+    "test-evidence"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.codex-mcp.json",
+  "interface": {
+    "displayName": "GliderTrace",
+    "shortDescription": ".NET runtime evidence for coding agents",
+    "longDescription": "Use GliderTrace to give Codex captured evidence from .NET commands, tests, failures, exceptions, counters, traces, dumps, and local artifacts through a runtime-focused MCP server.",
+    "developerName": "GliderMCP",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://glidermcp.com",
+    "defaultPrompt": [
+      "Use GliderTrace to collect runtime evidence before diagnosing .NET failures or test behavior."
+    ],
+    "screenshots": []
+  }
+}
