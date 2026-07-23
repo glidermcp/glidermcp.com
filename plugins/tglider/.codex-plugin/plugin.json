@@ -7,7 +7,7 @@
     "email": "feedback@glidermcp.com",
     "url": "https://glidermcp.com"
   },
-  "homepage": "https://glidermcp.com",
+  "homepage": "https://glidermcp.com/tglider",
   "repository": "https://github.com/glidermcp/glidermcp.com",
   "license": "MIT",
   "keywords": [
@@ -29,7 +29,7 @@
       "Interactive",
       "Write"
     ],
-    "websiteURL": "https://glidermcp.com",
+    "websiteURL": "https://glidermcp.com/tglider",
     "defaultPrompt": [
       "Use TGlider to load this TypeScript or JavaScript workspace and navigate symbols semantically before editing."
     ],

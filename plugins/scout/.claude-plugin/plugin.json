@@ -1,21 +1,21 @@
 {
-  "name": "glider-trace",
+  "name": "scout",
   "version": "0.1.0",
-  "description": "Connect coding agents to the local GliderTrace runtime evidence MCP server.",
+  "description": "Connect coding agents to the local Scout universal code search MCP server.",
   "author": {
     "name": "GliderMCP",
     "email": "feedback@glidermcp.com",
     "url": "https://glidermcp.com"
   },
-  "homepage": "https://glidermcp.com/glider-trace",
+  "homepage": "https://glidermcp.com/scout",
   "repository": "https://github.com/glidermcp/glidermcp.com",
   "license": "MIT",
   "keywords": [
-    "csharp",
-    "dotnet",
+    "code-search",
     "mcp",
-    "runtime-evidence",
-    "test-evidence"
+    "grep",
+    "fuzzy-search",
+    "code-intelligence"
   ],
   "skills": "./skills/"
 }

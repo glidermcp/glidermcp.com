@@ -1,4 +1,5 @@
 ---
+name: glider-csharp
 description: Use GliderMCP for C#/.NET navigation, diagnostics, references, call graphs, impact analysis, and safe refactoring.
 ---
 
@@ -10,4 +11,4 @@ Start by checking `server_status`. If no workspace is loaded, call `load` with t
 
 For edits, gather evidence first with tools such as `find_references`, `find_implementations`, `find_callers`, `get_outgoing_calls`, `analyze_change_impact`, `get_cascade_impact`, `get_diagnostics`, and `diagnostic_hotspots`. Prefer preview-first refactoring tools where available. After external edits, use `sync` for changed `.cs` files and `reload` for structural project changes.
 
-Use shell text search only for non-C# assets, literal strings, config files, or when a semantic tool cannot answer the question.
+For non-C# assets, literal strings, config files, and repo-wide text search, prefer Scout's `find` when Scout is installed. Glider's own `search_text` already delegates to Scout when a `scout` binary is on `PATH`, and reports which backend answered in `data.backend` - `scout` covers every file under the solution root in any language, `workspace` covers only loaded C# documents. Use shell text search only when neither can answer the question.

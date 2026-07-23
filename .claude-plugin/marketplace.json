@@ -1,5 +1,6 @@
 {
   "name": "glidermcp",
+  "description": "GliderMCP plugins for coding agents.",
   "owner": {
     "name": "GliderMCP",
     "email": "feedback@glidermcp.com",
@@ -20,6 +21,11 @@
       "name": "tglider",
       "source": "./plugins/tglider",
       "description": "TypeScript and JavaScript semantic navigation, diagnostics, references, dependency topology, and refactoring for Claude Code."
+    },
+    {
+      "name": "scout",
+      "source": "./plugins/scout",
+      "description": "Universal read-only code search over any repository and any language - ranked fuzzy discovery and exhaustive strict search from a resident index, for Claude Code."
     }
   ]
 }

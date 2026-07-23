@@ -1,0 +1,37 @@
+{
+  "name": "scout",
+  "version": "0.1.0",
+  "description": "Connect coding agents to the local Scout universal code search MCP server.",
+  "author": {
+    "name": "GliderMCP",
+    "email": "feedback@glidermcp.com",
+    "url": "https://glidermcp.com"
+  },
+  "homepage": "https://glidermcp.com/scout",
+  "repository": "https://github.com/glidermcp/glidermcp.com",
+  "license": "MIT",
+  "keywords": [
+    "code-search",
+    "mcp",
+    "grep",
+    "fuzzy-search",
+    "code-intelligence"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.codex-mcp.json",
+  "interface": {
+    "displayName": "Scout",
+    "shortDescription": "Universal code search for coding agents",
+    "longDescription": "Use Scout to give Codex ranked fuzzy search and exhaustive strict search over any repository in any language, from a resident watcher-fresh index, with no project configuration.",
+    "developerName": "GliderMCP",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive"
+    ],
+    "websiteURL": "https://glidermcp.com/scout",
+    "defaultPrompt": [
+      "Use Scout to search this repository for the relevant code before reading files."
+    ],
+    "screenshots": []
+  }
+}
