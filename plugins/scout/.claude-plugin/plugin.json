@@ -1,20 +1,20 @@
 {
-  "name": "glidermcp",
-  "description": "Connect coding agents to the local GliderMCP C# semantic analysis server.",
+  "name": "scout",
+  "description": "Connect coding agents to the local Scout universal code search MCP server.",
   "author": {
     "name": "GliderMCP",
     "email": "feedback@glidermcp.com",
     "url": "https://glidermcp.com"
   },
-  "homepage": "https://glidermcp.com/glider",
+  "homepage": "https://glidermcp.com/scout",
   "repository": "https://github.com/glidermcp/glidermcp.com",
   "license": "MIT",
   "keywords": [
-    "csharp",
-    "dotnet",
+    "code-search",
     "mcp",
-    "semantic-code-navigation",
-    "roslyn"
+    "grep",
+    "fuzzy-search",
+    "code-intelligence"
   ],
   "skills": "./skills/"
 }

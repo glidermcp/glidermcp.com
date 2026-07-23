@@ -7,7 +7,7 @@
     "email": "feedback@glidermcp.com",
     "url": "https://glidermcp.com"
   },
-  "homepage": "https://glidermcp.com",
+  "homepage": "https://glidermcp.com/glider",
   "repository": "https://github.com/glidermcp/glidermcp.com",
   "license": "MIT",
   "keywords": [
@@ -29,7 +29,7 @@
       "Interactive",
       "Write"
     ],
-    "websiteURL": "https://glidermcp.com",
+    "websiteURL": "https://glidermcp.com/glider",
     "defaultPrompt": [
       "Use GliderMCP to load this C# solution, inspect diagnostics, and navigate symbols semantically before editing."
     ],

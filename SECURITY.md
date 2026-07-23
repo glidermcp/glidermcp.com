@@ -8,6 +8,6 @@ Open a new issue in this repository titled `Security report: <short summary>` wi
 
 Include:
 
-- affected product (`glider`, `glider-trace`, `tglider`, `glidermcp-web`)
+- affected product (`glider`, `glider-trace`, `tglider`, `scout`, `glidermcp-web`)
 - affected version
 - high-level impact

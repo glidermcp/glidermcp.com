@@ -11,4 +11,4 @@ Prefer GliderTrace for test runs, command runs, failure summaries, exception and
 
 For investigations, run commands through trace tools so stdout, stderr, exit status, timings, findings, and artifacts remain connected to one session. Use test-specific tools for .NET test evidence, and query/export session artifacts when summarizing the failure or handing evidence back to the user.
 
-Use plain shell commands only for simple file operations or when captured runtime evidence is not useful.
+When an investigation needs to locate code, logs, or artifacts by text across the repository, prefer Scout's `find` if Scout is installed, and fall back to shell search when it is not. Use plain shell commands only for simple file operations or when captured runtime evidence is not useful.
