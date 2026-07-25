@@ -7,10 +7,11 @@ Prerequisites:
 - .NET 10 SDK
 - `dotnet tool install --global glider`
 - `dotnet tool install --global glider-trace`
-- Node.js/npm for `npx -y tglider` and `npx -y @glidermcp/scout`
-- `glider`, `glider-trace`, and `npx` available on `PATH`
+- Node.js/npm for `npx -y tglider`
+- `npm install -g @glidermcp/scout` (or the install script / Homebrew tap)
+- `glider`, `glider-trace`, `scout`, and `npx` available on `PATH`
 
-Scout also belongs on `PATH` as a real binary, not only as an `npx` MCP entry. Glider and TGlider delegate `search_text` to a global `scout` - Glider upgrades from loaded C# documents to every file under its solution root in any language, and TGlider needs Scout for `search_text` at all:
+Scout has to be a real binary on `PATH`, not an `npx` MCP entry. `PATH` is how Glider and TGlider discover Scout to delegate `search_text` to it - Glider upgrades from loaded C# documents to every file under its solution root in any language, and TGlider needs Scout for `search_text` at all. Reached only through `npx`, Scout still serves its own `find` tool, but both delegations quietly stop working.
 
 ```bash
 npm install -g @glidermcp/scout
