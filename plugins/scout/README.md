@@ -20,4 +20,8 @@ An `npx -y @glidermcp/scout` entry runs Scout fine on its own, but it leaves no 
 
 A global install also keeps one Scout version in play. An `npx` entry resolves the latest published version on each start, which can drift from whatever binary Glider federates to.
 
-The install script does not edit `PATH`. If `~/.local/bin` is not already on it, add it, or point at the binary with `SCOUT_BINARY_PATH`. Turn the delegation off with `--no-scout` or `GLIDERMCP_NO_SCOUT=1`.
+The install script does not edit `PATH`. If `~/.local/bin` is not already on your agent client's `PATH`, add it — this plugin launches the literal command `scout`, so a binary the client cannot find fails to start regardless of anything else. If you would rather not touch `PATH`, set the plugin's MCP `command` to the binary's absolute path instead.
+
+`SCOUT_BINARY_PATH` does not substitute for either: Glider and TGlider read it to locate Scout for delegation, but it is not consulted when your client spawns this plugin's own server. Use it for delegation-only setups, where Scout is not configured as an MCP server at all.
+
+Turn the delegation off with `--no-scout` or `GLIDERMCP_NO_SCOUT=1`.
