@@ -17,7 +17,7 @@ startup_timeout_sec = 30
 tool_timeout_sec = 1200
 
 [mcp_servers.scout]
-command = "npx"
-args = ["-y", "@glidermcp/scout"]
+command = "scout"
+args = []
 startup_timeout_sec = 30
 tool_timeout_sec = 60

@@ -41,6 +41,17 @@ This repository ships root-level marketplace and config assets for agent clients
 - `install/claude-code/.mcp.json` - direct Claude Code project config template.
 - `install/codex/config.toml` - direct Codex global config snippet.
 
+Every plugin launches a server that must already be on `PATH`:
+
+```bash
+dotnet tool install --global glider          # glidermcp plugin
+dotnet tool install --global glider-trace    # glider-trace plugin
+npm install -g @glidermcp/scout              # scout plugin
+# tglider runs via npx and needs only Node.js/npm
+```
+
+Scout in particular has to be a real binary rather than an `npx` entry: `PATH` is how Glider and TGlider find it to delegate `search_text`. See `plugins/scout/README.md`.
+
 Claude Code plugin install:
 
 ```bash

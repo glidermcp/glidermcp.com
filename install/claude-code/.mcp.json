@@ -24,11 +24,8 @@
       ]
     },
     "scout": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@glidermcp/scout"
-      ]
+      "command": "scout",
+      "args": []
     }
   }
 }
