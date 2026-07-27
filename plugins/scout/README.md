@@ -16,12 +16,12 @@ The bundled MCP config starts Scout over stdio with `"command": "scout"` and no 
 
 ## Why a real binary and not `npx`
 
-An `npx -y @glidermcp/scout` entry runs Scout fine on its own, but it leaves no `scout` binary on `PATH` - and `PATH` is how Glider and TGlider discover Scout to delegate `search_text` to it. With Scout reachable only through `npx` you get Scout's `find` tool and nothing else: Glider's `search_text` silently stays on loaded C# documents instead of covering every file under its solution root in any language, and TGlider's `search_text` fails outright with a `scout_not_installed` hint.
+This plugin launches the literal command `scout`, so the client has to find a binary of that name on `PATH`; an `npx -y @glidermcp/scout` entry leaves none behind and the server simply fails to start.
 
-A global install also keeps one Scout version in play. An `npx` entry resolves the latest published version on each start, which can drift from whatever binary Glider federates to.
+TGlider needs one on `PATH` for a second reason: its `search_text` delegates to Scout and returns a `scout_not_installed` hint without it. Glider does not - its `search_text` searches the documents its own workspace has loaded and never calls Scout ([adr-007](https://github.com/rexsacrorum/glider/blob/main/docs/adr/adr-007-text-search-ownership.md)).
 
-The install script does not edit `PATH`. If `~/.local/bin` is not already on your agent client's `PATH`, add it — this plugin launches the literal command `scout`, so a binary the client cannot find fails to start regardless of anything else. If you would rather not touch `PATH`, set the plugin's MCP `command` to the binary's absolute path instead.
+A global install also keeps one Scout version in play, starts faster than re-resolving the package on every launch, and keeps a single index cache. An `npx` entry resolves the latest published version on each start.
 
-`SCOUT_BINARY_PATH` does not substitute for either: Glider and TGlider read it to locate Scout for delegation, but it is not consulted when your client spawns this plugin's own server. Use it for delegation-only setups, where Scout is not configured as an MCP server at all.
+The install script does not edit `PATH`. If `~/.local/bin` is not already on your agent client's `PATH`, add it — or, if you would rather not touch `PATH`, set the plugin's MCP `command` to the binary's absolute path instead.
 
-Turn the delegation off with `--no-scout` or `GLIDERMCP_NO_SCOUT=1`.
+`SCOUT_BINARY_PATH` does not substitute for either: TGlider reads it to locate Scout for its own delegation, but it is not consulted when your client spawns this plugin's server. Use it when TGlider needs Scout and you are not configuring Scout as an MCP server at all.

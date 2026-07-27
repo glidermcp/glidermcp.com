@@ -50,7 +50,7 @@ npm install -g @glidermcp/scout              # scout plugin
 # tglider runs via npx and needs only Node.js/npm
 ```
 
-Scout in particular has to be a real binary rather than an `npx` entry: `PATH` is how Glider and TGlider find it to delegate `search_text`. See `plugins/scout/README.md`.
+Scout is launched as the literal command `scout`, so it needs a real binary on `PATH` rather than an `npx` entry. TGlider additionally needs one there for its own `search_text`. See `plugins/scout/README.md`.
 
 Claude Code plugin install:
 
