@@ -11,7 +11,7 @@ Prerequisites:
 - `npm install -g @glidermcp/scout` (or the install script / Homebrew tap)
 - `glider`, `glider-trace`, `scout`, and `npx` available on `PATH`
 
-Scout has to be a real binary on `PATH`, not an `npx` MCP entry. `PATH` is how Glider and TGlider discover Scout to delegate `search_text` to it - Glider upgrades from loaded C# documents to every file under its solution root in any language, and TGlider needs Scout for `search_text` at all. Reached only through `npx`, Scout still serves its own `find` tool, but both delegations quietly stop working.
+Scout is launched as the literal command `scout`, so it needs a real binary on `PATH`; an `npx` MCP entry leaves none behind. TGlider needs one there for a second reason - its `search_text` delegates to Scout and returns a `scout_not_installed` hint without it. Glider does not: its `search_text` searches the documents its own workspace has loaded and never calls Scout.
 
 ```bash
 npm install -g @glidermcp/scout
